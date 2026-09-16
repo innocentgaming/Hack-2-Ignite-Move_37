@@ -1,0 +1,537 @@
+// InternOS Database Schema Foundation (Phase 0)
+// PostgreSQL via Prisma ORM with strict Multi-Tenant Scoping
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Enums
+// ==========================================
+
+enum UserRole {
+  SUPER_ADMIN
+  INSTITUTION_ADMIN
+  FACULTY_SUPERVISOR
+  INDUSTRY_MENTOR
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_VERIFICATION
+  SUSPENDED
+}
+
+enum InternshipStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  ACTIVE
+  UNDER_REVIEW
+  COMPLETED
+  TERMINATED
+}
+
+enum WorkflowStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum TaskStatus {
+  PENDING
+  SUBMITTED
+  CHANGES_REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  ACCEPTED
+  REVISION_NEEDED
+}
+
+enum NotificationType {
+  SYSTEM
+  TASK_ASSIGNED
+  SUBMISSION_RECEIVED
+  REVIEW_SUBMITTED
+  EVALUATION_POSTED
+  DEADLINE_WARNING
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  ACCESS_DENIED
+  EXPORT
+}
+
+// ==========================================
+// 1. Organization (Multi-Tenant Root)
+// ==========================================
+model Organization {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  domain      String?
+  settings    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users             User[]
+  departments       Department[]
+  companies         Company[]
+  internships       Internship[]
+  workflowTemplates WorkflowTemplate[]
+  workflowInstances WorkflowInstance[]
+  workflowTasks     WorkflowTask[]
+  outcomes          Outcome[]
+  submissions       Submission[]
+  reviews           Review[]
+  evaluations       Evaluation[]
+  aiAnalyses        AIAnalysis[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  documents         Document[]
+
+  @@index([code])
+}
+
+// ==========================================
+// 2. Department
+// ==========================================
+model Department {
+  id             String       @id @default(uuid())
+  organizationId String
+  code           String
+  name           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users          User[]
+  studentProfiles StudentProfile[]
+  facultyProfiles FacultyProfile[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+}
+
+// ==========================================
+// 3. User
+// ==========================================
+model User {
+  id             String       @id @default(uuid())
+  organizationId String
+  departmentId   String?
+  email          String
+  passwordHash   String
+  firstName      String
+  lastName       String
+  role           UserRole
+  status         UserStatus   @default(ACTIVE)
+  lastLoginAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  department     Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  studentProfile StudentProfile?
+  facultyProfile FacultyProfile?
+  mentorProfile  MentorProfile?
+
+  reviews           Review[]
+  evaluations       Evaluation[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  uploadedDocuments Document[]
+
+  @@unique([organizationId, email])
+  @@index([organizationId, role])
+  @@index([email])
+}
+
+// ==========================================
+// 4. StudentProfile
+// ==========================================
+model StudentProfile {
+  id           String       @id @default(uuid())
+  userId       String       @unique
+  departmentId String?
+  rollNumber   String
+  batchYear    Int
+  cgpa         Float?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department   Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  internships  Internship[]
+  submissions  Submission[]
+
+  @@index([rollNumber])
+}
+
+// ==========================================
+// 5. FacultyProfile
+// ==========================================
+model FacultyProfile {
+  id           String       @id @default(uuid())
+  userId       String       @unique
+  departmentId String?
+  designation  String
+  employeeId   String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department   Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  internships  Internship[]
+
+  @@index([employeeId])
+}
+
+// ==========================================
+// 6. MentorProfile
+// ==========================================
+model MentorProfile {
+  id           String       @id @default(uuid())
+  userId       String       @unique
+  companyId    String
+  designation  String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  internships  Internship[]
+
+  @@index([companyId])
+}
+
+// ==========================================
+// 7. Company
+// ==========================================
+model Company {
+  id             String          @id @default(uuid())
+  organizationId String
+  name           String
+  industry       String
+  website        String?
+  isVerified     Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  mentors        MentorProfile[]
+  internships    Internship[]
+
+  @@index([organizationId, name])
+}
+
+// ==========================================
+// 8. Internship
+// ==========================================
+model Internship {
+  id             String           @id @default(uuid())
+  organizationId String
+  studentId      String
+  companyId      String
+  facultyId      String?
+  mentorId       String?
+  title          String
+  type           String           @default("FULL_TIME")
+  status         InternshipStatus @default(DRAFT)
+  startDate      DateTime
+  endDate        DateTime
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  student        StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  company        Company          @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  faculty        FacultyProfile?  @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  mentor         MentorProfile?   @relation(fields: [mentorId], references: [id], onDelete: SetNull)
+
+  workflowInstance WorkflowInstance?
+  documents        Document[]
+
+  @@index([organizationId, status])
+  @@index([studentId])
+}
+
+// ==========================================
+// 9. WorkflowTemplate
+// ==========================================
+model WorkflowTemplate {
+  id             String             @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  stepsConfig    Json
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  instances      WorkflowInstance[]
+
+  @@index([organizationId])
+}
+
+// ==========================================
+// 10. WorkflowInstance
+// ==========================================
+model WorkflowInstance {
+  id             String           @id @default(uuid())
+  organizationId String
+  internshipId   String           @unique
+  templateId     String
+  status         WorkflowStatus   @default(NOT_STARTED)
+  progress       Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  internship     Internship       @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  template       WorkflowTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  tasks          WorkflowTask[]
+
+  @@index([organizationId, status])
+}
+
+// ==========================================
+// 11. WorkflowTask
+// ==========================================
+model WorkflowTask {
+  id             String           @id @default(uuid())
+  organizationId String
+  instanceId     String
+  title          String
+  stage          String
+  status         TaskStatus       @default(PENDING)
+  dueDate        DateTime?
+  assigneeRole   UserRole         @default(STUDENT)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  instance       WorkflowInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  submissions    Submission[]
+
+  @@index([organizationId, status])
+  @@index([instanceId])
+}
+
+// ==========================================
+// 12. Outcome
+// ==========================================
+model Outcome {
+  id             String           @id @default(uuid())
+  organizationId String
+  code           String
+  name           String
+  description    String?
+  bloomLevel     String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  versions       OutcomeVersion[]
+  evaluations    Evaluation[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+}
+
+// ==========================================
+// 13. OutcomeVersion
+// ==========================================
+model OutcomeVersion {
+  id            String   @id @default(uuid())
+  outcomeId     String
+  versionNumber Int
+  rubric        Json
+  createdAt     DateTime @default(now())
+
+  outcome       Outcome  @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+
+  @@unique([outcomeId, versionNumber])
+  @@index([outcomeId])
+}
+
+// ==========================================
+// 14. Submission
+// ==========================================
+model Submission {
+  id             String           @id @default(uuid())
+  organizationId String
+  taskId         String
+  studentId      String
+  title          String
+  content        String?
+  status         SubmissionStatus @default(SUBMITTED)
+  submittedAt    DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  task           WorkflowTask     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  student        StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  reviews        Review[]
+  evaluations    Evaluation[]
+  aiAnalyses     AIAnalysis[]
+  documents      Document[]
+
+  @@index([organizationId, status])
+  @@index([taskId])
+  @@index([studentId])
+}
+
+// ==========================================
+// 15. Review
+// ==========================================
+model Review {
+  id             String       @id @default(uuid())
+  organizationId String
+  submissionId   String
+  reviewerId     String
+  feedback       String
+  score          Float?
+  status         String       @default("COMPLETED")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  submission     Submission   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviewer       User         @relation(fields: [reviewerId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([submissionId])
+}
+
+// ==========================================
+// 16. Evaluation
+// ==========================================
+model Evaluation {
+  id             String       @id @default(uuid())
+  organizationId String
+  submissionId   String
+  outcomeId      String
+  evaluatorId    String
+  rubricScores   Json
+  finalGrade     String?
+  comments       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  submission     Submission   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  outcome        Outcome      @relation(fields: [outcomeId], references: [id], onDelete: Restrict)
+  evaluator      User         @relation(fields: [evaluatorId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([submissionId])
+}
+
+// ==========================================
+// 17. AIAnalysis (Schema Foundation for Future Phase)
+// ==========================================
+model AIAnalysis {
+  id             String       @id @default(uuid())
+  organizationId String
+  submissionId   String
+  analysisType   String
+  status         String       @default("PENDING")
+  score          Float?
+  insights       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  submission     Submission   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([submissionId])
+}
+
+// ==========================================
+// 18. Notification
+// ==========================================
+model Notification {
+  id             String           @id @default(uuid())
+  organizationId String
+  userId         String
+  title          String
+  message        String
+  type           NotificationType @default(SYSTEM)
+  isRead         Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, userId, isRead])
+}
+
+// ==========================================
+// 19. AuditLog
+// ==========================================
+model AuditLog {
+  id             String       @id @default(uuid())
+  organizationId String
+  actorId        String?
+  action         AuditAction
+  entity         String
+  entityId       String?
+  details        Json?
+  ipAddress      String?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor          User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, action])
+  @@index([entity, entityId])
+}
+
+// ==========================================
+// 20. Document
+// ==========================================
+model Document {
+  id             String       @id @default(uuid())
+  organizationId String
+  uploaderId     String
+  internshipId   String?
+  submissionId   String?
+  name           String
+  mimeType       String
+  size           Int
+  storageKey     String
+  url            String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  uploader       User         @relation(fields: [uploaderId], references: [id], onDelete: Restrict)
+  internship     Internship?  @relation(fields: [internshipId], references: [id], onDelete: SetNull)
+  submission     Submission?  @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@index([uploaderId])
+}

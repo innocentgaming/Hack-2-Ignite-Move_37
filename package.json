@@ -1,0 +1,24 @@
+{
+  "name": "internos-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "InternOS - Multi-tenant Smart Internship Management and Monitoring System",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "dev:api": "npm run dev --workspace=@internos/api",
+    "dev:web": "npm run dev --workspace=@internos/web",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "prisma:generate": "npm run generate --workspace=@internos/prisma",
+    "prisma:migrate": "npm run migrate --workspace=@internos/prisma",
+    "prisma:seed": "npm run seed --workspace=@internos/prisma",
+    "prisma:studio": "npm run studio --workspace=@internos/prisma"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
