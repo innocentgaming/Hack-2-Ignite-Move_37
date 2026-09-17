@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '../../services/apiClient';
-import { TaskItemDto, TaskStatus } from '@internos/types';
+import { TaskItemDto, TaskStatus, SubmissionStatus } from '@internos/types';
 import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { LoadingSkeleton } from '../../components/LoadingSkeleton';
-import { Clock, ArrowRight, Target, GitBranch } from 'lucide-react';
+import { Clock, ArrowRight, Target, GitBranch, CheckCircle2 } from 'lucide-react';
 
 export const StudentTasksPage: React.FC = () => {
   const [tasks, setTasks] = useState<TaskItemDto[]>([]);
@@ -154,13 +154,45 @@ export const StudentTasksPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Link to={`/app/student/tasks/${task.id}`}>
-                    <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs">
-                      <span>{isSubmitted ? 'View Submission' : 'Open Task'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Button>
-                  </Link>
+                <div className="flex items-center gap-2.5">
+                  {task.latestSubmission ? (
+                    task.latestSubmission.status === SubmissionStatus.ACCEPTED || isApproved ? (
+                      <Link to={`/app/student/submissions/${task.latestSubmission.id}`}>
+                        <Button variant="secondary" size="sm" className="whitespace-nowrap gap-1.5 text-xs text-emerald-700 bg-emerald-50 border-emerald-200">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>View Submission</span>
+                        </Button>
+                      </Link>
+                    ) : task.latestSubmission.status === SubmissionStatus.REVISION_NEEDED || isChanges ? (
+                      <Link to={`/app/student/submissions/${task.latestSubmission.id}`}>
+                        <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs bg-rose-600 hover:bg-rose-700 border-rose-600">
+                          <span>Review & Resubmit</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    ) : task.latestSubmission.status === SubmissionStatus.DRAFT ? (
+                      <Link to={`/app/student/tasks/${task.id}/submit`}>
+                        <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 border-amber-600">
+                          <span>Continue Submission</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link to={`/app/student/submissions/${task.latestSubmission.id}`}>
+                        <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs">
+                          <span>View Submission</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    )
+                  ) : (
+                    <Link to={`/app/student/tasks/${task.id}`}>
+                      <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs">
+                        <span>Open Task</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </Card>
             );

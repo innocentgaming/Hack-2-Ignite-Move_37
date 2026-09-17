@@ -388,10 +388,16 @@ export const StudentOverviewPage: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {recentSubmissions.map((s: any) => (
-                <div key={s.id} className="p-3.5 rounded-xl border border-slate-200 space-y-2">
+                <Link
+                  key={s.id}
+                  to={`/app/student/submissions/${s.id}`}
+                  className="block p-3.5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-slate-50/50 transition-all space-y-2 group"
+                >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className="font-bold text-xs text-slate-900">{s.submissionTitle}</h4>
+                      <h4 className="font-bold text-xs text-slate-900 group-hover:text-indigo-600 transition-colors">
+                        {s.submissionTitle}
+                      </h4>
                       <p className="text-[11px] text-slate-500">Task: {s.taskTitle}</p>
                     </div>
                     <Badge
@@ -418,7 +424,7 @@ export const StudentOverviewPage: React.FC = () => {
                   ) : (
                     <span className="text-[11px] text-slate-400 italic">Pending mentor review</span>
                   )}
-                </div>
+                </Link>
               ))}
             </div>
           )}

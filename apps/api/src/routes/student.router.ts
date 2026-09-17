@@ -26,8 +26,16 @@ studentRouter.post('/tasks/:id/submissions', studentController.submitTaskEvidenc
 
 studentRouter.get('/submissions', studentController.getSubmissions.bind(studentController));
 studentRouter.get('/submissions/:id', studentController.getSubmissionById.bind(studentController));
+studentRouter.patch('/submissions/:id', studentController.updateSubmission.bind(studentController));
+studentRouter.post('/submissions/:id/resubmit', studentController.updateSubmission.bind(studentController));
 
 studentRouter.get('/outcomes', studentController.getOutcomes.bind(studentController));
 studentRouter.get('/feedback', studentController.getFeedback.bind(studentController));
+
 studentRouter.get('/documents', studentController.getDocuments.bind(studentController));
+studentRouter.get('/documents/:id', studentController.getDocumentById.bind(studentController));
+studentRouter.get('/documents/:id/view', studentController.viewDocument.bind(studentController));
+studentRouter.get('/documents/:id/download', studentController.downloadDocument.bind(studentController));
+studentRouter.post('/documents', studentController.uploadDocument.bind(studentController));
+
 studentRouter.get('/profile', studentController.getProfile.bind(studentController));

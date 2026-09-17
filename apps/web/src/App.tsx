@@ -36,7 +36,9 @@ import { StudentSubmissionsPage } from './pages/student/StudentSubmissionsPage';
 import { StudentSubmissionDetailPage } from './pages/student/StudentSubmissionDetailPage';
 import { StudentOutcomesPage } from './pages/student/StudentOutcomesPage';
 import { StudentFeedbackPage } from './pages/student/StudentFeedbackPage';
+import { StudentSubmitEvidencePage } from './pages/student/StudentSubmitEvidencePage';
 import { StudentDocumentsPage } from './pages/student/StudentDocumentsPage';
+import { StudentDocumentViewerPage } from './pages/student/StudentDocumentViewerPage';
 import { StudentProfilePage } from './pages/student/StudentProfilePage';
 
 // Mentor Workspace Pages
@@ -95,14 +97,18 @@ export const App: React.FC = () => {
               <Route path="student/milestones" element={<StudentMilestonesPage />} />
               <Route path="student/milestones/:id" element={<StudentMilestoneDetailPage />} />
               <Route path="student/tasks" element={<StudentTasksPage />} />
+              <Route path="student/tasks/:taskId" element={<StudentTaskDetailPage />} />
+              <Route path="student/tasks/:taskId/submit" element={<StudentSubmitEvidencePage />} />
               <Route path="student/tasks/:id" element={<StudentTaskDetailPage />} />
               <Route path="student/submissions" element={<StudentSubmissionsPage />} />
+              <Route path="student/submissions/:submissionId" element={<StudentSubmissionDetailPage />} />
               <Route path="student/submissions/:id" element={<StudentSubmissionDetailPage />} />
               <Route path="student/outcomes" element={<StudentOutcomesPage />} />
               <Route path="student/feedback" element={<StudentFeedbackPage />} />
               <Route path="student/documents" element={<StudentDocumentsPage />} />
+              <Route path="student/documents/:documentId/view" element={<StudentDocumentViewerPage />} />
+              <Route path="student/documents/:id/view" element={<StudentDocumentViewerPage />} />
               <Route path="student/profile" element={<StudentProfilePage />} />
-              <Route path="student/*" element={<Navigate to="/app/student" replace />} />
 
               {/* Mentor Dedicated Routes */}
               <Route path="mentor" element={<MentorOverviewPage />} />

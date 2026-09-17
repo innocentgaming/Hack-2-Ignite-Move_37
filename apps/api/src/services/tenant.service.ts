@@ -202,8 +202,8 @@ class TenantStore {
       name: 'Offer_Letter_OrgA.pdf',
       mimeType: 'application/pdf',
       size: 1048576,
-      storageKey: 'org-a/docs/offer.pdf',
-      url: '/uploads/org-a/offer.pdf',
+      storageKey: 'org-a-id/Offer_Letter_OrgA.pdf',
+      url: '/api/v1/student/documents/doc-a-1/view',
       createdAt: new Date(),
       updatedAt: new Date(),
     });

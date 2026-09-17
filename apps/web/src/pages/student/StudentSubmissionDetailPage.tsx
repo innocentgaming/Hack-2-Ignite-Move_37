@@ -17,18 +17,19 @@ import {
 } from 'lucide-react';
 
 export const StudentSubmissionDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { submissionId, id } = useParams<{ submissionId?: string; id?: string }>();
+  const effectiveSubId = submissionId || id;
   const [sub, setSub] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDetail = async () => {
-      if (!id) return;
+      if (!effectiveSubId) return;
       try {
         setLoading(true);
         setError(null);
-        const res = await apiClient.get<any>(`/api/v1/student/submissions/${id}`);
+        const res = await apiClient.get<any>(`/api/v1/student/submissions/${effectiveSubId}`);
         if (res.success && res.data) {
           setSub(res.data);
         } else {
@@ -42,7 +43,7 @@ export const StudentSubmissionDetailPage: React.FC = () => {
     };
 
     fetchDetail();
-  }, [id]);
+  }, [effectiveSubId]);
 
   if (loading) {
     return (
@@ -197,6 +198,40 @@ export const StudentSubmissionDetailPage: React.FC = () => {
           )}
         </div>
 
+        {/* Previous Review History */}
+        {sub.history && sub.history.length > 0 && (
+          <div className="pt-4 border-t border-slate-100 space-y-3">
+            <h4 className="font-bold text-slate-900 uppercase tracking-wider text-slate-400 text-xs">
+              Previous Revision History & Feedback Ledger
+            </h4>
+            <div className="space-y-3">
+              {sub.history.map((h: any, idx: number) => (
+                <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-800">
+                      Revision #{idx + 1}: {h.title}
+                    </span>
+                    <Badge variant="slate" size="sm">
+                      {h.status}
+                    </Badge>
+                  </div>
+                  {h.evidenceUrl && (
+                    <p className="text-[11px] font-mono text-slate-600 truncate">
+                      Evidence URL: {h.evidenceUrl}
+                    </p>
+                  )}
+                  {h.mentorFeedback && (
+                    <div className="p-2.5 bg-rose-50/70 border border-rose-200 rounded-lg text-rose-900">
+                      <span className="font-bold block text-[11px]">Mentor Feedback on this Revision:</span>
+                      <p className="mt-0.5">{h.mentorFeedback}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Revision Action */}
         {isRevision && (
           <div className="p-4 bg-rose-50/50 rounded-2xl border border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -204,8 +239,8 @@ export const StudentSubmissionDetailPage: React.FC = () => {
               <h4 className="font-bold text-xs text-rose-900">Mentor Requested Revisions</h4>
               <p className="text-xs text-rose-700">Update your code or documentation to resolve the feedback above and resubmit.</p>
             </div>
-            <Link to={`/app/student/tasks/${sub.taskId}`}>
-              <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs">
+            <Link to={`/app/student/tasks/${sub.taskId}/submit?resubmit=true`}>
+              <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs bg-rose-600 hover:bg-rose-700 border-rose-600">
                 <span>Resubmit Evidence</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Button>

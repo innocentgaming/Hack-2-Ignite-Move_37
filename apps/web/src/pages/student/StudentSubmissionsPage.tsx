@@ -12,7 +12,7 @@ import {
   ArrowRight,
   MessageSquare,
   ExternalLink,
-  PlusCircle,
+  CheckSquare,
 } from 'lucide-react';
 
 export const StudentSubmissionsPage: React.FC = () => {
@@ -62,8 +62,8 @@ export const StudentSubmissionsPage: React.FC = () => {
         </div>
         <Link to="/app/student/tasks">
           <Button variant="primary" size="sm" className="gap-1.5 shadow-xs">
-            <PlusCircle className="w-4 h-4" />
-            <span>Submit for a Task</span>
+            <CheckSquare className="w-4 h-4" />
+            <span>View Assigned Tasks</span>
           </Button>
         </Link>
       </div>
@@ -188,8 +188,8 @@ export const StudentSubmissionsPage: React.FC = () => {
                   </span>
                   <div className="flex items-center gap-2">
                     {isRevisionNeeded && (
-                      <Link to={`/app/student/tasks/${sub.taskId}`}>
-                        <Button variant="primary" size="sm" className="text-xs gap-1.5">
+                      <Link to={`/app/student/tasks/${sub.taskId}/submit?resubmit=true`}>
+                        <Button variant="primary" size="sm" className="text-xs gap-1.5 bg-rose-600 hover:bg-rose-700 border-rose-600">
                           <span>Submit Revision</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </Button>

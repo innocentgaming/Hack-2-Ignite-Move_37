@@ -22,12 +22,17 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
 
   try {
     const authHeader = req.headers.authorization;
+    let token: string | undefined;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('Missing or malformed Authorization header');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else if (typeof req.query.token === 'string') {
+      token = req.query.token;
     }
 
-    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedError('Missing or malformed Authorization token');
+    }
 
     if (!token || isTokenRevoked(token)) {
       throw new UnauthorizedError('Token has been revoked or is invalid');

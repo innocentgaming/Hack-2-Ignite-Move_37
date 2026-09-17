@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { studentMentorService } from '../services/student-mentor.service.js';
-import { formatSuccessResponse } from '@internos/shared';
+import { formatSuccessResponse, ValidationError } from '@internos/shared';
 
 export class StudentController {
   async getDashboard(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -98,6 +98,16 @@ export class StudentController {
     }
   }
 
+  async updateSubmission(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const data = await studentMentorService.updateStudentSubmission(req.user!.organizationId, req.user!, id, req.body);
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async getOutcomes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await studentMentorService.getStudentOutcomes(req.user!.organizationId, req.user!);
@@ -120,6 +130,59 @@ export class StudentController {
     try {
       const data = await studentMentorService.getStudentDocuments(req.user!.organizationId, req.user!);
       res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getDocumentById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const data = await studentMentorService.getStudentDocumentById(req.user!.organizationId, req.user!, id);
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async viewDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const fileData = await studentMentorService.getStudentDocumentFile(req.user!.organizationId, req.user!, id);
+      res.setHeader('Content-Type', fileData.mimeType);
+      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(fileData.filename)}"`);
+      res.send(fileData.buffer);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async downloadDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const fileData = await studentMentorService.getStudentDocumentFile(req.user!.organizationId, req.user!, id);
+      res.setHeader('Content-Type', fileData.mimeType);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileData.filename)}"`);
+      res.send(fileData.buffer);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async uploadDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { filename, mimeType, contentBase64, documentType } = req.body;
+      if (!filename || !contentBase64) {
+        throw new ValidationError('Filename and base64 encoded document content are required');
+      }
+      const buffer = Buffer.from(contentBase64, 'base64');
+      const data = await studentMentorService.uploadStudentDocument(req.user!.organizationId, req.user!, {
+        filename,
+        mimeType: mimeType || 'application/pdf',
+        buffer,
+        documentType,
+      });
+      res.status(201).json(formatSuccessResponse(data));
     } catch (err) {
       next(err);
     }
