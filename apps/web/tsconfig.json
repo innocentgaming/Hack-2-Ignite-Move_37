@@ -17,7 +17,11 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@internos/types": ["../../packages/types/src/index.ts"],
+      "@internos/types/*": ["../../packages/types/src/*"],
+      "@internos/shared": ["../../packages/shared/src/index.ts"],
+      "@internos/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "include": ["src"]

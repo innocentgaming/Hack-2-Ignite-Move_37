@@ -7,6 +7,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@internos/types': path.resolve(__dirname, '../../packages/types/src/index.ts'),
+      '@internos/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
   },
   server: {
