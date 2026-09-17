@@ -28,8 +28,10 @@ export enum InternshipStatus {
   PENDING_APPROVAL = 'PENDING_APPROVAL',
   APPROVED = 'APPROVED',
   ACTIVE = 'ACTIVE',
-  UNDER_REVIEW = 'UNDER_REVIEW',
+  READY_FOR_COMPLETION = 'READY_FOR_COMPLETION',
   COMPLETED = 'COMPLETED',
+  REJECTED = 'REJECTED',
+  CANCELLED = 'CANCELLED',
   TERMINATED = 'TERMINATED',
 }
 
@@ -91,6 +93,17 @@ export enum AuditAction {
   WORKFLOW_ASSIGNED = 'WORKFLOW_ASSIGNED',
   TASK_SUBMITTED = 'TASK_SUBMITTED',
   TASK_EXTENDED = 'TASK_EXTENDED',
+  // Phase 4 actions
+  INTERNSHIP_CREATE = 'INTERNSHIP_CREATE',
+  INTERNSHIP_UPDATE = 'INTERNSHIP_UPDATE',
+  INTERNSHIP_SUBMIT = 'INTERNSHIP_SUBMIT',
+  INTERNSHIP_APPROVE = 'INTERNSHIP_APPROVE',
+  INTERNSHIP_REJECT = 'INTERNSHIP_REJECT',
+  INTERNSHIP_STATE_TRANSITION = 'INTERNSHIP_STATE_TRANSITION',
+  INTERNSHIP_ASSIGN_FACULTY = 'INTERNSHIP_ASSIGN_FACULTY',
+  INTERNSHIP_ASSIGN_MENTOR = 'INTERNSHIP_ASSIGN_MENTOR',
+  OUTCOME_VERSION_CREATE = 'OUTCOME_VERSION_CREATE',
+  COMPANY_CREATE = 'COMPANY_CREATE',
 }
 
 // ==========================================
@@ -687,4 +700,145 @@ export interface GrantExtensionDto {
   reason: string;
 }
 
+// ==========================================
+// Phase 4: Internship Registration & Lifecycle DTOs
+// ==========================================
 
+export enum OutcomeStatus {
+  PLANNED = 'PLANNED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  MET = 'MET',
+  UNMET = 'UNMET',
+}
+
+export interface ExpectedOutcomeDto {
+  id: string;
+  title: string;
+  description?: string;
+  expectedEvidence: string;
+  status: OutcomeStatus;
+}
+
+export interface OutcomeVersionDto {
+  id: string;
+  internshipId: string;
+  versionNumber: number;
+  outcomes: ExpectedOutcomeDto[];
+  updatedBy: string;
+  createdAt: string;
+}
+
+export interface CompanyDto {
+  id: string;
+  organizationId: string;
+  name: string;
+  industry: string;
+  website?: string;
+  address?: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCompanyDto {
+  name: string;
+  industry: string;
+  website?: string;
+  address?: string;
+}
+
+export interface MentorInfoDto {
+  name: string;
+  email: string;
+  designation: string;
+  phone?: string;
+}
+
+export interface InternshipRegistrationDto {
+  title: string;
+  role?: string;
+  internshipType: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  companyId?: string;
+  newCompany?: CreateCompanyDto;
+  mentor?: MentorInfoDto;
+  expectedOutcomes: Array<{
+    title: string;
+    description?: string;
+    expectedEvidence: string;
+  }>;
+}
+
+export interface UpdateInternshipRegistrationDto {
+  title?: string;
+  role?: string;
+  internshipType?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  companyId?: string;
+  mentor?: MentorInfoDto;
+  expectedOutcomes?: ExpectedOutcomeDto[];
+}
+
+export interface StateTransitionDto {
+  targetStatus: InternshipStatus;
+  reason?: string;
+}
+
+export interface ApprovalDecisionDto {
+  approved: boolean;
+  reason?: string;
+}
+
+export interface AssignFacultyDto {
+  facultyId: string;
+  facultyName?: string;
+}
+
+export interface AssignMentorDto {
+  mentorId?: string;
+  mentorName: string;
+  mentorEmail: string;
+  designation: string;
+  phone?: string;
+}
+
+export interface InternshipDetailsDto {
+  id: string;
+  organizationId: string;
+  studentId: string;
+  studentName?: string;
+  studentEmail?: string;
+  studentRollNumber?: string;
+  departmentId?: string;
+  departmentName?: string;
+  companyId: string;
+  company: CompanyDto;
+  title: string;
+  role?: string;
+  type: string;
+  status: InternshipStatus;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  rejectionReason?: string;
+  facultyId?: string | null;
+  facultyName?: string | null;
+  mentorId?: string | null;
+  mentor?: MentorInfoDto | null;
+  expectedOutcomes: ExpectedOutcomeDto[];
+  outcomeVersion: number;
+  workflowInstanceId?: string | null;
+  stateHistory: Array<{
+    fromStatus: InternshipStatus;
+    toStatus: InternshipStatus;
+    changedBy: string;
+    changedAt: string;
+    reason?: string;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}

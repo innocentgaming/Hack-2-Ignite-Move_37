@@ -45,6 +45,12 @@ export class ValidationError extends AppError {
   }
 }
 
+export class BadRequestError extends AppError {
+  constructor(message: string, details?: unknown) {
+    super(message, 400, 'BAD_REQUEST', details);
+  }
+}
+
 export class TenantViolationError extends AppError {
   constructor(message = 'Cross-tenant access prohibited') {
     super(message, 403, 'TENANT_ISOLATION_VIOLATION');

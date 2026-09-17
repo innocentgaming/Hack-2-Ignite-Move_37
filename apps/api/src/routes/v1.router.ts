@@ -3,6 +3,7 @@ import { authRouter } from './auth.router.js';
 import { tenantRouter } from './tenant.router.js';
 import { adminRouter } from './admin.router.js';
 import { workflowRouter } from './workflow.router.js';
+import { internshipRouter, companyRouter } from './internship.router.js';
 
 const router = Router();
 
@@ -19,5 +20,8 @@ router.use('/auth', authRouter);
 router.use('/tenants', tenantRouter);
 router.use('/admin', adminRouter);
 router.use('/workflows', workflowRouter);
+router.use('/internships', internshipRouter);
+router.use('/companies', companyRouter);
 
 export const v1Router = router;
+

@@ -16,6 +16,8 @@ import { AdminAuditLogsPage } from './pages/AdminAuditLogsPage';
 import { AdminSettingsPage } from './pages/AdminSettingsPage';
 import { AdminWorkflowsPage } from './pages/AdminWorkflowsPage';
 import { TasksPage } from './pages/TasksPage';
+import { InternshipsPage } from './pages/InternshipsPage';
+import { InternshipRegistrationPage } from './pages/InternshipRegistrationPage';
 import { LoadingPage } from './pages/LoadingPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -56,11 +58,14 @@ export const App: React.FC = () => {
               <Route path="admin/settings" element={<AdminSettingsPage />} />
               <Route path="admin/*" element={<DashboardPage />} />
 
+              <Route path="hod/approvals" element={<InternshipsPage />} />
               <Route path="hod/*" element={<DashboardPage />} />
+              <Route path="faculty/reviews" element={<InternshipsPage />} />
               <Route path="faculty/*" element={<DashboardPage />} />
               <Route path="student/*" element={<DashboardPage />} />
               <Route path="mentor/*" element={<DashboardPage />} />
-              <Route path="internships" element={<DashboardPage />} />
+              <Route path="internships" element={<InternshipsPage />} />
+              <Route path="internships/new" element={<InternshipRegistrationPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="submissions" element={<TasksPage />} />
               <Route path="documents" element={<DashboardPage />} />
