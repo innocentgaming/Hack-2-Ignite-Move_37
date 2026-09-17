@@ -8,21 +8,20 @@ import {
   UserRole,
   InternshipDto,
   AdminDashboardMetrics,
-  HODDashboardMetrics,
-  FacultyDashboardMetrics,
-  MentorDashboardMetrics,
 } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
 import { apiClient } from '../services/apiClient';
 import { Link } from 'react-router-dom';
+import { StudentWorkspace } from '../components/workspaces/StudentWorkspace';
+import { FacultyWorkspace } from '../components/workspaces/FacultyWorkspace';
+import { HODWorkspace } from '../components/workspaces/HODWorkspace';
+import { MentorWorkspace } from '../components/workspaces/MentorWorkspace';
 import {
   Briefcase,
   CheckCircle2,
   TrendingUp,
   Sparkles,
   UserPlus,
-  ShieldCheck,
-  FolderArchive,
   BookOpen,
   Copy,
   Check,
@@ -30,6 +29,7 @@ import {
   FileSpreadsheet,
   GraduationCap,
   Award,
+  Eye,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -37,14 +37,15 @@ export const DashboardPage: React.FC = () => {
   const rawRole = user?.role || UserRole.STUDENT;
   const role = normalizeRole(rawRole);
 
-  const [internships, setInternships] = useState<InternshipDto[]>([]);
-  const [departments, setDepartments] = useState<{ id: string; name: string; code: string }[]>([]);
+  // Allow switching preview role for ADMIN
+  const [activeRoleView, setActiveRoleView] = useState<UserRole>(role);
 
-  // Real Dynamic Backend Metrics (Zero fake metrics)
+  useEffect(() => {
+    setActiveRoleView(role);
+  }, [role]);
+
+  const [internships, setInternships] = useState<InternshipDto[]>([]);
   const [adminMetrics, setAdminMetrics] = useState<AdminDashboardMetrics | null>(null);
-  const [hodMetrics, setHodMetrics] = useState<HODDashboardMetrics | null>(null);
-  const [facultyMetrics, setFacultyMetrics] = useState<FacultyDashboardMetrics | null>(null);
-  const [mentorMetrics, setMentorMetrics] = useState<MentorDashboardMetrics | null>(null);
 
   // User Invite Form State
   const [inviteEmail, setInviteEmail] = useState('');
@@ -59,15 +60,6 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     async function loadTenantData() {
       try {
-        const deptRes = await apiClient.get<{ id: string; name: string; code: string }[]>('/api/v1/tenants/departments');
-        if (deptRes.success && deptRes.data) {
-          setDepartments(deptRes.data);
-        }
-      } catch {
-        // ignore
-      }
-
-      try {
         const internRes = await apiClient.get<InternshipDto[]>('/api/v1/tenants/internships');
         if (internRes.success && internRes.data) {
           setInternships(internRes.data);
@@ -76,32 +68,11 @@ export const DashboardPage: React.FC = () => {
         // ignore
       }
 
-      // Fetch Real Metrics based on user role
+      // Fetch Real Metrics if Admin
       if (role === UserRole.ADMIN) {
         try {
           const res = await apiClient.get<AdminDashboardMetrics>('/api/v1/admin/dashboards/admin');
           if (res.success && res.data) setAdminMetrics(res.data);
-        } catch {
-          // ignore
-        }
-      } else if (role === UserRole.HOD) {
-        try {
-          const res = await apiClient.get<HODDashboardMetrics>('/api/v1/admin/dashboards/hod');
-          if (res.success && res.data) setHodMetrics(res.data);
-        } catch {
-          // ignore
-        }
-      } else if (role === UserRole.FACULTY) {
-        try {
-          const res = await apiClient.get<FacultyDashboardMetrics>('/api/v1/admin/dashboards/faculty');
-          if (res.success && res.data) setFacultyMetrics(res.data);
-        } catch {
-          // ignore
-        }
-      } else if (role === UserRole.MENTOR) {
-        try {
-          const res = await apiClient.get<MentorDashboardMetrics>('/api/v1/admin/dashboards/mentor');
-          if (res.success && res.data) setMentorMetrics(res.data);
         } catch {
           // ignore
         }
@@ -190,8 +161,42 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Role Workspace View Switcher for Admins */}
+      {role === UserRole.ADMIN && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+          <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+            <Eye className="w-4 h-4 text-indigo-600" />
+            <span>Workspace View Perspective:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {[UserRole.ADMIN, UserRole.STUDENT, UserRole.FACULTY, UserRole.HOD, UserRole.MENTOR].map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setActiveRoleView(r)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  activeRoleView === r
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Render Role Workspaces */}
+      {activeRoleView === UserRole.STUDENT && <StudentWorkspace />}
+      {activeRoleView === UserRole.FACULTY && <FacultyWorkspace />}
+      {activeRoleView === UserRole.HOD && <HODWorkspace />}
+      {activeRoleView === UserRole.MENTOR && <MentorWorkspace />}
+
       {/* Real Dynamic Metrics: ADMIN DASHBOARD */}
-      {role === UserRole.ADMIN && adminMetrics && (
+      {activeRoleView === UserRole.ADMIN && (
+        <>
+          {adminMetrics && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -283,181 +288,7 @@ export const DashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Real Dynamic Metrics: HOD DASHBOARD */}
-      {role === UserRole.HOD && hodMetrics && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-600" />
-            {hodMetrics.departmentName} Department Telemetry
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Department Students</span>
-                <div className="text-3xl font-black text-slate-900 mt-1">{hodMetrics.totalStudents}</div>
-                <p className="text-xs text-slate-500 mt-1">In {hodMetrics.departmentCode}</p>
-              </CardBody>
-            </Card>
-
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Department Faculty</span>
-                <div className="text-3xl font-black text-slate-900 mt-1">{hodMetrics.totalFaculty}</div>
-                <p className="text-xs text-slate-500 mt-1">Supervisors</p>
-              </CardBody>
-            </Card>
-
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Active Internships</span>
-                <div className="text-3xl font-black text-emerald-600 mt-1">{hodMetrics.activeInternships}</div>
-                <p className="text-xs text-emerald-700 mt-1">Currently Placed</p>
-              </CardBody>
-            </Card>
-
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Unassigned Interns</span>
-                <div className="text-3xl font-black text-amber-600 mt-1">{hodMetrics.unassignedInternsCount}</div>
-                <p className="text-xs text-amber-700 mt-1">Awaiting Placement</p>
-              </CardBody>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* Real Dynamic Metrics: FACULTY DASHBOARD */}
-      {role === UserRole.FACULTY && facultyMetrics && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-indigo-600" />
-            Assigned Supervision Overview
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Supervised Students</span>
-                <div className="text-3xl font-black text-slate-900 mt-1">{facultyMetrics.supervisedStudentsCount}</div>
-                <p className="text-xs text-slate-500 mt-1">In your department</p>
-              </CardBody>
-            </Card>
-
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Active Internships</span>
-                <div className="text-3xl font-black text-emerald-600 mt-1">{facultyMetrics.activeInternshipsCount}</div>
-                <p className="text-xs text-emerald-700 mt-1">Placed in Industry</p>
-              </CardBody>
-            </Card>
-
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Pending Approvals</span>
-                <div className="text-3xl font-black text-indigo-600 mt-1">{facultyMetrics.pendingReviewsCount}</div>
-                <p className="text-xs text-slate-500 mt-1">Awaiting Verification</p>
-              </CardBody>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* Real Dynamic Metrics: MENTOR DASHBOARD */}
-      {role === UserRole.MENTOR && mentorMetrics && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Award className="w-5 h-5 text-indigo-600" />
-            Industry Cohort Overview ({mentorMetrics.companyName})
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Mentored Interns</span>
-                <div className="text-3xl font-black text-indigo-600 mt-1">{mentorMetrics.mentoredInternsCount}</div>
-                <p className="text-xs text-slate-500 mt-1">Assigned from institution</p>
-              </CardBody>
-            </Card>
-
-            <Card hoverable>
-              <CardBody className="p-5">
-                <span className="text-xs font-semibold text-slate-500 uppercase">Company Entity</span>
-                <div className="text-xl font-bold text-slate-900 mt-1">{mentorMetrics.companyName}</div>
-                <p className="text-xs text-emerald-700 mt-1">Verified Corporate Host</p>
-              </CardBody>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* Fallback Metrics Row for Student */}
-      {role === UserRole.STUDENT && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <Card hoverable>
-            <CardBody className="p-5 flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tenant Internships</span>
-                <div className="text-2xl font-bold text-slate-900">{internships.length}</div>
-                <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Strictly isolated to {user?.organizationCode}</span>
-                </div>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                <Briefcase className="w-6 h-6" />
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card hoverable>
-            <CardBody className="p-5 flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Departments</span>
-                <div className="text-2xl font-bold text-slate-900">{departments.length}</div>
-                <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span>{departments.map((d) => d.code).join(', ') || 'Enrolled'}</span>
-                </div>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                <BookOpen className="w-6 h-6" />
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card hoverable>
-            <CardBody className="p-5 flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Security State</span>
-                <div className="text-2xl font-bold text-emerald-600">ISOLATED</div>
-                <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Zero Cross-Tenant Access</span>
-                </div>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card hoverable>
-            <CardBody className="p-5 flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Document Vault</span>
-                <div className="text-2xl font-bold text-slate-900">Protected</div>
-                <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                  <FolderArchive className="w-3.5 h-3.5" />
-                  <span>Scoped to {user?.organizationCode}</span>
-                </div>
-              </div>
-              <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-                <FolderArchive className="w-6 h-6" />
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-      )}
-
-      {/* Role-Specific Shells */}
+      {/* Admin Shell */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column (2 Cols) */}
         <div className="lg:col-span-2 space-y-6">
@@ -627,6 +458,8 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

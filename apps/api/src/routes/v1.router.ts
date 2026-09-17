@@ -4,6 +4,7 @@ import { tenantRouter } from './tenant.router.js';
 import { adminRouter } from './admin.router.js';
 import { workflowRouter } from './workflow.router.js';
 import { internshipRouter, companyRouter } from './internship.router.js';
+import { workspaceRouter } from './workspace.router.js';
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.use('/admin', adminRouter);
 router.use('/workflows', workflowRouter);
 router.use('/internships', internshipRouter);
 router.use('/companies', companyRouter);
+router.use('/workspaces', workspaceRouter);
 
 export const v1Router = router;
 

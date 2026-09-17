@@ -104,6 +104,12 @@ export enum AuditAction {
   INTERNSHIP_ASSIGN_MENTOR = 'INTERNSHIP_ASSIGN_MENTOR',
   OUTCOME_VERSION_CREATE = 'OUTCOME_VERSION_CREATE',
   COMPANY_CREATE = 'COMPANY_CREATE',
+  // Phase 5 actions
+  SUBMISSION_CREATE = 'SUBMISSION_CREATE',
+  SUBMISSION_REVIEW = 'SUBMISSION_REVIEW',
+  MENTOR_CONCERN_RAISE = 'MENTOR_CONCERN_RAISE',
+  EVALUATION_CREATE = 'EVALUATION_CREATE',
+  TERMINATION_REQUEST = 'TERMINATION_REQUEST',
 }
 
 // ==========================================
@@ -672,6 +678,7 @@ export interface WorkflowTaskDto {
   currentDueDate: string;
   isLate: boolean;
   completedAt?: string | null;
+  description?: string;
   evaluationCriteria?: string;
   maxMarks?: number;
   latePolicy: LatePolicyType;
@@ -841,4 +848,167 @@ export interface InternshipDetailsDto {
   }>;
   createdAt: string;
   updatedAt: string;
+}
+
+// ==========================================
+// Phase 5: Role-Specific Workspaces & Reviews DTOs
+// ==========================================
+
+export interface SubmissionDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  taskId: string;
+  studentId: string;
+  studentName?: string;
+  title: string;
+  content: string;
+  documentUrl?: string;
+  evidenceUrls?: string[];
+  status: SubmissionStatus;
+  submittedAt: string;
+  updatedAt: string;
+  reviews: ReviewDto[];
+}
+
+export interface CreateSubmissionDto {
+  internshipId: string;
+  taskId: string;
+  title: string;
+  content: string;
+  documentUrl?: string;
+  evidenceUrls?: string[];
+}
+
+export interface ReviewDto {
+  id: string;
+  organizationId: string;
+  submissionId: string;
+  reviewerId: string;
+  reviewerName: string;
+  reviewerRole: UserRole;
+  feedback: string;
+  score?: number;
+  status: 'ACCEPTED' | 'CHANGES_REQUESTED';
+  createdAt: string;
+}
+
+export interface CreateReviewDto {
+  submissionId: string;
+  feedback: string;
+  score?: number;
+  requestRevision?: boolean;
+}
+
+export interface EvaluationDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  evaluatorId: string;
+  evaluatorName: string;
+  evaluatorRole: UserRole;
+  rubricScores: Record<string, number>;
+  finalGrade: string;
+  comments?: string;
+  createdAt: string;
+}
+
+export interface CreateEvaluationDto {
+  internshipId: string;
+  rubricScores: Record<string, number>;
+  finalGrade: string;
+  comments?: string;
+}
+
+export interface MentorConcernDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  mentorId: string;
+  mentorName: string;
+  reason: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  status: 'OPEN' | 'RESOLVED' | 'ACTIONED';
+  requestedAt: string;
+}
+
+export interface CreateMentorConcernDto {
+  internshipId: string;
+  reason: string;
+  severity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}
+
+export interface AttentionCaseDto {
+  id: string;
+  internshipId: string;
+  studentId: string;
+  studentName: string;
+  companyName: string;
+  reason: string;
+  severity: 'warning' | 'critical';
+  timestamp: string;
+}
+
+export interface StudentWorkspaceDto {
+  internship: InternshipDetailsDto | null;
+  workflowProgress: number;
+  currentTasks: WorkflowTaskDto[];
+  upcomingDeadlines: WorkflowTaskDto[];
+  overdueTasks: WorkflowTaskDto[];
+  recentFeedback: ReviewDto[];
+  outcomeProgress: {
+    total: number;
+    planned: number;
+    inProgress: number;
+    met: number;
+  };
+  submissions: SubmissionDto[];
+}
+
+export interface FacultyWorkspaceDto {
+  assignedInternships: InternshipDetailsDto[];
+  activeInternshipsCount: number;
+  overdueTasks: WorkflowTaskDto[];
+  pendingReviews: SubmissionDto[];
+  attentionCases: AttentionCaseDto[];
+  recentActivity: Array<{
+    id: string;
+    action: string;
+    description: string;
+    timestamp: string;
+  }>;
+}
+
+export interface HODWorkspaceDto {
+  departmentInternships: InternshipDetailsDto[];
+  facultyAssignments: Array<{
+    facultyId: string;
+    facultyName: string;
+    assignedCount: number;
+    activeCount: number;
+  }>;
+  departmentMonitoring: {
+    totalStudents: number;
+    totalInternships: number;
+    active: number;
+    pendingApproval: number;
+    completed: number;
+    overdueCount: number;
+  };
+  attentionCases: AttentionCaseDto[];
+}
+
+export interface MentorWorkspaceDto {
+  assignedStudents: Array<{
+    studentId: string;
+    studentName: string;
+    studentEmail: string;
+    internshipId: string;
+    title: string;
+    status: InternshipStatus;
+  }>;
+  assignedInternships: InternshipDetailsDto[];
+  pendingReviews: SubmissionDto[];
+  recentSubmissions: SubmissionDto[];
+  activeConcerns: MentorConcernDto[];
 }
