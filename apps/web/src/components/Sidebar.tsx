@@ -18,6 +18,8 @@ import {
   Compass,
   UserPlus,
   Activity,
+  FileSpreadsheet,
+  ClipboardList,
 } from 'lucide-react';
 
 interface NavItem {
@@ -135,6 +137,18 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.ADMIN, UserRole.HOD],
     },
     {
+      label: 'Student CSV Import',
+      to: '/app/admin/students/import',
+      icon: FileSpreadsheet,
+      roles: [UserRole.ADMIN],
+    },
+    {
+      label: 'Audit Trail',
+      to: '/app/admin/audit',
+      icon: ClipboardList,
+      roles: [UserRole.ADMIN],
+    },
+    {
       label: 'Workflow Blueprints',
       to: '/app/admin/workflows',
       icon: GitBranch,
@@ -143,7 +157,7 @@ export const Sidebar: React.FC = () => {
 
     // Universal
     { label: 'Document Vault', to: '/app/documents', icon: FolderArchive },
-    { label: 'System Settings', to: '/app/settings', icon: Settings, roles: [UserRole.ADMIN] },
+    { label: 'System Settings', to: '/app/admin/settings', icon: Settings, roles: [UserRole.ADMIN] },
   ];
 
   const visibleItems = navItems.filter((item) => {

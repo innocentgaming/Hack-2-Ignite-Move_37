@@ -9,6 +9,11 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { ActivateAccountPage } from './pages/ActivateAccountPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { AdminDepartmentsPage } from './pages/AdminDepartmentsPage';
+import { AdminUsersPage } from './pages/AdminUsersPage';
+import { AdminStudentImportPage } from './pages/AdminStudentImportPage';
+import { AdminAuditLogsPage } from './pages/AdminAuditLogsPage';
+import { AdminSettingsPage } from './pages/AdminSettingsPage';
 import { LoadingPage } from './pages/LoadingPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -38,7 +43,16 @@ export const App: React.FC = () => {
             <Route path="/app" element={<AppLayout />}>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />
+              
+              {/* Admin Phase 2 Dedicated Pages */}
+              <Route path="admin" element={<DashboardPage />} />
+              <Route path="admin/departments" element={<AdminDepartmentsPage />} />
+              <Route path="admin/users" element={<AdminUsersPage />} />
+              <Route path="admin/students/import" element={<AdminStudentImportPage />} />
+              <Route path="admin/audit" element={<AdminAuditLogsPage />} />
+              <Route path="admin/settings" element={<AdminSettingsPage />} />
               <Route path="admin/*" element={<DashboardPage />} />
+
               <Route path="hod/*" element={<DashboardPage />} />
               <Route path="faculty/*" element={<DashboardPage />} />
               <Route path="student/*" element={<DashboardPage />} />
@@ -47,7 +61,7 @@ export const App: React.FC = () => {
               <Route path="tasks" element={<DashboardPage />} />
               <Route path="submissions" element={<DashboardPage />} />
               <Route path="documents" element={<DashboardPage />} />
-              <Route path="settings" element={<DashboardPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
 
             {/* 404 Fallback */}

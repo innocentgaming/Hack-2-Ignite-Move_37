@@ -145,7 +145,11 @@ export type Permission =
   // Documents
   | 'documents:read'
   | 'documents:upload'
-  | 'documents:manage';
+  | 'documents:manage'
+  // Phase 2: Import, Audit, Settings
+  | 'students:import'
+  | 'audit:read'
+  | 'settings:manage';
 
 export function normalizeRole(role: UserRole | string): UserRole {
   switch (role) {
@@ -200,6 +204,9 @@ const ADMIN_PERMISSIONS: Permission[] = [
   'documents:read',
   'documents:upload',
   'documents:manage',
+  'students:import',
+  'audit:read',
+  'settings:manage',
 ];
 
 const HOD_PERMISSIONS: Permission[] = [

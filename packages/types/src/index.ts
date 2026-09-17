@@ -73,6 +73,18 @@ export enum AuditAction {
   LOGOUT = 'LOGOUT',
   ACCESS_DENIED = 'ACCESS_DENIED',
   EXPORT = 'EXPORT',
+  // Phase 2 actions
+  USER_CREATE = 'USER_CREATE',
+  USER_ROLE_CHANGE = 'USER_ROLE_CHANGE',
+  USER_ACTIVATED = 'USER_ACTIVATED',
+  USER_DEACTIVATED = 'USER_DEACTIVATED',
+  USER_INVITATION_SENT = 'USER_INVITATION_SENT',
+  DEPARTMENT_CREATE = 'DEPARTMENT_CREATE',
+  DEPARTMENT_UPDATE = 'DEPARTMENT_UPDATE',
+  DEPARTMENT_ASSIGN_HOD = 'DEPARTMENT_ASSIGN_HOD',
+  DEPARTMENT_ASSIGNMENT = 'DEPARTMENT_ASSIGNMENT',
+  STUDENTS_CSV_IMPORT = 'STUDENTS_CSV_IMPORT',
+  INSTITUTION_PROFILE_UPDATE = 'INSTITUTION_PROFILE_UPDATE',
 }
 
 // ==========================================
@@ -216,6 +228,242 @@ export interface DocumentDto {
   url: string;
   uploaderId?: string;
   createdAt?: string;
+}
+
+// ==========================================
+// Phase 2: Department Administration DTOs
+// ==========================================
+
+export interface DepartmentDto {
+  id: string;
+  organizationId: string;
+  code: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  hodId?: string | null;
+  hodName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDepartmentDto {
+  code: string;
+  name: string;
+  description?: string;
+  hodId?: string;
+}
+
+export interface UpdateDepartmentDto {
+  code?: string;
+  name?: string;
+  description?: string;
+  isActive?: boolean;
+  hodId?: string | null;
+}
+
+export interface DepartmentStatsDto {
+  departmentId: string;
+  departmentName: string;
+  departmentCode: string;
+  totalStudents: number;
+  totalFaculty: number;
+  activeInternships: number;
+  hodName?: string | null;
+}
+
+// ==========================================
+// Phase 2: User Administration DTOs
+// ==========================================
+
+export interface CreateUserDto {
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  departmentId?: string;
+  studentId?: string; // Roll number if student
+  designation?: string;
+  password?: string;
+}
+
+export interface UpdateUserDto {
+  firstName?: string;
+  lastName?: string;
+  role?: UserRole;
+  departmentId?: string | null;
+  status?: UserStatus;
+}
+
+export interface UserFilterQuery {
+  role?: UserRole;
+  departmentId?: string;
+  status?: UserStatus;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface UserListItemDto {
+  id: string;
+  organizationId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  status: UserStatus;
+  departmentId?: string | null;
+  departmentName?: string | null;
+  studentRollNumber?: string | null;
+  createdAt: string;
+}
+
+// ==========================================
+// Phase 2: CSV Student Import Pipeline DTOs
+// ==========================================
+
+export interface CSVStudentRow {
+  studentId: string; // Roll Number
+  name: string;
+  email: string;
+  department: string; // Department Code or Name
+}
+
+export interface CSVValidationError {
+  rowNumber: number;
+  field: string;
+  value: string;
+  message: string;
+}
+
+export interface CSVImportPreviewResponse {
+  previewToken: string;
+  totalRows: number;
+  validCount: number;
+  invalidCount: number;
+  duplicateCount: number;
+  validRows: (CSVStudentRow & { parsedFirstName: string; parsedLastName: string; departmentId: string })[];
+  invalidRows: { rowNumber: number; raw: Record<string, string>; errors: string[] }[];
+  duplicates: { rowNumber: number; studentId: string; email: string; reason: string }[];
+  errorReport: string[];
+}
+
+export interface CSVImportConfirmRequest {
+  previewToken: string;
+  defaultPassword?: string;
+}
+
+export interface CSVImportResult {
+  importedCount: number;
+  failedCount: number;
+  organizationId: string;
+  importedUserIds: string[];
+  message: string;
+}
+
+// ==========================================
+// Phase 2: Dashboard Metrics DTOs
+// ==========================================
+
+export interface AdminDashboardMetrics {
+  totalStudents: number;
+  totalFaculty: number;
+  totalMentors: number;
+  totalHods: number;
+  totalDepartments: number;
+  activeInternships: number;
+  pendingApprovals: number;
+  departmentBreakdown: {
+    departmentId: string;
+    departmentName: string;
+    departmentCode: string;
+    studentCount: number;
+    facultyCount: number;
+    internshipCount: number;
+  }[];
+}
+
+export interface HODDashboardMetrics {
+  departmentId: string;
+  departmentName: string;
+  departmentCode: string;
+  totalStudents: number;
+  totalFaculty: number;
+  activeInternships: number;
+  pendingApprovals: number;
+  unassignedInternsCount: number;
+}
+
+export interface FacultyDashboardMetrics {
+  facultyId: string;
+  supervisedStudentsCount: number;
+  activeInternshipsCount: number;
+  pendingReviewsCount: number;
+  completedEvaluationsCount: number;
+}
+
+export interface MentorDashboardMetrics {
+  mentorId: string;
+  companyName: string;
+  mentoredInternsCount: number;
+  pendingReviewsCount: number;
+  completedEvaluationsCount: number;
+}
+
+// ==========================================
+// Phase 2: Institution Profile & Settings DTOs
+// ==========================================
+
+export interface InstitutionProfileDto {
+  id: string;
+  code: string;
+  name: string;
+  domain?: string;
+  settings?: InstitutionSettingsDto;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateInstitutionDto {
+  name?: string;
+  domain?: string;
+  settings?: Partial<InstitutionSettingsDto>;
+}
+
+export interface InstitutionSettingsDto {
+  academicYear?: string;
+  semester?: string;
+  defaultInternshipDurationWeeks?: number;
+  requireMentorEvaluation?: boolean;
+  allowStudentSelfRegistration?: boolean;
+  contactEmail?: string;
+}
+
+// ==========================================
+// Phase 2: Audit Log DTOs
+// ==========================================
+
+export interface AuditLogDto {
+  id: string;
+  organizationId: string;
+  userId?: string | null;
+  actorId?: string | null;
+  actorEmail?: string | null;
+  actorName?: string | null;
+  action: AuditAction | string;
+  entity: string;
+  entityId?: string | null;
+  details?: Record<string, unknown> | null;
+  ipAddress?: string | null;
+  createdAt: string;
+}
+
+export interface AuditLogQuery {
+  action?: AuditAction | string;
+  entity?: string;
+  userId?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface SystemHealthData {

@@ -36,6 +36,9 @@ export interface InMemoryOrg {
   code: string;
   name: string;
   domain?: string;
+  settings?: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // In-Memory Multi-Tenant Store (Used for offline parity and CI/Testing)
@@ -51,6 +54,7 @@ class AuthStore {
     // Standard BCrypt hash for "Password123!"
     // Generated with bcryptjs, rounds=10
     const defaultPasswordHash = bcrypt.hashSync('Password123!', 10);
+    const seedDate = new Date('2026-09-01T00:00:00Z');
 
     // 1. Organization A
     const orgA: InMemoryOrg = {
@@ -58,6 +62,16 @@ class AuthStore {
       code: 'ORG_A',
       name: 'Organization A University',
       domain: 'org-a.edu',
+      settings: {
+        academicYear: '2026-2027',
+        semester: 'Fall',
+        defaultInternshipDurationWeeks: 12,
+        requireMentorEvaluation: true,
+        allowStudentSelfRegistration: false,
+        contactEmail: 'admin@org-a.edu',
+      },
+      createdAt: seedDate,
+      updatedAt: seedDate,
     };
     this.organizations.set(orgA.id, orgA);
 
@@ -67,6 +81,16 @@ class AuthStore {
       code: 'ORG_B',
       name: 'Organization B Institute',
       domain: 'org-b.edu',
+      settings: {
+        academicYear: '2026-2027',
+        semester: 'Fall',
+        defaultInternshipDurationWeeks: 16,
+        requireMentorEvaluation: true,
+        allowStudentSelfRegistration: false,
+        contactEmail: 'admin@org-b.edu',
+      },
+      createdAt: seedDate,
+      updatedAt: seedDate,
     };
     this.organizations.set(orgB.id, orgB);
 
@@ -76,6 +100,16 @@ class AuthStore {
       code: 'apex-inst',
       name: 'Apex Institute of Technology',
       domain: 'apex.edu',
+      settings: {
+        academicYear: '2026-2027',
+        semester: 'Fall',
+        defaultInternshipDurationWeeks: 12,
+        requireMentorEvaluation: true,
+        allowStudentSelfRegistration: true,
+        contactEmail: 'contact@apex.edu',
+      },
+      createdAt: seedDate,
+      updatedAt: seedDate,
     };
     this.organizations.set(orgApex.id, orgApex);
 

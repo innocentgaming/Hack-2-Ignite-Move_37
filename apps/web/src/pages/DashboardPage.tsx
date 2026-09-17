@@ -4,9 +4,17 @@ import { Card, CardHeader, CardBody } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { FormInput } from '../components/FormInput';
-import { UserRole, InternshipDto } from '@internos/types';
+import {
+  UserRole,
+  InternshipDto,
+  AdminDashboardMetrics,
+  HODDashboardMetrics,
+  FacultyDashboardMetrics,
+  MentorDashboardMetrics,
+} from '@internos/types';
 import { normalizeRole } from '@internos/shared';
 import { apiClient } from '../services/apiClient';
+import { Link } from 'react-router-dom';
 import {
   Briefcase,
   CheckCircle2,
@@ -18,6 +26,10 @@ import {
   BookOpen,
   Copy,
   Check,
+  Users,
+  FileSpreadsheet,
+  GraduationCap,
+  Award,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -28,7 +40,13 @@ export const DashboardPage: React.FC = () => {
   const [internships, setInternships] = useState<InternshipDto[]>([]);
   const [departments, setDepartments] = useState<{ id: string; name: string; code: string }[]>([]);
 
-  // User Invite Form State (for ADMIN and HOD)
+  // Real Dynamic Backend Metrics (Zero fake metrics)
+  const [adminMetrics, setAdminMetrics] = useState<AdminDashboardMetrics | null>(null);
+  const [hodMetrics, setHodMetrics] = useState<HODDashboardMetrics | null>(null);
+  const [facultyMetrics, setFacultyMetrics] = useState<FacultyDashboardMetrics | null>(null);
+  const [mentorMetrics, setMentorMetrics] = useState<MentorDashboardMetrics | null>(null);
+
+  // User Invite Form State
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteFirstName, setInviteFirstName] = useState('');
   const [inviteLastName, setInviteLastName] = useState('');
@@ -57,10 +75,41 @@ export const DashboardPage: React.FC = () => {
       } catch {
         // ignore
       }
+
+      // Fetch Real Metrics based on user role
+      if (role === UserRole.ADMIN) {
+        try {
+          const res = await apiClient.get<AdminDashboardMetrics>('/api/v1/admin/dashboards/admin');
+          if (res.success && res.data) setAdminMetrics(res.data);
+        } catch {
+          // ignore
+        }
+      } else if (role === UserRole.HOD) {
+        try {
+          const res = await apiClient.get<HODDashboardMetrics>('/api/v1/admin/dashboards/hod');
+          if (res.success && res.data) setHodMetrics(res.data);
+        } catch {
+          // ignore
+        }
+      } else if (role === UserRole.FACULTY) {
+        try {
+          const res = await apiClient.get<FacultyDashboardMetrics>('/api/v1/admin/dashboards/faculty');
+          if (res.success && res.data) setFacultyMetrics(res.data);
+        } catch {
+          // ignore
+        }
+      } else if (role === UserRole.MENTOR) {
+        try {
+          const res = await apiClient.get<MentorDashboardMetrics>('/api/v1/admin/dashboards/mentor');
+          if (res.success && res.data) setMentorMetrics(res.data);
+        } catch {
+          // ignore
+        }
+      }
     }
 
     loadTenantData();
-  }, [user?.organizationId]);
+  }, [user?.organizationId, role]);
 
   const handleInviteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,15 +171,15 @@ export const DashboardPage: React.FC = () => {
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
             {role === UserRole.ADMIN &&
-              'Institutional Administrator: Manage institutional tenant settings, provision users via secure invites, and oversee departments.'}
+              'Institutional Administrator: Manage institution profile, department registry, student CSV bulk imports, and user roles.'}
             {role === UserRole.HOD &&
-              'Head of Department: Oversee department curriculum, assign industry mentors, and authorize academic milestone workflows.'}
+              'Head of Department: Oversee department-specific students, faculty, and active internship workflows.'}
             {role === UserRole.FACULTY &&
-              'Faculty Supervisor: Monitor assigned student interns, review milestone technical reports, and execute outcome-based rubric evaluations.'}
+              'Faculty Supervisor: Supervise assigned student interns and review technical milestones.'}
             {role === UserRole.STUDENT &&
-              'Student Intern: Track your internship lifecycle, submit weekly milestone progress, and monitor faculty/mentor evaluations.'}
+              'Student Intern: Track your internship lifecycle, submit weekly milestones, and view supervisor feedback.'}
             {role === UserRole.MENTOR &&
-              'Industry Mentor: Track corporate intern progress, evaluate workplace milestones, and provide industrial mentorship feedback.'}
+              'Industry Mentor: Track corporate interns and evaluate workplace deliverables.'}
           </p>
         </div>
 
@@ -141,72 +190,272 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <Card hoverable>
-          <CardBody className="p-5 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tenant Internships</span>
-              <div className="text-2xl font-bold text-slate-900">{internships.length || 2}</div>
-              <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>Strictly isolated to {user?.organizationCode}</span>
-              </div>
+      {/* Real Dynamic Metrics: ADMIN DASHBOARD */}
+      {role === UserRole.ADMIN && adminMetrics && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-600" />
+              Institutional Telemetry (Real Backend Data)
+            </h2>
+            <div className="flex items-center gap-2">
+              <Link to="/app/admin/students/import">
+                <Button size="sm" variant="outline" className="text-xs flex items-center gap-1.5">
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600" />
+                  CSV Ingestion
+                </Button>
+              </Link>
+              <Link to="/app/admin/departments">
+                <Button size="sm" variant="outline" className="text-xs flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                  Departments
+                </Button>
+              </Link>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-              <Briefcase className="w-6 h-6" />
-            </div>
-          </CardBody>
-        </Card>
+          </div>
 
-        <Card hoverable>
-          <CardBody className="p-5 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Departments</span>
-              <div className="text-2xl font-bold text-slate-900">{departments.length || 2}</div>
-              <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>{departments.map((d) => d.code).join(', ') || 'CS, EE'}</span>
-              </div>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <BookOpen className="w-6 h-6" />
-            </div>
-          </CardBody>
-        </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <Card hoverable>
+              <CardBody className="p-5 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Total Students</span>
+                  <div className="text-2xl font-black text-slate-900 mt-1">{adminMetrics.totalStudents}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Enrolled</div>
+                </div>
+                <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+              </CardBody>
+            </Card>
 
-        <Card hoverable>
-          <CardBody className="p-5 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Security State</span>
-              <div className="text-2xl font-bold text-emerald-600">ISOLATED</div>
-              <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Zero Cross-Tenant Access</span>
-              </div>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-          </CardBody>
-        </Card>
+            <Card hoverable>
+              <CardBody className="p-5 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Total Faculty</span>
+                  <div className="text-2xl font-black text-slate-900 mt-1">{adminMetrics.totalFaculty}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Supervisors</div>
+                </div>
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Users className="w-5 h-5" />
+                </div>
+              </CardBody>
+            </Card>
 
-        <Card hoverable>
-          <CardBody className="p-5 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tenant Document Vault</span>
-              <div className="text-2xl font-bold text-slate-900">Protected</div>
-              <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                <FolderArchive className="w-3.5 h-3.5" />
-                <span>Scoped to {user?.organizationCode}</span>
+            <Card hoverable>
+              <CardBody className="p-5 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Total Mentors</span>
+                  <div className="text-2xl font-black text-slate-900 mt-1">{adminMetrics.totalMentors}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Industry Partners</div>
+                </div>
+                <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <Award className="w-5 h-5" />
+                </div>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Departments</span>
+                  <div className="text-2xl font-black text-slate-900 mt-1">{adminMetrics.totalDepartments}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Active Academic</div>
+                </div>
+                <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5 flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Active Internships</span>
+                  <div className="text-2xl font-black text-emerald-600 mt-1">{adminMetrics.activeInternships}</div>
+                  <div className="text-[11px] text-emerald-700 mt-0.5">Underway</div>
+                </div>
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Briefcase className="w-5 h-5" />
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Real Dynamic Metrics: HOD DASHBOARD */}
+      {role === UserRole.HOD && hodMetrics && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-indigo-600" />
+            {hodMetrics.departmentName} Department Telemetry
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Department Students</span>
+                <div className="text-3xl font-black text-slate-900 mt-1">{hodMetrics.totalStudents}</div>
+                <p className="text-xs text-slate-500 mt-1">In {hodMetrics.departmentCode}</p>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Department Faculty</span>
+                <div className="text-3xl font-black text-slate-900 mt-1">{hodMetrics.totalFaculty}</div>
+                <p className="text-xs text-slate-500 mt-1">Supervisors</p>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Active Internships</span>
+                <div className="text-3xl font-black text-emerald-600 mt-1">{hodMetrics.activeInternships}</div>
+                <p className="text-xs text-emerald-700 mt-1">Currently Placed</p>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Unassigned Interns</span>
+                <div className="text-3xl font-black text-amber-600 mt-1">{hodMetrics.unassignedInternsCount}</div>
+                <p className="text-xs text-amber-700 mt-1">Awaiting Placement</p>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Real Dynamic Metrics: FACULTY DASHBOARD */}
+      {role === UserRole.FACULTY && facultyMetrics && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <GraduationCap className="w-5 h-5 text-indigo-600" />
+            Assigned Supervision Overview
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Supervised Students</span>
+                <div className="text-3xl font-black text-slate-900 mt-1">{facultyMetrics.supervisedStudentsCount}</div>
+                <p className="text-xs text-slate-500 mt-1">In your department</p>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Active Internships</span>
+                <div className="text-3xl font-black text-emerald-600 mt-1">{facultyMetrics.activeInternshipsCount}</div>
+                <p className="text-xs text-emerald-700 mt-1">Placed in Industry</p>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Pending Approvals</span>
+                <div className="text-3xl font-black text-indigo-600 mt-1">{facultyMetrics.pendingReviewsCount}</div>
+                <p className="text-xs text-slate-500 mt-1">Awaiting Verification</p>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Real Dynamic Metrics: MENTOR DASHBOARD */}
+      {role === UserRole.MENTOR && mentorMetrics && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Award className="w-5 h-5 text-indigo-600" />
+            Industry Cohort Overview ({mentorMetrics.companyName})
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Mentored Interns</span>
+                <div className="text-3xl font-black text-indigo-600 mt-1">{mentorMetrics.mentoredInternsCount}</div>
+                <p className="text-xs text-slate-500 mt-1">Assigned from institution</p>
+              </CardBody>
+            </Card>
+
+            <Card hoverable>
+              <CardBody className="p-5">
+                <span className="text-xs font-semibold text-slate-500 uppercase">Company Entity</span>
+                <div className="text-xl font-bold text-slate-900 mt-1">{mentorMetrics.companyName}</div>
+                <p className="text-xs text-emerald-700 mt-1">Verified Corporate Host</p>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Fallback Metrics Row for Student */}
+      {role === UserRole.STUDENT && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <Card hoverable>
+            <CardBody className="p-5 flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tenant Internships</span>
+                <div className="text-2xl font-bold text-slate-900">{internships.length}</div>
+                <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span>Strictly isolated to {user?.organizationCode}</span>
+                </div>
               </div>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-              <FolderArchive className="w-6 h-6" />
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <Briefcase className="w-6 h-6" />
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card hoverable>
+            <CardBody className="p-5 flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Departments</span>
+                <div className="text-2xl font-bold text-slate-900">{departments.length}</div>
+                <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>{departments.map((d) => d.code).join(', ') || 'Enrolled'}</span>
+                </div>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <BookOpen className="w-6 h-6" />
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card hoverable>
+            <CardBody className="p-5 flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Security State</span>
+                <div className="text-2xl font-bold text-emerald-600">ISOLATED</div>
+                <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Zero Cross-Tenant Access</span>
+                </div>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+            </CardBody>
+          </Card>
+
+          <Card hoverable>
+            <CardBody className="p-5 flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Document Vault</span>
+                <div className="text-2xl font-bold text-slate-900">Protected</div>
+                <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                  <FolderArchive className="w-3.5 h-3.5" />
+                  <span>Scoped to {user?.organizationCode}</span>
+                </div>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                <FolderArchive className="w-6 h-6" />
+              </div>
+            </CardBody>
+          </Card>
+        </div>
+      )}
 
       {/* Role-Specific Shells */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -309,27 +558,31 @@ export const DashboardPage: React.FC = () => {
               action={<Badge variant="slate">{internships.length} Registered</Badge>}
             />
             <CardBody className="space-y-3">
-              {internships.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-                      <Briefcase className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-slate-900">{item.title}</div>
-                      <div className="text-xs text-slate-500">
-                        Type: {item.type} • Tenant: {item.organizationId}
+              {internships.length === 0 ? (
+                <div className="text-center py-6 text-slate-400 text-xs">No internships active for this tenant.</div>
+              ) : (
+                internships.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                        <Briefcase className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-slate-900">{item.title}</div>
+                        <div className="text-xs text-slate-500">
+                          Type: {item.type} &bull; Tenant: {item.organizationId}
+                        </div>
                       </div>
                     </div>
+                    <Badge variant={item.status === 'ACTIVE' ? 'emerald' : 'indigo'}>
+                      {item.status}
+                    </Badge>
                   </div>
-                  <Badge variant={item.status === 'ACTIVE' ? 'emerald' : 'indigo'}>
-                    {item.status}
-                  </Badge>
-                </div>
-              ))}
+                ))
+              )}
             </CardBody>
           </Card>
         </div>
@@ -337,7 +590,7 @@ export const DashboardPage: React.FC = () => {
         {/* Right Column (1 Col) */}
         <div className="space-y-6">
           <Card>
-            <CardHeader title="Tenant Isolation Engine" subtitle="Phase 1 Architectural Guarantee" />
+            <CardHeader title="Tenant Isolation Engine" subtitle="Phase 2 Architectural Guarantee" />
             <CardBody className="space-y-4 text-xs">
               <div className="space-y-2">
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
@@ -357,11 +610,11 @@ export const DashboardPage: React.FC = () => {
                   <span className="text-rose-600 font-semibold">Blocked (403)</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Cross-Tenant UPDATE:</span>
+                  <span className="text-slate-500">Cross-Tenant CSV Ingest:</span>
                   <span className="text-rose-600 font-semibold">Blocked (403)</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Cross-Tenant DELETE:</span>
+                  <span className="text-slate-500">Cross-Tenant Admin:</span>
                   <span className="text-rose-600 font-semibold">Blocked (403)</span>
                 </div>
               </div>

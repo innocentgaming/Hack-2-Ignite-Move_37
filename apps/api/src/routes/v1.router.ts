@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authRouter } from './auth.router.js';
 import { tenantRouter } from './tenant.router.js';
+import { adminRouter } from './admin.router.js';
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.get('/health', (_req, res) => {
 
 router.use('/auth', authRouter);
 router.use('/tenants', tenantRouter);
+router.use('/admin', adminRouter);
 
 export const v1Router = router;
