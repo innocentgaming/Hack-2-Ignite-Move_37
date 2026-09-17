@@ -11,6 +11,7 @@ import { completionRouter } from './completion.router.js';
 import { aiRouter } from './ai.router.js';
 import { notificationRouter } from './notification.router.js';
 import { documentRouter } from './document.router.js';
+import { analyticsRouter } from './analytics.router.js';
 
 const router = Router();
 
@@ -36,6 +37,7 @@ router.use('/completion', completionRouter);
 router.use('/ai', aiRouter);
 router.use('/notifications', notificationRouter);
 router.use('/documents', documentRouter);
+router.use('/analytics', analyticsRouter);
 
 export const v1Router = router;
 

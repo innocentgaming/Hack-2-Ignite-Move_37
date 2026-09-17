@@ -23,6 +23,7 @@ import {
   BadgeCheck,
   Medal,
   ScrollText,
+  BarChart3,
 } from 'lucide-react';
 
 interface NavItem {
@@ -124,6 +125,12 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.HOD],
     },
     {
+      label: 'Department Analytics',
+      to: '/app/hod/analytics',
+      icon: BarChart3,
+      roles: [UserRole.HOD],
+    },
+    {
       label: 'Completion Hub',
       to: '/app/hod/completion',
       icon: ScrollText,
@@ -161,6 +168,12 @@ export const Sidebar: React.FC = () => {
       label: 'Institution Health',
       to: '/app/admin/monitoring',
       icon: Activity,
+      roles: [UserRole.ADMIN],
+    },
+    {
+      label: 'Institutional Analytics',
+      to: '/app/admin/analytics',
+      icon: BarChart3,
       roles: [UserRole.ADMIN],
     },
     {

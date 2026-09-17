@@ -193,10 +193,10 @@ export class CompletionService {
     let criteria = dto.criteria;
     if ((!Array.isArray(criteria) || criteria.length === 0) && (dto as any).technicalSkillsScore !== undefined) {
       criteria = [
-        { name: 'Technical Skills', maxMarks: 30, awardedMarks: Number((dto as any).technicalSkillsScore) || 25, comments: 'Good execution' },
-        { name: 'Work Quality', maxMarks: 30, awardedMarks: Number((dto as any).workQualityScore) || 25, comments: 'Good quality' },
-        { name: 'Initiative', maxMarks: 20, awardedMarks: Number((dto as any).initiativeScore) || 18, comments: 'Proactive' },
-        { name: 'Professionalism', maxMarks: 20, awardedMarks: Number((dto as any).professionalismScore) || 18, comments: 'Professional' },
+        { id: 'crit-tech', name: 'Technical Skills', maxMarks: 30, awardedMarks: Number((dto as any).technicalSkillsScore) || 25, comment: 'Good execution' },
+        { id: 'crit-qual', name: 'Work Quality', maxMarks: 30, awardedMarks: Number((dto as any).workQualityScore) || 25, comment: 'Good quality' },
+        { id: 'crit-init', name: 'Initiative', maxMarks: 20, awardedMarks: Number((dto as any).initiativeScore) || 18, comment: 'Proactive' },
+        { id: 'crit-prof', name: 'Professionalism', maxMarks: 20, awardedMarks: Number((dto as any).professionalismScore) || 18, comment: 'Professional' },
       ];
     }
 

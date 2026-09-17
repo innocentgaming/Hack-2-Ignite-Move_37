@@ -1496,3 +1496,124 @@ export interface DocumentQuery {
   limit?: number;
 }
 
+// ==========================================
+// Phase 11: Institutional & Department Analytics DTOs
+// ==========================================
+
+export interface AnalyticsOverviewDto {
+  totalInternships: number;
+  activeInternships: number;
+  completedInternships: number;
+  overdueSubmissions: number;
+  completionRate: number;
+  reviewCompletionRate: number;
+  reviewsCompleted: number;
+  reviewsPending: number;
+  outcomeEvidenceCoverageRate: number;
+  averageEvaluationScore: number;
+}
+
+export interface DepartmentCompletionDto {
+  departmentId: string;
+  departmentName: string;
+  departmentCode: string;
+  totalInternships: number;
+  activeInternships: number;
+  completedInternships: number;
+  completionRate: number;
+  studentCount: number;
+}
+
+export interface CompanyDistributionDto {
+  companyId: string;
+  companyName: string;
+  industry: string;
+  internshipCount: number;
+  percentage: number;
+}
+
+export interface MentorWorkloadDto {
+  mentorId: string;
+  mentorName: string;
+  mentorEmail: string;
+  companyName: string;
+  assignedInternships: number;
+  activeInternships: number;
+  completedInternships: number;
+  pendingReviews: number;
+}
+
+export interface SubmissionComplianceDto {
+  totalSubmissions: number;
+  onTimeSubmissions: number;
+  lateSubmissions: number;
+  overdueSubmissions: number;
+  onTimeRate: number;
+}
+
+export interface EvaluationGradeBandDto {
+  grade: string;
+  count: number;
+  percentage: number;
+}
+
+export interface EvaluationScoreBandDto {
+  band: string;
+  count: number;
+  percentage: number;
+}
+
+export interface EvaluationDistributionDto {
+  totalEvaluations: number;
+  averageScore: number;
+  gradeBreakdown: EvaluationGradeBandDto[];
+  scoreBands: EvaluationScoreBandDto[];
+}
+
+export interface OutcomeCoverageItemDto {
+  outcomeId: string;
+  code: string;
+  name: string;
+  evidenceCount: number;
+  hasEvidence: boolean;
+}
+
+export interface OutcomeEvidenceCoverageDto {
+  totalOutcomes: number;
+  coveredOutcomes: number;
+  coveragePercentage: number;
+  outcomes: OutcomeCoverageItemDto[];
+}
+
+export interface InternshipStatusDistributionDto {
+  status: string;
+  count: number;
+  percentage: number;
+}
+
+export interface AnalyticsFilterQuery {
+  departmentId?: string;
+  startDate?: string;
+  endDate?: string;
+  format?: 'json' | 'csv' | string;
+}
+
+export interface InstitutionalAnalyticsDto {
+  organizationId: string;
+  generatedAt: string;
+  filtersApplied: {
+    departmentId?: string;
+    startDate?: string;
+    endDate?: string;
+  };
+  overview: AnalyticsOverviewDto;
+  statusDistribution: InternshipStatusDistributionDto[];
+  departmentCompletion: DepartmentCompletionDto[];
+  companyDistribution: CompanyDistributionDto[];
+  mentorWorkload: MentorWorkloadDto[];
+  submissionCompliance: SubmissionComplianceDto;
+  evaluationDistribution: EvaluationDistributionDto;
+  outcomeEvidenceCoverage: OutcomeEvidenceCoverageDto;
+}
+
+

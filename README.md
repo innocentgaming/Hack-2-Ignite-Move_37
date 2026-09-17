@@ -10,7 +10,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-147%20Passed-brightgreen)](https://nodejs.org/api/test.html)
+[![Tests](https://img.shields.io/badge/Tests-160%20Passed-brightgreen)](https://nodejs.org/api/test.html)
 
 ---
 
@@ -150,6 +150,17 @@ InternOS solves these systemic inefficiencies through a modular, deterministic, 
 * **Institutional Action Audit Trail**: Append-only tamper-evident audit log recording actor, organization, action, entity, entity ID, timestamp, and metadata for institutional compliance.
 * **Sensitive Information Redaction**: Automated sanitization pipeline that redacts passwords, tokens, API keys, credentials, and authorization headers from audit logs.
 * **Private-by-Default Secure Document Management**: Document metadata stored in PostgreSQL/in-memory store with binary assets stored in isolated object storage. Files are private by default, requiring backend RBAC authorization and tenant checks for streaming access.
+
+### 11. Institutional & Department Analytics Engine
+* **Direct Real-Data Aggregation**: All operational metrics are calculated dynamically from actual records without unpredictable AI interpretations or complex websocket infrastructure.
+* **Executive Institutional KPIs**: Active internships, completed internships, overdue tasks, institutional completion rate (%), review completion rate (%), on-time compliance rate (%), and average evaluation score.
+* **Department Completion Roster**: Department-by-department completion metrics, comparing total enrolled students, active engagements, and completion percentages.
+* **Partner Company Distribution**: Distribution analysis ranking host companies by total intern headcount and cohort share percentage.
+* **Mentor Workload Balancing**: Track assigned mentees, active internships, completed training, and review backlogs per corporate mentor.
+* **Outcome Evidence Attainment**: Quantifies verified Program Outcome (PO) coverage from deliverables and evaluations.
+* **Multi-Dimensional Filtering**: Real-time filtering by academic department, start date, and end date with automatic HOD department boundary scoping.
+* **Multi-Format Export**: Generates and streams structured CSV reports for university compliance and administrative reporting.
+* **Tenant Isolation Guarantee**: Organization boundaries are strictly enforced—cross-tenant analytics access is strictly rejected with HTTP 403 Forbidden.
 
 ---
 

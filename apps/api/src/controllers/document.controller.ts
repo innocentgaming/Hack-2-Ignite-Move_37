@@ -89,11 +89,11 @@ export class DocumentController {
       let filename: string;
       let mimeType: string;
 
-      // Check if uploaded via multer (req.file)
-      if (req.file) {
-        buffer = req.file.buffer;
-        filename = req.file.originalname;
-        mimeType = req.file.mimetype;
+      const file = (req as any).file;
+      if (file) {
+        buffer = file.buffer;
+        filename = file.originalname;
+        mimeType = file.mimetype;
       } else if (req.body.content || req.body.base64) {
         // Fallback for direct JSON payloads
         filename = req.body.filename || req.body.name || 'document.pdf';

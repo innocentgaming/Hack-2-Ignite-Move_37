@@ -1,6 +1,7 @@
 import { prisma, isDatabaseOnline } from '../lib/prisma.js';
 import { storageService } from './storage.service.js';
 import { internshipStore } from './internship.service.js';
+import { workspaceStore } from './workspace.service.js';
 import { submissionStore } from './submission.service.js';
 import { tenantStore } from './tenant.service.js';
 import {
@@ -235,7 +236,7 @@ export class DocumentService {
       }
 
       if (entityType === 'SUBMISSION') {
-        const sub = submissionStore.submissions.get(entityId);
+        const sub = workspaceStore.submissions.get(entityId);
         if (sub) {
           if (sub.studentId === callerId) return true;
           const internship = internshipStore.details.get(sub.internshipId);
