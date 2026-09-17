@@ -8,12 +8,11 @@ databases:
 services:
   - type: web
     name: internos-api
-    env: node
+    runtime: node
     plan: free
     region: oregon
     buildCommand: npm install && npm run prisma:generate && npm run build:api
-    preDeployCommand: npx prisma migrate deploy
-    startCommand: node apps/api/dist/index.js
+    startCommand: npx prisma migrate deploy && node apps/api/dist/index.js
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_ENV
