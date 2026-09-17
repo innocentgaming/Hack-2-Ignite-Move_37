@@ -439,7 +439,10 @@ export class WorkflowService {
 
     for (const step of newInstance.stepsSnapshot) {
       const taskId = `task-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
-      const dueDate = new Date(startDate.getTime() + step.deadlineDays * 24 * 3600 * 1000);
+      const deadlineDays = typeof step.deadlineDays === 'number' && !isNaN(step.deadlineDays)
+        ? step.deadlineDays
+        : ((step as any).relativeDueWeek ? (step as any).relativeDueWeek * 7 : 14);
+      const dueDate = new Date(startDate.getTime() + deadlineDays * 24 * 3600 * 1000);
 
       const newTask: InMemoryWorkflowTask = {
         id: taskId,
@@ -448,17 +451,17 @@ export class WorkflowService {
         stepId: step.id,
         title: step.title,
         stage: `Step ${step.order}: ${step.title}`,
-        type: step.type,
+        type: step.type || (step as any).stepType || WorkflowStepType.SUBMISSION,
         status: TaskStatus.PENDING,
-        assigneeRole: step.actor,
-        required: step.required,
+        assigneeRole: step.actor || (step as any).assigneeRole || UserRole.STUDENT,
+        required: step.required !== undefined ? step.required : true,
         originalDueDate: dueDate,
         currentDueDate: dueDate,
         isLate: false,
         completedAt: null,
         evaluationCriteria: step.evaluationCriteria,
         maxMarks: step.maxMarks,
-        latePolicy: step.latePolicy,
+        latePolicy: step.latePolicy || LatePolicyType.ALLOW_NO_PENALTY,
         extensions: [],
         createdAt: now,
         updatedAt: now,
