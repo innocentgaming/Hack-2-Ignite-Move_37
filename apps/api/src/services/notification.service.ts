@@ -1,4 +1,5 @@
 import { prisma, isDatabaseOnline } from '../lib/prisma.js';
+import { TenantViolationError } from '@internos/shared';
 import {
   NotificationDto,
   NotificationType,
@@ -240,7 +241,11 @@ export class NotificationService {
     const notif = notificationStore.notifications.get(notificationId);
     if (!notif) return null;
 
-    if (notif.organizationId !== organizationId || notif.recipientId !== recipientId) {
+    if (notif.organizationId !== organizationId) {
+      throw new TenantViolationError('Cross-tenant notification access prohibited');
+    }
+
+    if (notif.recipientId !== recipientId) {
       return null;
     }
 

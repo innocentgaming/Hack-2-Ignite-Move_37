@@ -262,6 +262,11 @@ export class AIAnalysisService {
     submissionId: string,
     options?: { customProvider?: AIProvider }
   ): Promise<AIAnalysisRecordDto> {
+    const sub = workspaceStore.submissions.get(submissionId);
+    if (sub && sub.organizationId !== organizationId) {
+      throw new TenantViolationError('Cross-tenant AI analysis prohibited');
+    }
+
     const versions = submissionStore.versions.get(submissionId);
     if (!versions || versions.length === 0) {
       throw new NotFoundError('SubmissionVersion', submissionId);
@@ -284,6 +289,13 @@ export class AIAnalysisService {
    */
   getSubmissionAnalysis(organizationId: string, submissionId: string): AIAnalysisRecordDto | null {
     const list = aiStore.analysesBySubmission.get(submissionId) || [];
+    if (list.length > 0 && list.some((a) => a.organizationId !== organizationId)) {
+      throw new TenantViolationError('Cross-tenant AI analysis access prohibited');
+    }
+    const sub = workspaceStore.submissions.get(submissionId);
+    if (sub && sub.organizationId !== organizationId) {
+      throw new TenantViolationError('Cross-tenant AI analysis access prohibited');
+    }
     const match = list.filter((a) => a.organizationId === organizationId);
     if (match.length === 0) return null;
     return match[match.length - 1];

@@ -24,10 +24,18 @@ export function tenantIsolation(req: Request, res: Response, next: NextFunction)
   // Check if client attempted to pass an untrusted organizationId in body, query, params, or headers
   const untrustedOrgId =
     req.body?.organizationId ||
+    req.body?.tenantId ||
+    req.body?.orgId ||
     req.query?.organizationId ||
+    req.query?.tenantId ||
+    req.query?.orgId ||
     req.params?.organizationId ||
+    req.params?.tenantId ||
     req.headers['x-organization-id'] ||
-    req.headers['x-organization-override'];
+    req.headers['x-organization-override'] ||
+    req.headers['x-tenant-id'] ||
+    req.headers['x-institution-id'] ||
+    req.headers['x-org-id'];
 
   if (untrustedOrgId && untrustedOrgId !== authenticatedOrgId) {
     throw new TenantViolationError(

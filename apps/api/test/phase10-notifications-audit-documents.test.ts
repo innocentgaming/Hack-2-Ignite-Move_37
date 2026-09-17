@@ -341,12 +341,12 @@ describe('InternOS Phase 10: Notifications, Audit Logging & Document Management 
     const dataA = (await resA.json()) as any;
     assert.ok(!dataA.data.some((n: any) => n.id === notifB.id));
 
-    // Student A attempts to mark Student B notification read -> returns 404
+    // Student A attempts to mark Student B notification read -> access denied (403 or 404)
     const resCrossMark = await fetch(`${baseUrl}/api/v1/notifications/${notifB.id}/read`, {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${tokenStudentA}` },
     });
-    assert.equal(resCrossMark.status, 404);
+    assert.ok(resCrossMark.status === 403 || resCrossMark.status === 404, 'Cross-tenant notification read must fail');
   });
 
   // =========================================================================

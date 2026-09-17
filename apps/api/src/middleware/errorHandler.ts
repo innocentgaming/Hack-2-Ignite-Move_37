@@ -1,6 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError, formatErrorResponse } from '@internos/shared';
 
+function sanitizeDetails(details: unknown): unknown {
+  if (!details || typeof details !== 'object') return details;
+  if (Array.isArray(details)) return details.map(sanitizeDetails);
+  const sanitized: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(details as Record<string, unknown>)) {
+    if (/password|secret|token|hash|authorization/i.test(key)) {
+      sanitized[key] = '[REDACTED]';
+    } else if (typeof value === 'object') {
+      sanitized[key] = sanitizeDetails(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+}
+
 export function errorHandler(
   err: Error,
   req: Request,
@@ -12,7 +28,7 @@ export function errorHandler(
 
   if (err instanceof AppError) {
     res.status(err.statusCode).json(
-      formatErrorResponse(err.message, err.code, err.details, path)
+      formatErrorResponse(err.message, err.code, sanitizeDetails(err.details), path)
     );
     return;
   }

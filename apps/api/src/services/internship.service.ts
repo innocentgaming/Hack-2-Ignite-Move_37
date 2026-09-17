@@ -705,6 +705,9 @@ export class InternshipService {
     if (!detail) {
       throw new NotFoundError('Internship', internshipId);
     }
+    if (detail.organizationId !== organizationId) {
+      throw new TenantViolationError('Cross-tenant internship approval prohibited');
+    }
 
     if (dto.approved) {
       const res = await this.transitionState(organizationId, internshipId, user, {

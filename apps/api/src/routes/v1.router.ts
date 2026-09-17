@@ -13,9 +13,12 @@ import { notificationRouter } from './notification.router.js';
 import { documentRouter } from './document.router.js';
 import { analyticsRouter } from './analytics.router.js';
 
+import { authenticate } from '../middleware/auth.js';
+import { tenantIsolation } from '../middleware/tenantIsolation.js';
+
 const router = Router();
 
-// GET /api/v1/health
+// GET /api/v1/health (Public health check)
 router.get('/health', (_req, res) => {
   res.status(200).json({
     success: true,
@@ -24,20 +27,30 @@ router.get('/health', (_req, res) => {
   });
 });
 
+// Authentication endpoints (login & activate are public; logout, me, invite handle auth/RBAC)
 router.use('/auth', authRouter);
-router.use('/tenants', tenantRouter);
-router.use('/admin', adminRouter);
-router.use('/workflows', workflowRouter);
-router.use('/internships', internshipRouter);
-router.use('/companies', companyRouter);
-router.use('/workspaces', workspaceRouter);
-router.use('/submissions', submissionRouter);
-router.use('/monitoring', monitoringRouter);
-router.use('/completion', completionRouter);
-router.use('/ai', aiRouter);
-router.use('/notifications', notificationRouter);
-router.use('/documents', documentRouter);
-router.use('/analytics', analyticsRouter);
+
+// Strict Multi-Tenant Protected Domain Routers
+// Guarantees authenticate and tenantIsolation run before any controller logic
+const protectedRouter = Router();
+protectedRouter.use(authenticate, tenantIsolation);
+
+protectedRouter.use('/tenants', tenantRouter);
+protectedRouter.use('/admin', adminRouter);
+protectedRouter.use('/workflows', workflowRouter);
+protectedRouter.use('/internships', internshipRouter);
+protectedRouter.use('/companies', companyRouter);
+protectedRouter.use('/workspaces', workspaceRouter);
+protectedRouter.use('/submissions', submissionRouter);
+protectedRouter.use('/monitoring', monitoringRouter);
+protectedRouter.use('/completion', completionRouter);
+protectedRouter.use('/ai', aiRouter);
+protectedRouter.use('/notifications', notificationRouter);
+protectedRouter.use('/documents', documentRouter);
+protectedRouter.use('/analytics', analyticsRouter);
+
+router.use(protectedRouter);
 
 export const v1Router = router;
+
 
