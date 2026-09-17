@@ -136,19 +136,71 @@ export class InternshipStore {
       'FULL_TIME',
       InternshipStatus.ACTIVE,
       new Date('2026-06-01'),
-      new Date('2026-12-01')
+      new Date('2026-12-01'),
+      'user-a-mentor',
+      {
+        name: 'Mark Mentor',
+        email: 'mentor@org-a.com',
+        designation: 'Staff Solutions Architect',
+        phone: '+1 555-0199',
+      }
     );
 
     this.syncSeedInternship(
       'internship-a-2',
       'org-a-id',
+      'user-a-student-2',
+      'company-a-cloud',
+      'Distributed Systems & API Intern',
+      'FULL_TIME',
+      InternshipStatus.ACTIVE,
+      new Date('2026-06-15'),
+      new Date('2026-12-15'),
+      'user-a-mentor-2',
+      {
+        name: 'Sarah Jenkins',
+        email: 'sarah.mentor@org-a.com',
+        designation: 'Principal Systems Engineer',
+        phone: '+1 555-0244',
+      }
+    );
+
+    this.syncSeedInternship(
+      'internship-a-3',
+      'org-a-id',
+      'user-a-student-3',
+      'company-a-tech',
+      'Cloud Infrastructure & DevOps Intern',
+      'FULL_TIME',
+      InternshipStatus.ACTIVE,
+      new Date('2026-07-01'),
+      new Date('2026-11-30'),
+      'user-a-mentor',
+      {
+        name: 'Mark Mentor',
+        email: 'mentor@org-a.com',
+        designation: 'Staff Solutions Architect',
+        phone: '+1 555-0199',
+      }
+    );
+
+    this.syncSeedInternship(
+      'internship-a-4',
+      'org-a-id',
       'user-a-student',
       'company-a-cloud',
-      'Cloud Systems Internship',
+      'AI Platform & Data Systems Intern',
       'PART_TIME',
       InternshipStatus.PENDING_APPROVAL,
-      new Date('2026-07-01'),
-      new Date('2026-10-01')
+      new Date('2026-08-01'),
+      new Date('2026-12-31'),
+      'user-a-mentor-2',
+      {
+        name: 'Sarah Jenkins',
+        email: 'sarah.mentor@org-a.com',
+        designation: 'Principal Systems Engineer',
+        phone: '+1 555-0244',
+      }
     );
 
     this.syncSeedInternship(
@@ -173,7 +225,14 @@ export class InternshipStore {
     type: string,
     status: InternshipStatus,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    mentorId?: string | null,
+    mentor?: {
+      name: string;
+      email: string;
+      designation: string;
+      phone?: string;
+    } | null
   ) {
     const outcomes: ExpectedOutcomeDto[] = [
       {
@@ -206,10 +265,10 @@ export class InternshipStore {
       description: `Structured academic internship in ${title}`,
       facultyId: 'user-a-faculty',
       facultyName: 'Dr. Alan Turing',
-      mentorId: null,
-      mentor: {
-        name: 'John Mentor',
-        email: 'mentor@partner.com',
+      mentorId: mentorId || null,
+      mentor: mentor || {
+        name: 'Mark Mentor',
+        email: 'mentor@org-a.com',
         designation: 'Staff Software Engineer',
         phone: '+1 555-0199',
       },

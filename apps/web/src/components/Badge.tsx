@@ -1,10 +1,25 @@
 import React from 'react';
 
+export type BadgeVariant =
+  | 'slate'
+  | 'indigo'
+  | 'emerald'
+  | 'amber'
+  | 'rose'
+  | 'purple'
+  | 'success'
+  | 'warning'
+  | 'destructive'
+  | 'default'
+  | 'outline'
+  | 'primary';
+
 export interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'slate' | 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple';
+  variant?: BadgeVariant;
   size?: 'sm' | 'md';
   dot?: boolean;
+  className?: string;
 }
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -12,7 +27,27 @@ export const Badge: React.FC<BadgeProps> = ({
   variant = 'slate',
   size = 'md',
   dot = false,
+  className = '',
 }) => {
+  // Normalize alias variants to curated design system tokens
+  const normalizedVariant: 'slate' | 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple' = (() => {
+    switch (variant) {
+      case 'success':
+        return 'emerald';
+      case 'warning':
+        return 'amber';
+      case 'destructive':
+        return 'rose';
+      case 'primary':
+        return 'indigo';
+      case 'outline':
+      case 'default':
+        return 'slate';
+      default:
+        return variant || 'slate';
+    }
+  })();
+
   const variantStyles = {
     slate: 'bg-slate-100 text-slate-700 border-slate-200',
     indigo: 'bg-indigo-50 text-indigo-700 border-indigo-200',
@@ -38,9 +73,9 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border ${variantStyles[variant]} ${sizeStyles[size]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border ${variantStyles[normalizedVariant]} ${sizeStyles[size]} ${className}`}
     >
-      {dot && <span className={`w-1.5 h-1.5 rounded-full ${dotColors[variant]}`} />}
+      {dot && <span className={`w-1.5 h-1.5 rounded-full ${dotColors[normalizedVariant]}`} />}
       {children}
     </span>
   );

@@ -4,115 +4,75 @@ import { Badge } from './Badge';
 import { Button } from './Button';
 import { UserRole } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
-import { Building2, LogOut, UserCheck } from 'lucide-react';
+import { Building2, LogOut, User, GraduationCap } from 'lucide-react';
 import { NotificationCenter } from './NotificationCenter';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, switchDemoRole } = useAuth();
+  const { user, logout } = useAuth();
   const normalizedRole = user?.role ? normalizeRole(user.role) : UserRole.STUDENT;
 
   const roleLabels: Record<UserRole, { label: string; variant: 'slate' | 'indigo' | 'emerald' | 'amber' | 'purple' }> = {
     [UserRole.ADMIN]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.HOD]: { label: 'HOD', variant: 'purple' },
-    [UserRole.FACULTY]: { label: 'FACULTY', variant: 'emerald' },
+    [UserRole.HOD]: { label: 'ADMIN', variant: 'indigo' },
+    [UserRole.FACULTY]: { label: 'ADMIN', variant: 'indigo' },
     [UserRole.STUDENT]: { label: 'STUDENT', variant: 'slate' },
     [UserRole.MENTOR]: { label: 'MENTOR', variant: 'amber' },
-    // Legacy aliases
     [UserRole.SUPER_ADMIN]: { label: 'ADMIN', variant: 'indigo' },
     [UserRole.INSTITUTION_ADMIN]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.FACULTY_SUPERVISOR]: { label: 'FACULTY', variant: 'emerald' },
+    [UserRole.FACULTY_SUPERVISOR]: { label: 'ADMIN', variant: 'indigo' },
     [UserRole.INDUSTRY_MENTOR]: { label: 'MENTOR', variant: 'amber' },
   };
 
   const currentRoleInfo = roleLabels[normalizedRole] || { label: normalizedRole, variant: 'slate' as const };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-30">
-      {/* Left: Organization Context */}
+    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+      {/* Left: Organization & Department Context */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-700 to-indigo-500 text-white flex items-center justify-center font-bold text-base shadow-sm">
           <Building2 className="w-5 h-5" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-slate-900 leading-tight">
-              {user?.organizationName || 'InternOS Educational Tenant'}
+            <span className="text-sm font-bold text-slate-900 tracking-tight">
+              InternOS
+            </span>
+            <span className="text-slate-300">/</span>
+            <span className="text-sm font-semibold text-slate-700">
+              {user?.organizationName || 'Educational Institution'}
             </span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold">
               {user?.organizationCode || 'ORG_A'}
             </span>
           </div>
-          <span className="text-xs text-slate-500">Multi-Tenant Internship Operating System (Phase 1)</span>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span>Enterprise Internship Governance</span>
+            {user?.departmentId && (
+              <>
+                <span>•</span>
+                <span className="flex items-center gap-1 text-slate-600 font-medium">
+                  <GraduationCap className="w-3.5 h-3.5 text-indigo-500" />
+                  Computer Engineering
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Center: Demo Quick Role Switcher */}
-      <div className="hidden lg:flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200 text-xs">
-        <span className="text-[11px] font-medium text-slate-500 px-1.5 flex items-center gap-1">
-          <UserCheck className="w-3.5 h-3.5 text-indigo-500" /> Switch:
-        </span>
-        <button
-          onClick={() => switchDemoRole(UserRole.ADMIN, user?.organizationCode || 'ORG_A')}
-          className={`px-2 py-1 rounded font-medium transition-colors ${
-            normalizedRole === UserRole.ADMIN
-              ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Admin
-        </button>
-        <button
-          onClick={() => switchDemoRole(UserRole.HOD, user?.organizationCode || 'ORG_A')}
-          className={`px-2 py-1 rounded font-medium transition-colors ${
-            normalizedRole === UserRole.HOD
-              ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          HOD
-        </button>
-        <button
-          onClick={() => switchDemoRole(UserRole.FACULTY, user?.organizationCode || 'ORG_A')}
-          className={`px-2 py-1 rounded font-medium transition-colors ${
-            normalizedRole === UserRole.FACULTY
-              ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Faculty
-        </button>
-        <button
-          onClick={() => switchDemoRole(UserRole.STUDENT, user?.organizationCode || 'ORG_A')}
-          className={`px-2 py-1 rounded font-medium transition-colors ${
-            normalizedRole === UserRole.STUDENT
-              ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Student
-        </button>
-        <button
-          onClick={() => switchDemoRole(UserRole.MENTOR, user?.organizationCode || 'ORG_A')}
-          className={`px-2 py-1 rounded font-medium transition-colors ${
-            normalizedRole === UserRole.MENTOR
-              ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Mentor
-        </button>
-      </div>
-
-      {/* Right: Notifications & User Profile */}
+      {/* Right: Notifications, User Identity & Logout */}
       <div className="flex items-center gap-4">
         <NotificationCenter />
 
         <div className="h-6 w-px bg-slate-200" />
 
         <div className="flex items-center gap-3">
-          <div className="text-right">
+          <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600">
+            <User className="w-4 h-4" />
+          </div>
+          <div className="text-right hidden sm:block">
             <div className="text-xs font-semibold text-slate-900 leading-tight">
-              {user ? `${user.firstName} ${user.lastName}` : 'Guest User'}
+              {user ? `${user.firstName} ${user.lastName}` : 'Authenticated User'}
             </div>
             <div className="text-[11px] text-slate-500">{user?.email}</div>
           </div>
@@ -125,8 +85,8 @@ export const Navbar: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={logout}
-            title="Sign out"
-            className="text-slate-500 hover:text-rose-600 px-2"
+            title="Sign out of InternOS"
+            className="text-slate-400 hover:text-rose-600 hover:bg-rose-50 px-2 rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />
           </Button>
@@ -135,3 +95,5 @@ export const Navbar: React.FC = () => {
     </header>
   );
 };
+
+export default Navbar;

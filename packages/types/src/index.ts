@@ -1616,4 +1616,273 @@ export interface InstitutionalAnalyticsDto {
   outcomeEvidenceCoverage: OutcomeEvidenceCoverageDto;
 }
 
+// ==========================================
+// Phase 1 Redesign: Milestones, Tasks & Workspaces
+// ==========================================
+
+export enum EvidenceType {
+  GITHUB_REPO = 'GITHUB_REPO',
+  GITHUB_PR = 'GITHUB_PR',
+  DEPLOYMENT_URL = 'DEPLOYMENT_URL',
+  DOCUMENT = 'DOCUMENT',
+  SCREENSHOT = 'SCREENSHOT',
+  VIDEO = 'VIDEO',
+  REPORT = 'REPORT',
+  OTHER = 'OTHER',
+}
+
+export interface MilestoneDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  title: string;
+  description: string;
+  order: number;
+  startDate?: string;
+  dueDate: string;
+  progress: number;
+  completedTasks: number;
+  totalTasks: number;
+  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+  tasks?: TaskItemDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMilestoneDto {
+  internshipId: string;
+  title: string;
+  description: string;
+  startDate?: string;
+  dueDate: string;
+  order?: number;
+}
+
+export interface UpdateMilestoneDto {
+  title?: string;
+  description?: string;
+  startDate?: string;
+  dueDate?: string;
+  status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+}
+
+export interface TaskItemDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  milestoneId?: string;
+  milestoneTitle?: string;
+  title: string;
+  description: string;
+  instructions?: string;
+  stage?: string;
+  status: TaskStatus;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  dueDate: string;
+  learningOutcomeId?: string;
+  learningOutcomeCode?: string;
+  learningOutcomeName?: string;
+  expectedEvidence: string;
+  requiredEvidence?: string;
+  submissionCount?: number;
+  latestSubmission?: {
+    id: string;
+    title: string;
+    status: SubmissionStatus;
+    submittedAt: string;
+    mentorFeedback?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTaskDto {
+  internshipId: string;
+  milestoneId?: string;
+  title: string;
+  description: string;
+  instructions?: string;
+  dueDate: string;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  learningOutcomeId?: string;
+  expectedEvidence?: string;
+}
+
+export interface UpdateTaskDto {
+  title?: string;
+  description?: string;
+  instructions?: string;
+  dueDate?: string;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  status?: TaskStatus;
+  milestoneId?: string;
+  learningOutcomeId?: string;
+  expectedEvidence?: string;
+}
+
+export interface StudentEvidenceItem {
+  type: EvidenceType;
+  url?: string;
+  name?: string;
+  notes?: string;
+}
+
+export interface StudentOutcomeViewDto {
+  outcomeId: string;
+  code: string;
+  name: string;
+  description?: string;
+  expectedEvidence: string[];
+  studentEvidence: Array<{
+    submissionId: string;
+    taskTitle: string;
+    evidenceType: string;
+    evidenceUrl?: string;
+    fileName?: string;
+    submittedAt: string;
+    status: SubmissionStatus;
+  }>;
+  status: 'NOT_STARTED' | 'IN_PROGRESS' | 'EVIDENCE_SUBMITTED' | 'VERIFIED' | 'REVISION_NEEDED';
+  mentorAssessment?: string;
+  feedback?: string;
+}
+
+export interface StudentDashboardDto {
+  studentName: string;
+  internship: {
+    id: string;
+    title: string;
+    companyName: string;
+    companyWebsite?: string;
+    startDate: string;
+    endDate: string;
+    status: InternshipStatus;
+    workMode: string;
+    departmentName?: string;
+    mentorName?: string;
+    mentorEmail?: string;
+    overallProgress: number;
+  } | null;
+  activeMilestone: {
+    id: string;
+    title: string;
+    dueDate: string;
+    progress: number;
+    completedTasks: number;
+    totalTasks: number;
+  } | null;
+  upcomingTasks: TaskItemDto[];
+  recentSubmissions: Array<{
+    id: string;
+    taskId: string;
+    taskTitle: string;
+    submissionTitle: string;
+    submittedAt: string;
+    status: SubmissionStatus;
+    mentorFeedback?: string;
+  }>;
+  outcomesSummary: {
+    total: number;
+    progressing: number;
+    verified: number;
+    requiresEvidence: number;
+  };
+  upcomingDeadlines: Array<{
+    id: string;
+    title: string;
+    type: 'TASK' | 'MILESTONE';
+    dueDate: string;
+    daysRemaining: number;
+  }>;
+}
+
+export interface MentorDashboardDto {
+  mentorName: string;
+  companyName: string;
+  stats: {
+    assignedInterns: number;
+    activeInternships: number;
+    pendingReviews: number;
+    tasksAwaitingReview: number;
+    outcomesRequiringEvidence: number;
+  };
+  recentSubmissions: Array<{
+    id: string;
+    internshipId: string;
+    studentName: string;
+    studentEmail: string;
+    taskTitle: string;
+    submissionTitle: string;
+    submittedAt: string;
+    status: SubmissionStatus;
+  }>;
+  interns: Array<{
+    studentId: string;
+    internshipId: string;
+    studentName: string;
+    department: string;
+    internshipTitle: string;
+    progress: number;
+    currentMilestoneTitle?: string;
+    pendingSubmissionsCount: number;
+    status: InternshipStatus;
+  }>;
+}
+
+export interface MentorInternDetailDto {
+  student: {
+    id: string;
+    name: string;
+    email: string;
+    department: string;
+    college: string;
+    rollNumber: string;
+    batchYear: number;
+  };
+  internship: {
+    id: string;
+    title: string;
+    companyName: string;
+    startDate: string;
+    endDate: string;
+    status: InternshipStatus;
+    workMode: string;
+    progress: number;
+  };
+  milestones: MilestoneDto[];
+  tasks: TaskItemDto[];
+  submissions: SubmissionDto[];
+  outcomes: StudentOutcomeViewDto[];
+  feedbacks: Array<{
+    id: string;
+    submissionId?: string;
+    taskTitle?: string;
+    feedback: string;
+    rating?: number;
+    strengths?: string;
+    improvements?: string;
+    nextAction?: string;
+    createdAt: string;
+  }>;
+  documents: Array<{
+    id: string;
+    name: string;
+    type: string;
+    url: string;
+    uploadedAt: string;
+  }>;
+}
+
+export interface MentorReviewSubmissionDto {
+  status: 'ACCEPTED' | 'NEEDS_REVISION';
+  feedback: string;
+  score?: number;
+  rating?: number;
+  strengths?: string;
+  improvements?: string;
+  nextAction?: string;
+  revisionReason?: string;
+}
+
+
 

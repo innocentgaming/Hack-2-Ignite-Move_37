@@ -112,6 +112,7 @@ model Organization {
   notifications     Notification[]
   auditLogs         AuditLog[]
   documents         Document[]
+  milestones        Milestone[]
 
   @@index([code])
 }
@@ -275,9 +276,35 @@ model Internship {
 
   workflowInstance WorkflowInstance?
   documents        Document[]
+  milestones       Milestone[]
 
   @@index([organizationId, status])
   @@index([studentId])
+}
+
+// ==========================================
+// 8b. Milestone
+// ==========================================
+model Milestone {
+  id             String           @id @default(uuid())
+  organizationId String
+  internshipId   String
+  title          String
+  description    String?
+  order          Int              @default(1)
+  startDate      DateTime?
+  dueDate        DateTime
+  progress       Int              @default(0)
+  status         String           @default("NOT_STARTED")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  internship     Internship       @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  tasks          WorkflowTask[]
+
+  @@index([organizationId])
+  @@index([internshipId])
 }
 
 // ==========================================
@@ -323,23 +350,32 @@ model WorkflowInstance {
 // 11. WorkflowTask
 // ==========================================
 model WorkflowTask {
-  id             String           @id @default(uuid())
-  organizationId String
-  instanceId     String
-  title          String
-  stage          String
-  status         TaskStatus       @default(PENDING)
-  dueDate        DateTime?
-  assigneeRole   UserRole         @default(STUDENT)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id               String           @id @default(uuid())
+  organizationId   String
+  instanceId       String
+  milestoneId      String?
+  outcomeId        String?
+  title            String
+  stage            String
+  instructions     String?
+  priority         String           @default("MEDIUM")
+  expectedEvidence String?
+  status           TaskStatus       @default(PENDING)
+  dueDate          DateTime?
+  assigneeRole     UserRole         @default(STUDENT)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  instance       WorkflowInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  submissions    Submission[]
+  organization     Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  instance         WorkflowInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  milestone        Milestone?       @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  outcome          Outcome?         @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  submissions      Submission[]
 
   @@index([organizationId, status])
   @@index([instanceId])
+  @@index([milestoneId])
+  @@index([outcomeId])
 }
 
 // ==========================================
@@ -358,6 +394,7 @@ model Outcome {
   organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   versions       OutcomeVersion[]
   evaluations    Evaluation[]
+  tasks          WorkflowTask[]
 
   @@unique([organizationId, code])
   @@index([organizationId])

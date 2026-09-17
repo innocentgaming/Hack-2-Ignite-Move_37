@@ -90,6 +90,17 @@ class TenantStore {
       createdAt: now,
       updatedAt: now,
     });
+    this.departments.set('dept-a-it', {
+      id: 'dept-a-it',
+      organizationId: 'org-a-id',
+      code: 'ITECH',
+      name: 'Information Technology',
+      description: 'Department of Information Technology & Software Systems',
+      isActive: true,
+      hodId: null,
+      createdAt: now,
+      updatedAt: now,
+    });
     this.departments.set('dept-a-ee', {
       id: 'dept-a-ee',
       organizationId: 'org-a-id',

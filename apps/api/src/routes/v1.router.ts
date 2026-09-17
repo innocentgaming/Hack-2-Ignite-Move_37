@@ -13,6 +13,9 @@ import { notificationRouter } from './notification.router.js';
 import { documentRouter } from './document.router.js';
 import { analyticsRouter } from './analytics.router.js';
 
+import { studentRouter } from './student.router.js';
+import { mentorRouter } from './mentor.router.js';
+
 import { authenticate } from '../middleware/auth.js';
 import { tenantIsolation } from '../middleware/tenantIsolation.js';
 
@@ -48,6 +51,8 @@ protectedRouter.use('/ai', aiRouter);
 protectedRouter.use('/notifications', notificationRouter);
 protectedRouter.use('/documents', documentRouter);
 protectedRouter.use('/analytics', analyticsRouter);
+protectedRouter.use('/student', studentRouter);
+protectedRouter.use('/mentor', mentorRouter);
 
 router.use(protectedRouter);
 

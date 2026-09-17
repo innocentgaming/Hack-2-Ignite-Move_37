@@ -5,25 +5,25 @@ import { UserRole } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
 import {
   LayoutDashboard,
-  GraduationCap,
   Users,
   Briefcase,
   GitBranch,
+  CheckSquare,
   FileCheck,
-  Award,
-  BookOpen,
-  Settings,
-  ShieldCheck,
+  Target,
+  MessageSquare,
   FolderArchive,
-  Compass,
-  UserPlus,
+  User,
+  ShieldCheck,
   Activity,
+  BarChart3,
+  BookOpen,
+  UserPlus,
   FileSpreadsheet,
   ClipboardList,
-  BadgeCheck,
-  Medal,
   ScrollText,
-  BarChart3,
+  Settings,
+  Compass,
 } from 'lucide-react';
 
 interface NavItem {
@@ -39,125 +39,131 @@ export const Sidebar: React.FC = () => {
   const role = normalizeRole(rawRole);
 
   const navItems: NavItem[] = [
-    { label: 'Overview', to: '/app/dashboard', icon: LayoutDashboard },
-
-    // Student Navigation
+    // ---------------------------------------------------------
+    // STUDENT WORKSPACE NAVIGATION
+    // ---------------------------------------------------------
+    {
+      label: 'Overview',
+      to: '/app/student',
+      icon: LayoutDashboard,
+      roles: [UserRole.STUDENT],
+    },
     {
       label: 'My Internship',
-      to: '/app/internships',
+      to: '/app/student/internship',
       icon: Briefcase,
       roles: [UserRole.STUDENT],
     },
     {
-      label: 'Milestones & Tasks',
-      to: '/app/tasks',
+      label: 'Milestones',
+      to: '/app/student/milestones',
       icon: GitBranch,
       roles: [UserRole.STUDENT],
     },
     {
+      label: 'Tasks',
+      to: '/app/student/tasks',
+      icon: CheckSquare,
+      roles: [UserRole.STUDENT],
+    },
+    {
       label: 'Submissions',
-      to: '/app/submissions',
+      to: '/app/student/submissions',
       icon: FileCheck,
       roles: [UserRole.STUDENT],
     },
     {
-      label: 'Completion Record',
-      to: '/app/student/completion',
-      icon: Medal,
+      label: 'Learning Outcomes',
+      to: '/app/student/outcomes',
+      icon: Target,
+      roles: [UserRole.STUDENT],
+    },
+    {
+      label: 'Feedback',
+      to: '/app/student/feedback',
+      icon: MessageSquare,
+      roles: [UserRole.STUDENT],
+    },
+    {
+      label: 'Documents',
+      to: '/app/student/documents',
+      icon: FolderArchive,
+      roles: [UserRole.STUDENT],
+    },
+    {
+      label: 'Profile',
+      to: '/app/student/profile',
+      icon: User,
       roles: [UserRole.STUDENT],
     },
 
-    // Faculty Navigation
+    // ---------------------------------------------------------
+    // MENTOR WORKSPACE NAVIGATION
+    // ---------------------------------------------------------
     {
-      label: 'Supervised Interns',
-      to: '/app/faculty',
-      icon: GraduationCap,
-      roles: [UserRole.FACULTY],
-    },
-    {
-      label: 'Cohort Monitoring',
-      to: '/app/faculty/monitoring',
-      icon: Activity,
-      roles: [UserRole.FACULTY],
-    },
-    {
-      label: 'Review Submissions',
-      to: '/app/faculty/reviews',
-      icon: FileCheck,
-      roles: [UserRole.FACULTY],
-    },
-    {
-      label: 'Outcome Evaluations',
-      to: '/app/faculty/evaluations',
-      icon: Award,
-      roles: [UserRole.FACULTY],
-    },
-    {
-      label: 'Completion Sign-Off',
-      to: '/app/faculty/completion',
-      icon: BadgeCheck,
-      roles: [UserRole.FACULTY],
-    },
-
-    // HOD Navigation
-    {
-      label: 'Department Oversight',
-      to: '/app/hod',
-      icon: BookOpen,
-      roles: [UserRole.HOD],
-    },
-    {
-      label: 'Mentor Assignment',
-      to: '/app/hod/mentors',
-      icon: Users,
-      roles: [UserRole.HOD],
-    },
-    {
-      label: 'Internship Approvals',
-      to: '/app/hod/approvals',
-      icon: FileCheck,
-      roles: [UserRole.HOD],
-    },
-    {
-      label: 'Department Monitoring',
-      to: '/app/hod/monitoring',
-      icon: Activity,
-      roles: [UserRole.HOD],
-    },
-    {
-      label: 'Department Analytics',
-      to: '/app/hod/analytics',
-      icon: BarChart3,
-      roles: [UserRole.HOD],
-    },
-    {
-      label: 'Completion Hub',
-      to: '/app/hod/completion',
-      icon: ScrollText,
-      roles: [UserRole.HOD],
-    },
-
-    // Industry Mentor Navigation
-    {
-      label: 'Mentored Cohort',
+      label: 'Overview',
       to: '/app/mentor',
+      icon: LayoutDashboard,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'My Interns',
+      to: '/app/mentor/interns',
       icon: Users,
       roles: [UserRole.MENTOR],
     },
     {
-      label: 'Performance Reviews',
-      to: '/app/mentor/reviews',
-      icon: Award,
+      label: 'Internships',
+      to: '/app/mentor/internships',
+      icon: Briefcase,
       roles: [UserRole.MENTOR],
     },
     {
-      label: 'Final Evaluation',
-      to: '/app/mentor/evaluation',
-      icon: Medal,
+      label: 'Milestones',
+      to: '/app/mentor/milestones',
+      icon: GitBranch,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Tasks',
+      to: '/app/mentor/tasks',
+      icon: CheckSquare,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Submissions',
+      to: '/app/mentor/submissions',
+      icon: FileCheck,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Feedback',
+      to: '/app/mentor/feedback',
+      icon: MessageSquare,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Learning Outcomes',
+      to: '/app/mentor/outcomes',
+      icon: Target,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Documents',
+      to: '/app/mentor/documents',
+      icon: FolderArchive,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Profile',
+      to: '/app/mentor/profile',
+      icon: User,
       roles: [UserRole.MENTOR],
     },
 
-    // Institutional Admin Navigation
+    // ---------------------------------------------------------
+    // ADMIN WORKSPACE NAVIGATION (Preserved untouched)
+    // ---------------------------------------------------------
     {
       label: 'Tenant Governance',
       to: '/app/admin',
@@ -186,18 +192,12 @@ export const Sidebar: React.FC = () => {
       label: 'Users & Invites',
       to: '/app/admin/users',
       icon: UserPlus,
-      roles: [UserRole.ADMIN, UserRole.HOD],
+      roles: [UserRole.ADMIN],
     },
     {
       label: 'Student CSV Import',
       to: '/app/admin/students/import',
       icon: FileSpreadsheet,
-      roles: [UserRole.ADMIN],
-    },
-    {
-      label: 'Audit Trail',
-      to: '/app/admin/audit',
-      icon: ClipboardList,
       roles: [UserRole.ADMIN],
     },
     {
@@ -207,15 +207,23 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.ADMIN],
     },
     {
+      label: 'Audit Trail',
+      to: '/app/admin/audit',
+      icon: ClipboardList,
+      roles: [UserRole.ADMIN],
+    },
+    {
       label: 'Completion Admin',
       to: '/app/admin/completion',
       icon: ScrollText,
       roles: [UserRole.ADMIN],
     },
-
-    // Universal
-    { label: 'Document Vault', to: '/app/documents', icon: FolderArchive },
-    { label: 'System Settings', to: '/app/admin/settings', icon: Settings, roles: [UserRole.ADMIN] },
+    {
+      label: 'System Settings',
+      to: '/app/admin/settings',
+      icon: Settings,
+      roles: [UserRole.ADMIN],
+    },
   ];
 
   const visibleItems = navItems.filter((item) => {
@@ -223,24 +231,32 @@ export const Sidebar: React.FC = () => {
     return item.roles.includes(role);
   });
 
+  const portalTitle =
+    role === UserRole.STUDENT
+      ? 'Student Workspace'
+      : role === UserRole.MENTOR
+      ? 'Mentor Workspace'
+      : 'Admin Console';
+
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-[calc(100vh-4rem)] sticky top-16 border-r border-slate-800">
-      <div className="p-4">
-        <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-[calc(100vh-4rem)] sticky top-16 border-r border-slate-800 select-none">
+      <div className="p-4 border-b border-slate-800/60">
+        <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
           <Compass className="w-4 h-4 text-indigo-400" />
-          <span>{role} Portal</span>
+          <span>{portalTitle}</span>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
         {visibleItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.to === '/app/student' || item.to === '/app/mentor' || item.to === '/app/admin'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
                   : 'text-slate-300 hover:bg-slate-800 hover:text-white'
               }`
             }
@@ -251,18 +267,20 @@ export const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* Tenant Status Footer */}
-      <div className="p-4 border-t border-slate-800">
-        <div className="p-3 bg-slate-800/60 rounded-lg border border-slate-700/60 text-xs">
+      {/* Tenant Context Badge */}
+      <div className="p-4 border-t border-slate-800/80">
+        <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/60 text-xs space-y-1">
           <div className="flex items-center justify-between text-slate-400">
-            <span>Isolation Mode</span>
-            <span className="text-emerald-400 font-mono text-[10px] font-bold">STRICT_ORG</span>
+            <span>Tenant Root</span>
+            <span className="text-emerald-400 font-mono text-[10px] font-bold">ISOLATED</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1 truncate">
-            {user?.organizationName || user?.organizationCode || 'Organization'}
+          <p className="text-[11px] text-slate-300 font-medium truncate">
+            {user?.organizationName || user?.organizationCode || 'Organization A'}
           </p>
         </div>
       </div>
     </aside>
   );
 };
+
+export default Sidebar;

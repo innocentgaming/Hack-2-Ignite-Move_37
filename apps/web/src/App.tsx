@@ -25,6 +25,32 @@ import { LoadingPage } from './pages/LoadingPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
+// Student Workspace Pages
+import { StudentOverviewPage } from './pages/student/StudentOverviewPage';
+import { StudentInternshipPage } from './pages/student/StudentInternshipPage';
+import { StudentMilestonesPage } from './pages/student/StudentMilestonesPage';
+import { StudentMilestoneDetailPage } from './pages/student/StudentMilestoneDetailPage';
+import { StudentTasksPage } from './pages/student/StudentTasksPage';
+import { StudentTaskDetailPage } from './pages/student/StudentTaskDetailPage';
+import { StudentSubmissionsPage } from './pages/student/StudentSubmissionsPage';
+import { StudentSubmissionDetailPage } from './pages/student/StudentSubmissionDetailPage';
+import { StudentOutcomesPage } from './pages/student/StudentOutcomesPage';
+import { StudentFeedbackPage } from './pages/student/StudentFeedbackPage';
+import { StudentDocumentsPage } from './pages/student/StudentDocumentsPage';
+import { StudentProfilePage } from './pages/student/StudentProfilePage';
+
+// Mentor Workspace Pages
+import { MentorOverviewPage } from './pages/mentor/MentorOverviewPage';
+import { MentorInternsPage } from './pages/mentor/MentorInternsPage';
+import { MentorInternDetailPage } from './pages/mentor/MentorInternDetailPage';
+import { MentorMilestonesPage } from './pages/mentor/MentorMilestonesPage';
+import { MentorTasksPage } from './pages/mentor/MentorTasksPage';
+import { MentorSubmissionsPage } from './pages/mentor/MentorSubmissionsPage';
+import { MentorOutcomesPage } from './pages/mentor/MentorOutcomesPage';
+import { MentorFeedbackPage } from './pages/mentor/MentorFeedbackPage';
+import { MentorDocumentsPage } from './pages/mentor/MentorDocumentsPage';
+import { MentorProfilePage } from './pages/mentor/MentorProfilePage';
+
 export const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -63,25 +89,36 @@ export const App: React.FC = () => {
               <Route path="admin/analytics" element={<AnalyticsPage />} />
               <Route path="admin/*" element={<DashboardPage />} />
 
-              <Route path="hod/approvals" element={<InternshipsPage />} />
-              <Route path="hod/mentors" element={<InternshipsPage />} />
-              <Route path="hod/monitoring" element={<MonitoringPage />} />
-              <Route path="hod/analytics" element={<AnalyticsPage />} />
-              <Route path="hod" element={<DashboardPage />} />
-              <Route path="hod/*" element={<DashboardPage />} />
+              {/* Student Dedicated Routes */}
+              <Route path="student" element={<StudentOverviewPage />} />
+              <Route path="student/internship" element={<StudentInternshipPage />} />
+              <Route path="student/milestones" element={<StudentMilestonesPage />} />
+              <Route path="student/milestones/:id" element={<StudentMilestoneDetailPage />} />
+              <Route path="student/tasks" element={<StudentTasksPage />} />
+              <Route path="student/tasks/:id" element={<StudentTaskDetailPage />} />
+              <Route path="student/submissions" element={<StudentSubmissionsPage />} />
+              <Route path="student/submissions/:id" element={<StudentSubmissionDetailPage />} />
+              <Route path="student/outcomes" element={<StudentOutcomesPage />} />
+              <Route path="student/feedback" element={<StudentFeedbackPage />} />
+              <Route path="student/documents" element={<StudentDocumentsPage />} />
+              <Route path="student/profile" element={<StudentProfilePage />} />
+              <Route path="student/*" element={<Navigate to="/app/student" replace />} />
 
-              <Route path="faculty" element={<InternshipsPage />} />
-              <Route path="faculty/reviews" element={<InternshipsPage />} />
-              <Route path="faculty/evaluations" element={<TasksPage />} />
-              <Route path="faculty/monitoring" element={<MonitoringPage />} />
-              <Route path="faculty/*" element={<DashboardPage />} />
+              {/* Mentor Dedicated Routes */}
+              <Route path="mentor" element={<MentorOverviewPage />} />
+              <Route path="mentor/interns" element={<MentorInternsPage />} />
+              <Route path="mentor/interns/:studentId" element={<MentorInternDetailPage />} />
+              <Route path="mentor/internships" element={<MentorInternsPage />} />
+              <Route path="mentor/milestones" element={<MentorMilestonesPage />} />
+              <Route path="mentor/tasks" element={<MentorTasksPage />} />
+              <Route path="mentor/submissions" element={<MentorSubmissionsPage />} />
+              <Route path="mentor/outcomes" element={<MentorOutcomesPage />} />
+              <Route path="mentor/feedback" element={<MentorFeedbackPage />} />
+              <Route path="mentor/documents" element={<MentorDocumentsPage />} />
+              <Route path="mentor/profile" element={<MentorProfilePage />} />
+              <Route path="mentor/*" element={<Navigate to="/app/mentor" replace />} />
 
-              <Route path="student/*" element={<DashboardPage />} />
-
-              <Route path="mentor" element={<InternshipsPage />} />
-              <Route path="mentor/reviews" element={<TasksPage />} />
-              <Route path="mentor/*" element={<DashboardPage />} />
-
+              {/* Common Routes */}
               <Route path="monitoring" element={<MonitoringPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="internships" element={<InternshipsPage />} />
@@ -94,11 +131,13 @@ export const App: React.FC = () => {
               {/* Phase 8: Completion, Evaluation & Termination */}
               <Route path="completion" element={<CompletionPage />} />
               <Route path="mentor/evaluation" element={<CompletionPage />} />
-              <Route path="faculty/completion" element={<CompletionPage />} />
               <Route path="student/completion" element={<CompletionPage />} />
-              <Route path="hod/completion" element={<CompletionPage />} />
               <Route path="admin/completion" element={<CompletionPage />} />
             </Route>
+
+            {/* Direct convenience redirects */}
+            <Route path="/student/*" element={<Navigate to="/app/student" replace />} />
+            <Route path="/mentor/*" element={<Navigate to="/app/mentor" replace />} />
 
             {/* 404 Fallback */}
             <Route path="*" element={<NotFoundPage />} />

@@ -39,8 +39,9 @@ app.use(requestLogger);
 // Health check endpoint (explicitly required: GET /api/health)
 app.use('/api/health', healthRouter);
 
-// Versioned API endpoints
+// Versioned and base API endpoints
 app.use('/api/v1', v1Router);
+app.use('/api', v1Router);
 
 // Catch-all 404 handler
 app.use((req, res, next) => {

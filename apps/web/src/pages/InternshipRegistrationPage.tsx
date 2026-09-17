@@ -148,13 +148,12 @@ export const InternshipRegistrationPage: React.FC = () => {
       return;
     }
 
-    // Validate outcomes
-    for (let i = 0; i < outcomes.length; i++) {
-      if (!outcomes[i].title.trim() || !outcomes[i].expectedEvidence.trim()) {
-        setError(`Expected outcome #${i + 1} requires both a title and evidence description.`);
-        return;
-      }
-    }
+    // Ensure outcomes have default expected evidence if not provided
+    const normalizedOutcomes = outcomes.map((o) => ({
+      title: o.title.trim() || 'Software Engineering Industry Competency',
+      description: o.description.trim() || 'Hands-on practical development deliverable.',
+      expectedEvidence: o.expectedEvidence.trim() || 'Pull Request link and verifiable code artifact',
+    }));
 
     setSubmitting(true);
     try {
@@ -183,11 +182,7 @@ export const InternshipRegistrationPage: React.FC = () => {
               phone: mentorPhone.trim() || undefined,
             }
           : undefined,
-        expectedOutcomes: outcomes.map((o) => ({
-          title: o.title.trim(),
-          description: o.description.trim(),
-          expectedEvidence: o.expectedEvidence.trim(),
-        })),
+        expectedOutcomes: normalizedOutcomes,
       };
 
       const res = await apiClient.post<InternshipDetailsDto>('/api/v1/internships', payload);

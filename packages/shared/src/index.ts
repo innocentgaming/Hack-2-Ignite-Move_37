@@ -278,6 +278,8 @@ const STUDENT_PERMISSIONS: Permission[] = [
 
 const MENTOR_PERMISSIONS: Permission[] = [
   'internships:read',
+  'workflows:read',
+  'workflows:manage',
   'mentor_assignment:read',
   'submissions:read',
   'reviews:read',
