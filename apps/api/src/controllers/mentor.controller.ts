@@ -232,13 +232,14 @@ export class MentorController {
   async reviewRegistration(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const { decision, comments } = req.body;
+      const { decision, comments, notes } = req.body;
+      const finalComments = comments || notes;
       const data = await studentMentorService.reviewMentorRegistration(
         req.user!.organizationId,
         req.user!,
         id,
         decision,
-        comments
+        finalComments
       );
       res.status(200).json(formatSuccessResponse(data));
     } catch (err) {

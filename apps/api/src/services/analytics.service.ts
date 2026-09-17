@@ -14,6 +14,7 @@ import {
   AnalyticsFilterQuery,
   InternshipStatus,
   SubmissionStatus,
+  TaskStatus,
   UserRole,
   OutcomeStatus,
   AuthenticatedUser,
@@ -30,6 +31,7 @@ import { completionStore } from './completion.service.js';
 import { tenantStore } from './tenant.service.js';
 import { authStore } from './auth.service.js';
 import { aiStore } from './ai/ai-analysis.service.js';
+import { studentMentorStore } from './student-mentor.service.js';
 
 export class AnalyticsService {
   /**
@@ -89,6 +91,47 @@ export class AnalyticsService {
       internships = internships.filter((d) => {
         const start = d.startDate ? new Date(d.startDate) : new Date(d.createdAt);
         return start <= endDateFilter;
+      });
+    }
+
+    // Apply status filter
+    if (query.status) {
+      internships = internships.filter((d) => d.status === query.status);
+    }
+    // Apply type filter
+    if (query.type) {
+      internships = internships.filter((d) => (d as any).type === query.type);
+    }
+    // Apply internshipId filter
+    if (query.internshipId) {
+      internships = internships.filter((d) => d.id === query.internshipId);
+    }
+    // Apply studentId filter
+    if (query.studentId) {
+      internships = internships.filter((d) => d.studentId === query.studentId);
+    }
+    // Apply mentorId filter
+    if (query.mentorId) {
+      internships = internships.filter(
+        (d) => (d as any).industryMentorId === query.mentorId || (d as any).mentorId === query.mentorId
+      );
+    }
+    // Apply companyId filter
+    if (query.companyId) {
+      internships = internships.filter((d) => d.companyId === query.companyId);
+    }
+    // Apply text search
+    if (query.search && query.search.trim()) {
+      const q = query.search.toLowerCase().trim();
+      internships = internships.filter((d) => {
+        const student = authStore.users.get(d.studentId);
+        const studentName = `${student?.firstName || ''} ${student?.lastName || ''}`.toLowerCase();
+        const comp = internshipStore.companies.get(d.companyId)?.name?.toLowerCase() || '';
+        return (
+          d.title.toLowerCase().includes(q) ||
+          studentName.includes(q) ||
+          comp.includes(q)
+        );
       });
     }
 
@@ -475,7 +518,71 @@ export class AnalyticsService {
     lines.push(`Date Range Filter,${analytics.filtersApplied.startDate || 'Start'} to ${analytics.filtersApplied.endDate || 'End'}`);
     lines.push('');
 
-    // Section 1: Executive Overview KPIs
+    // Section 1: Detailed Filtered Student Records (18 Columns)
+    lines.push('=== DETAILED STUDENT INTERNSHIP RECORDS ===');
+    lines.push(
+      'Student,Student Email,Department,Internship,Company,Mentor,Start Date,End Date,Internship Status,Progress,Milestones Completed,Total Milestones,Tasks Completed,Total Tasks,Submissions,Pending Reviews,Learning Outcomes,Completion Status'
+    );
+
+    const escapeCsv = (str: string | number | undefined | null) => {
+      const val = str === undefined || str === null ? '' : String(str);
+      return `"${val.replace(/"/g, '""')}"`;
+    };
+
+    const orgInternships = Array.from(internshipStore.details.values()).filter(
+      (d) => d.organizationId === analytics.organizationId
+    );
+
+    for (const d of orgInternships) {
+      const student = authStore.users.get(d.studentId);
+      const studentName = student ? `${student.firstName} ${student.lastName}`.trim() : 'Student';
+      const studentEmail = student?.email || 'N/A';
+      const dept = student?.departmentId ? tenantStore.departments.get(student.departmentId)?.name : 'General';
+      const company = internshipStore.companies.get(d.companyId)?.name || 'Host Organization';
+      const mentorUser = (d as any).industryMentorId
+        ? authStore.users.get((d as any).industryMentorId)
+        : (d as any).mentorId
+        ? authStore.users.get((d as any).mentorId)
+        : null;
+      const mentorName = mentorUser ? `${mentorUser.firstName} ${mentorUser.lastName}`.trim() : (d.mentor?.name || 'Assigned Mentor');
+
+      const msList = Array.from(studentMentorStore.milestones.values()).filter((m) => m.internshipId === d.id);
+      const taskList = Array.from(studentMentorStore.tasks.values()).filter((t) => t.internshipId === d.id);
+      const completedTasks = taskList.filter((t) => (t.status as any) === TaskStatus.APPROVED).length;
+      const completedMs = msList.filter((m) => m.progress === 100).length;
+
+      const subs = Array.from(studentMentorStore.submissions.values()).filter((s) => s.internshipId === d.id);
+      const pendingReviews = subs.filter((s) => s.status === 'SUBMITTED' || s.status === 'REVISION_NEEDED').length;
+
+      const outcomes = (d.expectedOutcomes || []).length;
+      const progress = d.status === 'COMPLETED' ? 100 : (taskList.length > 0 ? Math.round((completedTasks / taskList.length) * 100) : 50);
+
+      lines.push(
+        [
+          escapeCsv(studentName),
+          escapeCsv(studentEmail),
+          escapeCsv(dept),
+          escapeCsv(d.title),
+          escapeCsv(company),
+          escapeCsv(mentorName),
+          escapeCsv(d.startDate ? new Date(d.startDate).toISOString().split('T')[0] : 'N/A'),
+          escapeCsv(d.endDate ? new Date(d.endDate).toISOString().split('T')[0] : 'N/A'),
+          escapeCsv(d.status),
+          escapeCsv(`${progress}%`),
+          completedMs,
+          msList.length,
+          completedTasks,
+          taskList.length,
+          subs.length,
+          pendingReviews,
+          outcomes,
+          escapeCsv(d.status === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS'),
+        ].join(',')
+      );
+    }
+    lines.push('');
+
+    // Section 2: Executive Overview KPIs
     lines.push('=== EXECUTIVE OVERVIEW METRICS ===');
     lines.push('Metric,Value');
     lines.push(`Total Registered Internships,${analytics.overview.totalInternships}`);

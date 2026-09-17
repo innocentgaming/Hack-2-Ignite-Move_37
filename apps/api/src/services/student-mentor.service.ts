@@ -907,6 +907,9 @@ export class StudentMentorService {
       endDate: string;
       workMode?: string;
       offerLetterUrl?: string;
+      offerLetterBase64?: string;
+      offerLetterFilename?: string;
+      offerLetterMimeType?: string;
     }
   ) {
     if (!data.companyName?.trim()) throw new ValidationError('Company name is required');
@@ -975,8 +978,36 @@ export class StudentMentorService {
 
     internshipStore.details.set(internshipId, newInternship as any);
 
-    // If offer letter was uploaded, attach document
-    if (data.offerLetterUrl) {
+    // If offer letter base64 was uploaded, validate PDF and store properly
+    if (data.offerLetterBase64) {
+      const base64Data = data.offerLetterBase64.replace(/^data:[^;]+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      if (buffer.length < 5 || buffer.subarray(0, 5).toString('ascii') !== '%PDF-') {
+        throw new ValidationError('Invalid Offer Letter PDF: file signature must be a valid PDF format.');
+      }
+      const safeFilename = path.basename(data.offerLetterFilename || 'Official Offer Letter.pdf');
+      const docId = `doc-${Date.now().toString(36)}`;
+      const sanitizedOrg = organizationId.replace(/[^a-zA-Z0-9-_]/g, '');
+      const storageKey = `${sanitizedOrg}/${docId}-${safeFilename}`;
+
+      const targetDir = path.resolve(process.cwd(), 'uploads', sanitizedOrg);
+      await fs.mkdir(targetDir, { recursive: true });
+      await fs.writeFile(path.join(targetDir, `${docId}-${safeFilename}`), buffer);
+
+      tenantStore.documents.set(docId, {
+        id: docId,
+        organizationId,
+        uploaderId: studentUser.id,
+        internshipId,
+        name: safeFilename,
+        mimeType: 'application/pdf',
+        size: buffer.length,
+        storageKey,
+        url: `/api/v1/student/documents/${docId}/view`,
+        createdAt: now,
+        updatedAt: now,
+      });
+    } else if (data.offerLetterUrl) {
       const docId = `doc-${Date.now().toString(36)}`;
       tenantStore.documents.set(docId, {
         id: docId,

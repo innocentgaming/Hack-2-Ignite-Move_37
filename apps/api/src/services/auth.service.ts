@@ -12,6 +12,8 @@ import {
   ActivateAccountDto,
   LogoutResponseData,
   AuthenticatedUser,
+  RegisterInstitutionDto,
+  RegisterInstitutionResponseData,
 } from '@internos/types';
 import { env } from '../config/env.js';
 import { revokeToken } from '../middleware/auth.js';
@@ -527,6 +529,11 @@ export class AuthService {
     const normalizedEmail = email.toLowerCase().trim();
     const normalizedRole = normalizeRole(role);
 
+    // Restrict invited roles to valid platform roles
+    if (![UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY].includes(normalizedRole)) {
+      throw new ValidationError('Invalid role for organization invite');
+    }
+
     // Check if user already exists in this organization
     const existingMemUser = authStore.findUserByEmailAndOrg(normalizedEmail, organizationId);
     if (existingMemUser) {
@@ -666,6 +673,149 @@ export class AuthService {
         organizationName: org?.name,
         organizationCode: org?.code,
         departmentId: user.departmentId,
+      },
+    };
+  }
+
+  /**
+   * Register a new educational institution and create the initial admin user
+   */
+  async registerInstitution(dto: RegisterInstitutionDto): Promise<RegisterInstitutionResponseData> {
+    const {
+      institutionName,
+      institutionCode,
+      officialEmail,
+      website,
+      address,
+      country,
+      state,
+      city,
+      adminFirstName,
+      adminLastName,
+      adminEmail,
+      password,
+    } = dto;
+
+    const normalizedOrgCode = institutionCode.toUpperCase().trim();
+    const normalizedAdminEmail = adminEmail.toLowerCase().trim();
+    const normalizedOfficialEmail = officialEmail.toLowerCase().trim();
+
+    // Verify org code is unique
+    const existingOrg = authStore.findOrgByCode(normalizedOrgCode);
+    if (existingOrg) {
+      throw new ConflictError(`Institution with code '${normalizedOrgCode}' already exists`);
+    }
+
+    // Verify admin email is unique
+    const existingUser = Array.from(authStore.users.values()).find(
+      (u) => u.email === normalizedAdminEmail
+    );
+    if (existingUser) {
+      throw new ConflictError(`User with email '${normalizedAdminEmail}' already exists`);
+    }
+
+    const orgId = `org-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+    const adminId = `user-admin-${Date.now().toString(36)}`;
+    const now = new Date();
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const newOrg: InMemoryOrg = {
+      id: orgId,
+      code: normalizedOrgCode,
+      name: institutionName.trim(),
+      domain: website || `${normalizedOrgCode.toLowerCase()}.edu`,
+      settings: {
+        academicYear: '2026-2027',
+        semester: 'Fall',
+        officialEmail: normalizedOfficialEmail,
+        address,
+        country: country || 'United States',
+        state,
+        city,
+        requireMentorEvaluation: true,
+        allowStudentSelfRegistration: true,
+      },
+      createdAt: now,
+      updatedAt: now,
+    };
+    authStore.organizations.set(orgId, newOrg);
+
+    // Seed default department
+    const deptId = `dept-${Date.now().toString(36)}`;
+    try {
+      const { tenantStore } = await import('./tenant.service.js');
+      tenantStore.departments.set(deptId, {
+        id: deptId,
+        organizationId: orgId,
+        code: 'CSE',
+        name: 'Computer Science & Engineering',
+        description: 'Default academic department for technical internships',
+        isActive: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+    } catch {
+      // ignore
+    }
+
+    const newAdminUser: InMemoryUser = {
+      id: adminId,
+      organizationId: orgId,
+      departmentId: deptId,
+      email: normalizedAdminEmail,
+      passwordHash,
+      firstName: adminFirstName.trim(),
+      lastName: adminLastName.trim(),
+      role: UserRole.ADMIN,
+      status: UserStatus.ACTIVE,
+      createdAt: now,
+      updatedAt: now,
+    };
+    authStore.users.set(adminId, newAdminUser);
+
+    const token = jwt.sign(
+      {
+        userId: adminId,
+        email: normalizedAdminEmail,
+        role: UserRole.ADMIN,
+        organizationId: orgId,
+        organizationCode: normalizedOrgCode,
+      },
+      env.JWT_SECRET,
+      { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
+    );
+
+    await auditService.log({
+      organizationId: orgId,
+      userId: adminId,
+      actorId: adminId,
+      actorEmail: normalizedAdminEmail,
+      actorRole: UserRole.ADMIN,
+      action: 'CREATE' as any,
+      entity: 'Organization',
+      entityId: orgId,
+      details: { name: newOrg.name, code: newOrg.code, adminEmail: normalizedAdminEmail },
+    });
+
+    return {
+      token,
+      user: {
+        id: adminId,
+        email: normalizedAdminEmail,
+        firstName: adminFirstName.trim(),
+        lastName: adminLastName.trim(),
+        role: UserRole.ADMIN,
+        status: UserStatus.ACTIVE,
+        organizationId: orgId,
+        organizationName: newOrg.name,
+        organizationCode: newOrg.code,
+        departmentId: deptId,
+      },
+      organization: {
+        id: orgId,
+        name: newOrg.name,
+        code: newOrg.code,
       },
     };
   }

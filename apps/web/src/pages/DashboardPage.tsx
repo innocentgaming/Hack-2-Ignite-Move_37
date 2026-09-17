@@ -11,11 +11,7 @@ import {
 } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
 import { apiClient } from '../services/apiClient';
-import { Link } from 'react-router-dom';
-import { StudentWorkspace } from '../components/workspaces/StudentWorkspace';
-import { FacultyWorkspace } from '../components/workspaces/FacultyWorkspace';
-import { HODWorkspace } from '../components/workspaces/HODWorkspace';
-import { MentorWorkspace } from '../components/workspaces/MentorWorkspace';
+import { Link, Navigate } from 'react-router-dom';
 import {
   Briefcase,
   CheckCircle2,
@@ -29,7 +25,6 @@ import {
   FileSpreadsheet,
   GraduationCap,
   Award,
-  Eye,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -37,12 +32,13 @@ export const DashboardPage: React.FC = () => {
   const rawRole = user?.role || UserRole.STUDENT;
   const role = normalizeRole(rawRole);
 
-  // Allow switching preview role for ADMIN
-  const [activeRoleView, setActiveRoleView] = useState<UserRole>(role);
-
-  useEffect(() => {
-    setActiveRoleView(role);
-  }, [role]);
+  // Authenticated user's role directly determines their workspace
+  if (role === UserRole.STUDENT) {
+    return <Navigate to="/app/student" replace />;
+  }
+  if (role === UserRole.MENTOR) {
+    return <Navigate to="/app/mentor" replace />;
+  }
 
   const [internships, setInternships] = useState<InternshipDto[]>([]);
   const [adminMetrics, setAdminMetrics] = useState<AdminDashboardMetrics | null>(null);
@@ -141,16 +137,7 @@ export const DashboardPage: React.FC = () => {
             Hello, {user?.firstName} {user?.lastName} ({role})
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
-            {role === UserRole.ADMIN &&
-              'Institutional Administrator: Manage institution profile, department registry, student CSV bulk imports, and user roles.'}
-            {role === UserRole.HOD &&
-              'Head of Department: Oversee department-specific students, faculty, and active internship workflows.'}
-            {role === UserRole.FACULTY &&
-              'Faculty Supervisor: Supervise assigned student interns and review technical milestones.'}
-            {role === UserRole.STUDENT &&
-              'Student Intern: Track your internship lifecycle, submit weekly milestones, and view supervisor feedback.'}
-            {role === UserRole.MENTOR &&
-              'Industry Mentor: Track corporate interns and evaluate workplace deliverables.'}
+            Institutional Administrator: Manage institution profile, department registry, student CSV bulk imports, and user roles.
           </p>
         </div>
 
@@ -161,42 +148,8 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Role Workspace View Switcher for Admins */}
-      {role === UserRole.ADMIN && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
-            <Eye className="w-4 h-4 text-indigo-600" />
-            <span>Workspace View Perspective:</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {[UserRole.ADMIN, UserRole.STUDENT, UserRole.FACULTY, UserRole.HOD, UserRole.MENTOR].map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setActiveRoleView(r)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                  activeRoleView === r
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Render Role Workspaces */}
-      {activeRoleView === UserRole.STUDENT && <StudentWorkspace />}
-      {activeRoleView === UserRole.FACULTY && <FacultyWorkspace />}
-      {activeRoleView === UserRole.HOD && <HODWorkspace />}
-      {activeRoleView === UserRole.MENTOR && <MentorWorkspace />}
-
       {/* Real Dynamic Metrics: ADMIN DASHBOARD */}
-      {activeRoleView === UserRole.ADMIN && (
-        <>
-          {adminMetrics && (
+      {adminMetrics && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -458,8 +411,6 @@ export const DashboardPage: React.FC = () => {
           </Card>
         </div>
       </div>
-        </>
-      )}
     </div>
   );
 };

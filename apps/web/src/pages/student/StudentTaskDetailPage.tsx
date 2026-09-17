@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { apiClient } from '../../services/apiClient';
 import { TaskItemDto, TaskStatus, SubmissionStatus } from '@internos/types';
 import { Card } from '../../components/Card';
@@ -9,21 +9,25 @@ import { LoadingSkeleton } from '../../components/LoadingSkeleton';
 import {
   ArrowLeft,
   Clock,
-  Target,
-  GitBranch,
-  CheckCircle2,
   AlertCircle,
   FileCheck,
-  BookOpen,
   ArrowRight,
+  Target,
+  GitBranch,
+  BookOpen,
   AlertTriangle,
-  RotateCcw,
   ExternalLink,
+  RotateCcw,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const StudentTaskDetailPage: React.FC = () => {
   const { taskId, id } = useParams<{ taskId?: string; id?: string }>();
   const effectiveTaskId = taskId || id;
+
+  if (effectiveTaskId === 'submit') {
+    return <Navigate to="/app/student/tasks/submit" replace />;
+  }
 
   const [task, setTask] = useState<TaskItemDto | null>(null);
   const [loading, setLoading] = useState(true);

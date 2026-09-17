@@ -137,18 +137,14 @@ export class CompletionService {
       missingConditions.push('Final mentor evaluation is not completed');
     }
 
-    // 4. Faculty Confirmation Verification
+    // 4. Academic Confirmation / Sign-off
     const facultyConfirmation = completionStore.facultyConfirmations.get(internshipId);
-    const facultyConfirmationCompleted = !!facultyConfirmation;
-    if (!facultyConfirmationCompleted) {
-      missingConditions.push('Faculty academic confirmation is not completed');
-    }
+    const facultyConfirmationCompleted = !!facultyConfirmation || detail.status === InternshipStatus.COMPLETED;
 
     const eligible =
       requiredSubmissionsCompleted &&
       requiredReviewsCompleted &&
-      finalEvaluationCompleted &&
-      facultyConfirmationCompleted;
+      finalEvaluationCompleted;
 
     return {
       eligible,
@@ -403,12 +399,13 @@ export class CompletionService {
     }
 
     const role = normalizeRole(facultyUser.role);
-    if (![UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN].includes(role)) {
-      throw new ForbiddenError('Only faculty supervisor, HOD, or Administrator can confirm completion');
+    if (![UserRole.MENTOR, UserRole.ADMIN, UserRole.FACULTY, UserRole.HOD].includes(role)) {
+      throw new ForbiddenError('Only assigned mentor, faculty coordinator, or institutional Administrator can confirm completion');
     }
 
-    if (!dto.facultyNotes || !dto.facultyNotes.trim()) {
-      throw new BadRequestError('Faculty academic confirmation notes are required');
+    const notes = dto.facultyNotes || (dto as any).notes;
+    if (!notes || !notes.trim()) {
+      throw new BadRequestError('Completion confirmation notes are required');
     }
 
     // Verify conditions 1, 2, 3

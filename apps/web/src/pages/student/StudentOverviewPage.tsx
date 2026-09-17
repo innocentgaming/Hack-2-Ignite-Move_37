@@ -127,7 +127,13 @@ export const StudentOverviewPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link to="/app/student/tasks">
+          <Link
+            to={
+              upcomingTasks && upcomingTasks.length > 0
+                ? `/app/student/tasks/${upcomingTasks[0].id}/submit`
+                : '/app/student/submit-evidence'
+            }
+          >
             <Button variant="primary" size="sm" className="gap-2 shadow-xs">
               <FileCheck className="w-4 h-4" />
               Submit Evidence
@@ -355,11 +361,19 @@ export const StudentOverviewPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <Link to={`/app/student/tasks/${t.id}`}>
-                    <Button variant="secondary" size="sm" className="text-xs whitespace-nowrap">
-                      Open Task
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-1.5">
+                    <Link to={`/app/student/tasks/${t.id}/submit`}>
+                      <Button variant="primary" size="sm" className="text-xs whitespace-nowrap gap-1">
+                        <FileCheck className="w-3.5 h-3.5" />
+                        <span>Submit</span>
+                      </Button>
+                    </Link>
+                    <Link to={`/app/student/tasks/${t.id}`}>
+                      <Button variant="secondary" size="sm" className="text-xs whitespace-nowrap">
+                        Details
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

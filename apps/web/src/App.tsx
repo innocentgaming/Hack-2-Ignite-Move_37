@@ -8,6 +8,7 @@ import { MarketingLayout } from './layouts/MarketingLayout';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { ActivateAccountPage } from './pages/ActivateAccountPage';
+import { RegisterInstitutionPage } from './pages/RegisterInstitutionPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AdminDepartmentsPage } from './pages/AdminDepartmentsPage';
 import { AdminUsersPage } from './pages/AdminUsersPage';
@@ -70,6 +71,7 @@ export const App: React.FC = () => {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/activate" element={<ActivateAccountPage />} />
+              <Route path="/register-institution" element={<RegisterInstitutionPage />} />
             </Route>
 
             {/* Dedicated Loading & Error Screens */}
@@ -99,9 +101,11 @@ export const App: React.FC = () => {
               <Route path="student/milestones" element={<StudentMilestonesPage />} />
               <Route path="student/milestones/:id" element={<StudentMilestoneDetailPage />} />
               <Route path="student/tasks" element={<StudentTasksPage />} />
-              <Route path="student/tasks/:taskId" element={<StudentTaskDetailPage />} />
+              <Route path="student/tasks/submit" element={<StudentSubmitEvidencePage />} />
+              <Route path="student/submit-evidence" element={<StudentSubmitEvidencePage />} />
+              <Route path="student/submissions/new" element={<StudentSubmitEvidencePage />} />
               <Route path="student/tasks/:taskId/submit" element={<StudentSubmitEvidencePage />} />
-              <Route path="student/tasks/:id" element={<StudentTaskDetailPage />} />
+              <Route path="student/tasks/:taskId" element={<StudentTaskDetailPage />} />
               <Route path="student/submissions" element={<StudentSubmissionsPage />} />
               <Route path="student/submissions/:submissionId" element={<StudentSubmissionDetailPage />} />
               <Route path="student/submissions/:id" element={<StudentSubmissionDetailPage />} />

@@ -11,6 +11,15 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
+export async function registerInstitution(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await authService.registerInstitution(req.body);
+    res.status(201).json(formatSuccessResponse(result));
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const authHeader = req.headers.authorization;

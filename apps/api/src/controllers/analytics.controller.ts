@@ -20,6 +20,13 @@ export class AnalyticsController {
         departmentId: req.query.departmentId as string | undefined,
         startDate: req.query.startDate as string | undefined,
         endDate: req.query.endDate as string | undefined,
+        internshipId: req.query.internshipId as string | undefined,
+        studentId: req.query.studentId as string | undefined,
+        mentorId: req.query.mentorId as string | undefined,
+        companyId: req.query.companyId as string | undefined,
+        status: req.query.status as any,
+        type: req.query.type as string | undefined,
+        search: req.query.search as string | undefined,
         format: req.query.format as string | undefined,
       };
 
@@ -63,6 +70,13 @@ export class AnalyticsController {
         departmentId: req.query.departmentId as string | undefined,
         startDate: req.query.startDate as string | undefined,
         endDate: req.query.endDate as string | undefined,
+        internshipId: req.query.internshipId as string | undefined,
+        studentId: req.query.studentId as string | undefined,
+        mentorId: req.query.mentorId as string | undefined,
+        companyId: req.query.companyId as string | undefined,
+        status: req.query.status as any,
+        type: req.query.type as string | undefined,
+        search: req.query.search as string | undefined,
         format: 'csv',
       };
 

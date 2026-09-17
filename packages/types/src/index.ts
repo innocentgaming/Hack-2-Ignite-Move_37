@@ -257,10 +257,47 @@ export interface LogoutResponseData {
 export interface CreateInternshipDto {
   title: string;
   companyName?: string;
+  companyIndustry?: string;
+  companyWebsite?: string;
+  companyAddress?: string;
   type?: string;
+  workMode?: string;
   startDate?: string;
   endDate?: string;
   studentId?: string;
+  description?: string;
+  mentorName?: string;
+  mentorEmail?: string;
+  mentorDesignation?: string;
+  mentorPhone?: string;
+  offerLetterBase64?: string;
+  offerLetterFilename?: string;
+  offerLetterMimeType?: string;
+}
+
+export interface RegisterInstitutionDto {
+  institutionName: string;
+  institutionCode: string;
+  officialEmail: string;
+  website?: string;
+  address?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  adminFirstName: string;
+  adminLastName: string;
+  adminEmail: string;
+  password: string;
+}
+
+export interface RegisterInstitutionResponseData {
+  token: string;
+  user: AuthenticatedUser;
+  organization: {
+    id: string;
+    name: string;
+    code: string;
+  };
 }
 
 export interface InternshipDto {
@@ -288,15 +325,15 @@ export interface DocumentDto {
   uploaderId?: string;
   name: string;
   filename?: string;
+  type?: string;
   mimeType: string;
   size: number;
-  storageKey: string;
   url: string;
+  storageKey?: string;
   isPrivate?: boolean;
-  entityRelation?: DocumentEntityRelation;
   uploadedAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  entityRelation?: any;
+  createdAt: string;
 }
 
 // ==========================================
@@ -312,6 +349,14 @@ export interface DepartmentDto {
   isActive: boolean;
   hodId?: string | null;
   hodName?: string | null;
+  studentCount?: number;
+  facultyCount?: number;
+  activeInternships?: number;
+  completedInternships?: number;
+  pendingRegistrations?: number;
+  pendingReviews?: number;
+  averageProgress?: number;
+  completionRate?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -336,8 +381,15 @@ export interface DepartmentStatsDto {
   departmentName: string;
   departmentCode: string;
   totalStudents: number;
-  totalFaculty: number;
+  studentCount?: number;
+  totalFaculty?: number;
   activeInternships: number;
+  completedInternships?: number;
+  pendingRegistrations?: number;
+  pendingReviews?: number;
+  mentorCount?: number;
+  averageProgress?: number;
+  completionRate?: number;
   hodName?: string | null;
 }
 
@@ -1597,6 +1649,13 @@ export interface AnalyticsFilterQuery {
   startDate?: string;
   endDate?: string;
   format?: 'json' | 'csv' | string;
+  internshipId?: string;
+  studentId?: string;
+  mentorId?: string;
+  companyId?: string;
+  status?: string;
+  type?: string;
+  search?: string;
 }
 
 export interface InstitutionalAnalyticsDto {

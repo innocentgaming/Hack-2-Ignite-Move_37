@@ -49,17 +49,17 @@ export const LandingPage: React.FC = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-          <Link to="/login">
+          <Link to="/register-institution">
             <Button size="lg" className="w-full sm:w-auto px-8 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30">
-              <span>Sign In to Demo Institution</span>
+              <span>Register Your Institution</span>
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
-          <a href="/api/health" target="_blank" rel="noreferrer">
+          <Link to="/login">
             <Button variant="outline" size="lg" className="w-full sm:w-auto border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700">
-              Inspect GET /api/health
+              Explore Demo Environment
             </Button>
-          </a>
+          </Link>
         </div>
 
         {/* Live Architecture Badge Bar */}

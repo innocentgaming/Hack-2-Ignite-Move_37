@@ -147,6 +147,12 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.MENTOR],
     },
     {
+      label: 'Final Evaluation',
+      to: '/app/mentor/evaluation',
+      icon: ScrollText,
+      roles: [UserRole.MENTOR],
+    },
+    {
       label: 'Feedback',
       to: '/app/mentor/feedback',
       icon: MessageSquare,
@@ -177,7 +183,7 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.ADMIN],
     },
     {
-      label: 'Institution Health',
+      label: 'Institution Overview',
       to: '/app/admin/monitoring',
       icon: Activity,
       roles: [UserRole.ADMIN],

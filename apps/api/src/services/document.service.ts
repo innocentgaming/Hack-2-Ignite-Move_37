@@ -275,6 +275,7 @@ export class DocumentService {
           url: legacy.url,
           isPrivate: true,
           uploadedAt: legacy.createdAt.toISOString(),
+          createdAt: legacy.createdAt.toISOString(),
         };
       }
       throw new NotFoundError('Document', documentId);

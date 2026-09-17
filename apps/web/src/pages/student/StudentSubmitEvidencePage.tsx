@@ -33,7 +33,9 @@ interface EvidenceEntry {
 
 export const StudentSubmitEvidencePage: React.FC = () => {
   const { taskId, id } = useParams<{ taskId?: string; id?: string }>();
-  const effectiveTaskId = taskId || id;
+  const [selectedTaskId, setSelectedTaskId] = useState<string>(taskId || id || '');
+  const [availableTasks, setAvailableTasks] = useState<TaskItemDto[]>([]);
+  const effectiveTaskId = selectedTaskId || taskId || id || '';
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isResubmitMode = searchParams.get('resubmit') === 'true';
@@ -62,13 +64,41 @@ export const StudentSubmitEvidencePage: React.FC = () => {
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTask = async () => {
-      if (!effectiveTaskId) return;
+    let isMounted = true;
+
+    const loadTaskData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await apiClient.get<TaskItemDto>(`/api/v1/student/tasks/${effectiveTaskId}`);
-        if (res.success && res.data) {
+
+        // Fetch all assigned tasks to enable switcher & fallback
+        const listRes = await apiClient.get<TaskItemDto[]>('/api/v1/student/tasks');
+        const tasks = listRes.success && listRes.data ? listRes.data : [];
+        if (isMounted) {
+          setAvailableTasks(tasks);
+        }
+
+        // Determine target task id
+        let targetId = selectedTaskId || taskId || id;
+        if (!targetId && tasks.length > 0) {
+          // Select first task needing evidence or pending revision
+          const needsEvidence = tasks.find(
+            (t) => t.status !== TaskStatus.APPROVED && t.status !== TaskStatus.SUBMITTED
+          ) || tasks.find((t) => t.status !== TaskStatus.APPROVED) || tasks[0];
+          targetId = needsEvidence.id;
+          if (isMounted) setSelectedTaskId(targetId);
+        }
+
+        if (!targetId) {
+          if (isMounted) {
+            setLoading(false);
+            setError('No internship tasks found. Please wait for your mentor to assign tasks or milestones.');
+          }
+          return;
+        }
+
+        const res = await apiClient.get<TaskItemDto>(`/api/v1/student/tasks/${targetId}`);
+        if (res.success && res.data && isMounted) {
           setTask(res.data);
 
           // If task has latestSubmission in DRAFT or REVISION_NEEDED, prefill details
@@ -83,7 +113,7 @@ export const StudentSubmitEvidencePage: React.FC = () => {
               const subRes = await apiClient.get<any>(
                 `/api/v1/student/submissions/${res.data.latestSubmission.id}`
               );
-              if (subRes.success && subRes.data) {
+              if (subRes.success && subRes.data && isMounted) {
                 setDescription(subRes.data.description || '');
                 if (subRes.data.evidenceType) setEvidenceType(subRes.data.evidenceType);
                 if (subRes.data.evidenceUrl) setEvidenceUrl(subRes.data.evidenceUrl);
@@ -96,18 +126,27 @@ export const StudentSubmitEvidencePage: React.FC = () => {
           } else {
             setTitle(`Submission: ${res.data.title}`);
           }
-        } else {
+        } else if (isMounted) {
           setError(res.error?.message || 'Task not found');
         }
       } catch (err: any) {
-        setError(err?.message || 'Failed to connect to task details');
+        if (isMounted) setError(err?.message || 'Failed to connect to task details');
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchTask();
-  }, [effectiveTaskId, isResubmitMode]);
+    loadTaskData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedTaskId, taskId, id, isResubmitMode]);
+
+  const handleTaskSwitch = (newTaskId: string) => {
+    setSelectedTaskId(newTaskId);
+    navigate(`/app/student/tasks/${newTaskId}/submit`, { replace: true });
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,7 +192,11 @@ export const StudentSubmitEvidencePage: React.FC = () => {
   };
 
   const handleFormSubmit = async (isDraft: boolean) => {
-    if (!effectiveTaskId) return;
+    const targetTaskId = task?.id || effectiveTaskId;
+    if (!targetTaskId) {
+      setSubmitError('Please select a valid task to submit evidence for.');
+      return;
+    }
 
     if (!title.trim()) {
       setSubmitError('Please enter a submission title.');
@@ -210,7 +253,7 @@ export const StudentSubmitEvidencePage: React.FC = () => {
       };
 
       const res = await apiClient.post(
-        `/api/v1/student/tasks/${effectiveTaskId}/submissions`,
+        `/api/v1/student/tasks/${targetTaskId}/submissions`,
         payload
       );
 
@@ -266,15 +309,40 @@ export const StudentSubmitEvidencePage: React.FC = () => {
   return (
     <div className="space-y-6 pb-16 max-w-4xl">
       {/* Navigation Breadcrumb */}
-      <div>
+      <div className="flex items-center justify-between">
         <Link
-          to={`/app/student/tasks/${effectiveTaskId}`}
+          to={task ? `/app/student/tasks/${task.id}` : '/app/student/tasks'}
           className="text-xs font-semibold text-slate-500 hover:text-indigo-600 inline-flex items-center gap-1.5 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Task Details</span>
         </Link>
       </div>
+
+      {/* Task Switcher when multiple tasks exist */}
+      {availableTasks.length > 1 && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-indigo-50/70 border border-indigo-100 rounded-2xl">
+          <div className="space-y-0.5">
+            <span className="text-xs font-bold text-slate-900 block">
+              Submitting Evidence For Task:
+            </span>
+            <p className="text-[11px] text-slate-500">
+              Select which assigned task or milestone this deliverable fulfills
+            </p>
+          </div>
+          <select
+            value={task.id}
+            onChange={(e) => handleTaskSwitch(e.target.value)}
+            className="w-full sm:w-auto min-w-[260px] text-xs font-semibold bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+          >
+            {availableTasks.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.title} ({t.status}) • Due {t.dueDate}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Header Banner */}
       <Card className="rounded-2xl border border-slate-200 p-6 bg-white space-y-4 shadow-xs">

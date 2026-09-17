@@ -761,12 +761,36 @@ export class TenantService {
     );
 
     const totalStudents = deptUsers.filter((u) => u.role === UserRole.STUDENT).length;
-    const totalFaculty = deptUsers.filter((u) => u.role === UserRole.FACULTY).length;
+    const mentors = Array.from(authStore.users.values()).filter(
+      (u) => u.organizationId === organizationId && u.role === UserRole.MENTOR && (!u.departmentId || u.departmentId === departmentId)
+    );
+    const mentorCount = mentors.length;
+    const totalFaculty = mentorCount;
 
     const studentIds = new Set(deptUsers.filter((u) => u.role === UserRole.STUDENT).map((u) => u.id));
-    const activeInternships = Array.from(tenantStore.internships.values()).filter(
-      (i) => i.organizationId === organizationId && studentIds.has(i.studentId) && i.status === InternshipStatus.ACTIVE
-    ).length;
+    const allInternships = Array.from(tenantStore.internships.values()).filter(
+      (i) => i.organizationId === organizationId && studentIds.has(i.studentId)
+    );
+
+    const activeInternships = allInternships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
+    const completedInternships = allInternships.filter((i) => i.status === InternshipStatus.COMPLETED).length;
+    const pendingRegistrations = allInternships.filter((i) => i.status === InternshipStatus.PENDING_APPROVAL).length;
+
+    // Count pending reviews for department
+    let pendingReviews = 0;
+    try {
+      const { studentMentorStore } = await import('./student-mentor.service.js');
+      const studentSubs = Array.from(studentMentorStore.submissions.values()).filter(
+        (s) => s.organizationId === organizationId && studentIds.has(s.studentId) && s.status === 'SUBMITTED'
+      );
+      pendingReviews = studentSubs.length;
+    } catch {
+      // fallback
+    }
+
+    const totalTracked = activeInternships + completedInternships;
+    const completionRate = totalTracked > 0 ? Math.round((completedInternships / totalTracked) * 100) : 0;
+    const averageProgress = totalTracked > 0 ? Math.round(((completedInternships * 100) + (activeInternships * 55)) / totalTracked) : 0;
 
     let hodName: string | null = null;
     if (dept.hodId) {
@@ -779,8 +803,15 @@ export class TenantService {
       departmentName: dept.name,
       departmentCode: dept.code,
       totalStudents,
+      studentCount: totalStudents,
       totalFaculty,
+      mentorCount,
       activeInternships,
+      completedInternships,
+      pendingRegistrations,
+      pendingReviews,
+      averageProgress,
+      completionRate,
       hodName,
     };
   }

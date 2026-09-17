@@ -6,7 +6,7 @@ import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { LoadingSkeleton } from '../../components/LoadingSkeleton';
-import { ArrowLeft, Clock, AlertCircle, ArrowRight, Target } from 'lucide-react';
+import { ArrowLeft, Clock, AlertCircle, ArrowRight, Target, FileCheck } from 'lucide-react';
 
 export const StudentMilestoneDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -185,12 +185,30 @@ export const StudentMilestoneDetailPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <Link to={`/app/student/tasks/${task.id}`}>
-                    <Button variant="primary" size="sm" className="whitespace-nowrap gap-1 text-xs">
-                      <span>{isSubmitted ? 'View Submission' : 'Submit Evidence'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    {isSubmitted ? (
+                      <Link to={`/app/student/tasks/${task.id}`}>
+                        <Button variant="primary" size="sm" className="whitespace-nowrap gap-1 text-xs">
+                          <span>View Submission</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    ) : (
+                      <>
+                        <Link to={`/app/student/tasks/${task.id}/submit`}>
+                          <Button variant="primary" size="sm" className="whitespace-nowrap gap-1 text-xs">
+                            <FileCheck className="w-3.5 h-3.5" />
+                            <span>Submit Evidence</span>
+                          </Button>
+                        </Link>
+                        <Link to={`/app/student/tasks/${task.id}`}>
+                          <Button variant="secondary" size="sm" className="whitespace-nowrap text-xs">
+                            <span>Details</span>
+                          </Button>
+                        </Link>
+                      </>
+                    )}
+                  </div>
                 </Card>
               );
             })}

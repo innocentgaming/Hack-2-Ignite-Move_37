@@ -6,7 +6,7 @@ import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { LoadingSkeleton } from '../../components/LoadingSkeleton';
-import { Clock, ArrowRight, Target, GitBranch, CheckCircle2 } from 'lucide-react';
+import { Clock, ArrowRight, Target, GitBranch, CheckCircle2, FileCheck } from 'lucide-react';
 
 export const StudentTasksPage: React.FC = () => {
   const [tasks, setTasks] = useState<TaskItemDto[]>([]);
@@ -186,12 +186,19 @@ export const StudentTasksPage: React.FC = () => {
                       </Link>
                     )
                   ) : (
-                    <Link to={`/app/student/tasks/${task.id}`}>
-                      <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs">
-                        <span>Open Task</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link to={`/app/student/tasks/${task.id}/submit`}>
+                        <Button variant="primary" size="sm" className="whitespace-nowrap gap-1.5 text-xs">
+                          <FileCheck className="w-3.5 h-3.5" />
+                          <span>Submit Evidence</span>
+                        </Button>
+                      </Link>
+                      <Link to={`/app/student/tasks/${task.id}`}>
+                        <Button variant="secondary" size="sm" className="whitespace-nowrap text-xs">
+                          <span>Details</span>
+                        </Button>
+                      </Link>
+                    </div>
                   )}
                 </div>
               </Card>

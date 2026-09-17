@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { login, logout, invite, activate, getMe } from '../controllers/auth.controller.js';
+import { login, registerInstitution, logout, invite, activate, getMe } from '../controllers/auth.controller.js';
 import { validateBody } from '../middleware/validator.js';
 import { authenticate } from '../middleware/auth.js';
 import { requirePermission } from '../middleware/rbac.js';
@@ -11,6 +11,21 @@ const loginSchema = z.object({
   email: z.string().email('Valid email address is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   organizationCode: z.string().optional(),
+});
+
+const registerInstitutionSchema = z.object({
+  institutionName: z.string().min(2, 'Institution name is required'),
+  institutionCode: z.string().min(2, 'Institution code is required'),
+  officialEmail: z.string().email('Valid official email is required'),
+  website: z.string().optional(),
+  address: z.string().optional(),
+  country: z.string().optional(),
+  state: z.string().optional(),
+  city: z.string().optional(),
+  adminFirstName: z.string().min(1, 'Admin first name is required'),
+  adminLastName: z.string().min(1, 'Admin last name is required'),
+  adminEmail: z.string().email('Valid admin email is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 const inviteSchema = z.object({
@@ -36,6 +51,7 @@ const authLimiter = rateLimiter({
 });
 
 router.post('/login', authLimiter, validateBody(loginSchema), login);
+router.post('/register-institution', authLimiter, validateBody(registerInstitutionSchema), registerInstitution);
 router.post('/logout', authenticate, logout);
 router.post('/invite', authenticate, requirePermission('users:invite'), validateBody(inviteSchema), invite);
 router.post('/activate', authLimiter, validateBody(activateSchema), activate);
