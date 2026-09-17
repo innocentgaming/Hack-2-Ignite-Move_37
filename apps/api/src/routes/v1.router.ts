@@ -7,6 +7,7 @@ import { internshipRouter, companyRouter } from './internship.router.js';
 import { workspaceRouter } from './workspace.router.js';
 import { submissionRouter } from './submission.router.js';
 import { monitoringRouter } from './monitoring.router.js';
+import { completionRouter } from './completion.router.js';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.use('/companies', companyRouter);
 router.use('/workspaces', workspaceRouter);
 router.use('/submissions', submissionRouter);
 router.use('/monitoring', monitoringRouter);
+router.use('/completion', completionRouter);
 
 export const v1Router = router;
 

@@ -19,6 +19,7 @@ import { TasksPage } from './pages/TasksPage';
 import { InternshipsPage } from './pages/InternshipsPage';
 import { InternshipRegistrationPage } from './pages/InternshipRegistrationPage';
 import { MonitoringPage } from './pages/MonitoringPage';
+import { CompletionPage } from './pages/CompletionPage';
 import { LoadingPage } from './pages/LoadingPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -85,6 +86,14 @@ export const App: React.FC = () => {
               <Route path="submissions" element={<TasksPage />} />
               <Route path="documents" element={<DashboardPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
+
+              {/* Phase 8: Completion, Evaluation & Termination */}
+              <Route path="completion" element={<CompletionPage />} />
+              <Route path="mentor/evaluation" element={<CompletionPage />} />
+              <Route path="faculty/completion" element={<CompletionPage />} />
+              <Route path="student/completion" element={<CompletionPage />} />
+              <Route path="hod/completion" element={<CompletionPage />} />
+              <Route path="admin/completion" element={<CompletionPage />} />
             </Route>
 
             {/* 404 Fallback */}

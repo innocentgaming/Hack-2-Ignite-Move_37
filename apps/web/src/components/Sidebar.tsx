@@ -20,6 +20,9 @@ import {
   Activity,
   FileSpreadsheet,
   ClipboardList,
+  BadgeCheck,
+  Medal,
+  ScrollText,
 } from 'lucide-react';
 
 interface NavItem {
@@ -56,6 +59,12 @@ export const Sidebar: React.FC = () => {
       icon: FileCheck,
       roles: [UserRole.STUDENT],
     },
+    {
+      label: 'Completion Record',
+      to: '/app/student/completion',
+      icon: Medal,
+      roles: [UserRole.STUDENT],
+    },
 
     // Faculty Navigation
     {
@@ -80,6 +89,12 @@ export const Sidebar: React.FC = () => {
       label: 'Outcome Evaluations',
       to: '/app/faculty/evaluations',
       icon: Award,
+      roles: [UserRole.FACULTY],
+    },
+    {
+      label: 'Completion Sign-Off',
+      to: '/app/faculty/completion',
+      icon: BadgeCheck,
       roles: [UserRole.FACULTY],
     },
 
@@ -108,6 +123,12 @@ export const Sidebar: React.FC = () => {
       icon: Activity,
       roles: [UserRole.HOD],
     },
+    {
+      label: 'Completion Hub',
+      to: '/app/hod/completion',
+      icon: ScrollText,
+      roles: [UserRole.HOD],
+    },
 
     // Industry Mentor Navigation
     {
@@ -120,6 +141,12 @@ export const Sidebar: React.FC = () => {
       label: 'Performance Reviews',
       to: '/app/mentor/reviews',
       icon: Award,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      label: 'Final Evaluation',
+      to: '/app/mentor/evaluation',
+      icon: Medal,
       roles: [UserRole.MENTOR],
     },
 
@@ -164,6 +191,12 @@ export const Sidebar: React.FC = () => {
       label: 'Workflow Blueprints',
       to: '/app/admin/workflows',
       icon: GitBranch,
+      roles: [UserRole.ADMIN],
+    },
+    {
+      label: 'Completion Admin',
+      to: '/app/admin/completion',
+      icon: ScrollText,
       roles: [UserRole.ADMIN],
     },
 

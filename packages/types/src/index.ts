@@ -113,6 +113,14 @@ export enum AuditAction {
   // Phase 6 actions
   SUBMISSION_REVISION = 'SUBMISSION_REVISION',
   SUBMISSION_FILE_UPLOAD = 'SUBMISSION_FILE_UPLOAD',
+  // Phase 8 actions
+  FINAL_EVALUATION_CREATE = 'FINAL_EVALUATION_CREATE',
+  FINAL_EVALUATION_UPDATE = 'FINAL_EVALUATION_UPDATE',
+  COMPLETION_CONFIRM = 'COMPLETION_CONFIRM',
+  INTERNSHIP_COMPLETE = 'INTERNSHIP_COMPLETE',
+  TERMINATION_DECIDE = 'TERMINATION_DECIDE',
+  INTERNSHIP_TERMINATE = 'INTERNSHIP_TERMINATE',
+  INTERNSHIP_CANCEL = 'INTERNSHIP_CANCEL',
 }
 
 // ==========================================
@@ -1181,4 +1189,123 @@ export interface LifecycleTimelineEventDto {
   timestamp: string;
   severity?: 'info' | 'warning' | 'critical' | 'success';
   metadata?: Record<string, any>;
+}
+
+// ==========================================
+// Phase 8: Final Evaluation and Completion Engine
+// ==========================================
+
+export interface EvaluationCriteriaScore {
+  id: string;
+  name: string;
+  maxMarks: number;
+  awardedMarks: number;
+  comment?: string;
+}
+
+export interface FinalEvaluationDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  evaluatorId: string;
+  evaluatorName: string;
+  evaluatorRole: UserRole;
+  criteria: EvaluationCriteriaScore[];
+  totalMarks: number;
+  maxMarks: number;
+  percentage: number;
+  finalGrade: string;
+  comments: string;
+  finalRemarks: string;
+  submittedAt: string;
+  updatedAt: string;
+}
+
+export interface CreateFinalEvaluationDto {
+  internshipId: string;
+  criteria: EvaluationCriteriaScore[];
+  comments?: string;
+  finalRemarks?: string;
+}
+
+export interface UpdateFinalEvaluationDto {
+  criteria?: EvaluationCriteriaScore[];
+  comments?: string;
+  finalRemarks?: string;
+}
+
+export interface CompletionChecklistDto {
+  eligible: boolean;
+  missingConditions: string[];
+  checks: {
+    requiredSubmissionsCompleted: boolean;
+    requiredReviewsCompleted: boolean;
+    finalEvaluationCompleted: boolean;
+    facultyConfirmationCompleted: boolean;
+  };
+  details: {
+    requiredTasksTotal: number;
+    requiredTasksSubmitted: number;
+    pendingReviewsTotal: number;
+    hasFinalEvaluation: boolean;
+    hasFacultyConfirmation: boolean;
+  };
+}
+
+export interface FacultyConfirmationDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  facultyId: string;
+  facultyName: string;
+  facultyNotes: string;
+  academicRecommendation: 'APPROVED_FOR_CREDITS' | 'SATISFACTORY' | 'COMMENDED';
+  creditsAwarded?: number;
+  confirmedAt: string;
+}
+
+export interface CreateFacultyConfirmationDto {
+  internshipId: string;
+  facultyNotes: string;
+  academicRecommendation?: 'APPROVED_FOR_CREDITS' | 'SATISFACTORY' | 'COMMENDED';
+  creditsAwarded?: number;
+}
+
+export interface CompletedInternshipDossierDto {
+  internship: InternshipDetailsDto;
+  company: {
+    name: string;
+    industry: string;
+    website?: string;
+    address?: string;
+  };
+  student: {
+    id: string;
+    name: string;
+    email: string;
+    departmentName?: string;
+  };
+  role: string;
+  dates: {
+    startDate: string;
+    endDate: string;
+    completedAt: string;
+  };
+  finalEvaluation: FinalEvaluationDto;
+  facultyConfirmation: FacultyConfirmationDto;
+  outcomes: ExpectedOutcomeDto[];
+  evidenceFiles: SubmissionFileDto[];
+  milestoneFeedback: ReviewDto[];
+  timeline: LifecycleTimelineEventDto[];
+}
+
+export interface TerminationDecisionDto {
+  internshipId: string;
+  approved: boolean;
+  reason: string;
+}
+
+export interface CancelInternshipDto {
+  internshipId: string;
+  reason: string;
 }

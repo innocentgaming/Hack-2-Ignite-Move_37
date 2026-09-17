@@ -99,6 +99,20 @@ export const STATE_TRANSITION_RULES: StateTransitionRule[] = [
     allowedRoles: [UserRole.HOD, UserRole.ADMIN],
     requiresReason: true,
   },
+  // 15. ACTIVE -> CANCELLED (Authorized cancellation with justification)
+  {
+    from: InternshipStatus.ACTIVE,
+    to: InternshipStatus.CANCELLED,
+    allowedRoles: [UserRole.STUDENT, UserRole.HOD, UserRole.ADMIN],
+    requiresReason: true,
+  },
+  // 16. READY_FOR_COMPLETION -> CANCELLED
+  {
+    from: InternshipStatus.READY_FOR_COMPLETION,
+    to: InternshipStatus.CANCELLED,
+    allowedRoles: [UserRole.STUDENT, UserRole.HOD, UserRole.ADMIN],
+    requiresReason: true,
+  },
 ];
 
 export class InternshipStateMachineService {
