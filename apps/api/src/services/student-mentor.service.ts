@@ -462,22 +462,37 @@ export class StudentMentorStore {
     };
     this.submissions.set(sub2_1.id, sub2_1);
 
-    // 6. Seed for internship-a-3 (David Chen @ Google Cloud, Mentor: Mark Mentor)
+    // 6. Seed for internship-a-3 (David Chen @ Amazon Web Systems, Mentor: Mark Mentor)
     const m3_1: InMemoryMilestone = {
       id: 'ms-3-1',
       organizationId: orgId,
       internshipId: 'internship-a-3',
-      title: 'Terraform & Infrastructure as Code',
-      description: 'Provision reproducible cloud VPC, clusters, and load balancers.',
+      title: 'Infrastructure Setup',
+      description: 'Provision reproducible cloud VPC, security groups, and automated CI/CD terraform pipelines.',
       order: 1,
       startDate: new Date('2026-07-01'),
       dueDate: new Date('2026-09-15'),
-      progress: 50,
+      progress: 80,
       status: 'IN_PROGRESS',
       createdAt: now,
       updatedAt: now,
     };
+    const m3_2: InMemoryMilestone = {
+      id: 'ms-3-2',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      title: 'Kubernetes & Service Mesh',
+      description: 'Deploy resilient EKS clusters, Helm deployments, and Istio service mesh observability.',
+      order: 2,
+      startDate: new Date('2026-09-16'),
+      dueDate: new Date('2026-11-30'),
+      progress: 0,
+      status: 'NOT_STARTED',
+      createdAt: now,
+      updatedAt: now,
+    };
     this.milestones.set(m3_1.id, m3_1);
+    this.milestones.set(m3_2.id, m3_2);
 
     const t3_1: InMemoryTask = {
       id: 'task-301',
@@ -487,15 +502,157 @@ export class StudentMentorStore {
       title: 'Automated Terraform VPC Modules',
       description: 'Create modular Terraform definitions for private and public subnets.',
       instructions: 'Write terraform-docs and validate terraform plan output.',
-      status: TaskStatus.PENDING,
-      priority: 'MEDIUM',
-      dueDate: new Date('2026-09-25'),
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-08-10'),
       learningOutcomeId: 'out-cicd',
       expectedEvidence: 'Terraform repository with tfsec scan report',
       createdAt: now,
       updatedAt: now,
     };
+    const t3_2: InMemoryTask = {
+      id: 'task-302',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      milestoneId: 'ms-3-1',
+      title: 'Kubernetes Cluster Provisioning',
+      description: 'Deploy production EKS cluster with managed node groups and IAM roles.',
+      instructions: 'Configure cluster autoscaler and core add-ons.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-08-28'),
+      learningOutcomeId: 'out-cicd',
+      expectedEvidence: 'EKS cluster configuration and readiness probes',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const t3_3: InMemoryTask = {
+      id: 'task-303',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      milestoneId: 'ms-3-1',
+      title: 'Prometheus & Grafana Observability',
+      description: 'Deploy centralized metrics collection and alert notification channels.',
+      instructions: 'Export Grafana dashboard configuration with custom PromQL panels.',
+      status: TaskStatus.APPROVED,
+      priority: 'MEDIUM',
+      dueDate: new Date('2026-09-08'),
+      learningOutcomeId: 'out-perf',
+      expectedEvidence: 'Grafana dashboard export and metrics latency report',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const t3_4: InMemoryTask = {
+      id: 'task-304',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      milestoneId: 'ms-3-1',
+      title: 'Zero-Trust Service Mesh Security',
+      description: 'Configure Istio sidecar injection with mTLS strict peer authentication.',
+      instructions: 'Verify zero-trust packet enforcement with telemetry logs.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-09-14'),
+      learningOutcomeId: 'out-perf',
+      expectedEvidence: 'mTLS verification report and Istio traffic rules',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const t3_5: InMemoryTask = {
+      id: 'task-305',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      milestoneId: 'ms-3-2',
+      title: 'Multi-Region Disaster Recovery & Failover',
+      description: 'Implement automated Route53 health checks and cross-region database replication.',
+      instructions: 'Execute failover test and record RTO/RPO recovery times.',
+      status: TaskStatus.PENDING,
+      priority: 'MEDIUM',
+      dueDate: new Date('2026-10-20'),
+      learningOutcomeId: 'out-cicd',
+      expectedEvidence: 'Failover simulation script and latency benchmarks',
+      createdAt: now,
+      updatedAt: now,
+    };
     this.tasks.set(t3_1.id, t3_1);
+    this.tasks.set(t3_2.id, t3_2);
+    this.tasks.set(t3_3.id, t3_3);
+    this.tasks.set(t3_4.id, t3_4);
+    this.tasks.set(t3_5.id, t3_5);
+
+    const sub3_1: InMemorySubmissionRecord = {
+      id: 'sub-301',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      taskId: 'task-301',
+      studentId: 'user-a-student-3',
+      title: 'Terraform VPC Infrastructure Modules',
+      description: 'Modularized VPC creation across 3 availability zones with NAT gateways.',
+      evidenceType: EvidenceType.GITHUB_REPO,
+      evidenceUrl: 'https://github.com/aws-students/terraform-vpc-modules',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-08-09'),
+      updatedAt: new Date('2026-08-10'),
+      mentorFeedback: 'Terrific module reusability and clean terraform-docs.',
+      mentorRating: 5,
+      reviewedAt: new Date('2026-08-10'),
+    };
+    const sub3_2: InMemorySubmissionRecord = {
+      id: 'sub-302',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      taskId: 'task-302',
+      studentId: 'user-a-student-3',
+      title: 'EKS Cluster Provisioning Artifacts',
+      description: 'Cluster automated bootstrap via eksctl with Karpenter autoscaling.',
+      evidenceType: EvidenceType.GITHUB_PR,
+      evidenceUrl: 'https://github.com/aws-students/cloud-infra/pull/2',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-08-27'),
+      updatedAt: new Date('2026-08-28'),
+      mentorFeedback: 'Proper least-privilege IAM IRSA roles configured.',
+      mentorRating: 5,
+      reviewedAt: new Date('2026-08-28'),
+    };
+    const sub3_3: InMemorySubmissionRecord = {
+      id: 'sub-303',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      taskId: 'task-303',
+      studentId: 'user-a-student-3',
+      title: 'Grafana & Prometheus Monitoring Dashboards',
+      description: 'Centralized observability dashboards and Slack notification triggers.',
+      evidenceType: EvidenceType.DOCUMENT,
+      evidenceUrl: 'https://monitoring.aws-internal.net/dashboards/cluster-overview',
+      attachmentName: 'grafana-metrics-report.pdf',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-09-07'),
+      updatedAt: new Date('2026-09-08'),
+      mentorFeedback: 'Detailed query panels for node CPU and request latencies.',
+      mentorRating: 5,
+      reviewedAt: new Date('2026-09-08'),
+    };
+    const sub3_4: InMemorySubmissionRecord = {
+      id: 'sub-304',
+      organizationId: orgId,
+      internshipId: 'internship-a-3',
+      taskId: 'task-304',
+      studentId: 'user-a-student-3',
+      title: 'Zero-Trust Service Mesh Verification',
+      description: 'Configured Istio strict mTLS and authorization policies.',
+      evidenceType: EvidenceType.GITHUB_PR,
+      evidenceUrl: 'https://github.com/aws-students/cloud-infra/pull/5',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-09-13'),
+      updatedAt: new Date('2026-09-14'),
+      mentorFeedback: 'All non-mTLS traffic rejected as verified by network traces. Outstanding.',
+      mentorRating: 5,
+      reviewedAt: new Date('2026-09-14'),
+    };
+    this.submissions.set(sub3_1.id, sub3_1);
+    this.submissions.set(sub3_2.id, sub3_2);
+    this.submissions.set(sub3_3.id, sub3_3);
+    this.submissions.set(sub3_4.id, sub3_4);
   }
 }
 
@@ -1576,12 +1733,16 @@ export class StudentMentorService {
         (m) => m.internshipId === i.id && m.status === 'IN_PROGRESS'
       );
 
+      const company = internshipStore.companies.get(i.companyId);
       return {
         studentId: i.studentId,
         internshipId: i.id,
         studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
         department: dept?.name || 'Computer Engineering',
         internshipTitle: i.title,
+        companyName: company?.name || 'Google Cloud Solutions',
+        startDate: i.startDate ? i.startDate.toISOString().split('T')[0] : '2026-06-01',
+        endDate: i.endDate ? i.endDate.toISOString().split('T')[0] : '2027-01-12',
         progress,
         currentMilestoneTitle: ms?.title || 'Backend API Development',
         pendingSubmissionsCount: pendingCount,
@@ -1746,18 +1907,29 @@ export class StudentMentorService {
   }
 
   /**
-   * List mentor milestones
+   * List mentor milestones with student and internship context
    */
-  async getMentorMilestones(organizationId: string, mentorUser: AuthenticatedUser, internshipId?: string) {
-    let milestones = Array.from(studentMentorStore.milestones.values()).filter(
-      (m) => m.organizationId === organizationId
+  async getMentorMilestones(organizationId: string, mentorUser: AuthenticatedUser, internshipId?: string): Promise<MilestoneDto[]> {
+    const internships = Array.from(internshipStore.details.values()).filter(
+      (i) => i.organizationId === organizationId && (i.mentorId === mentorUser.id || i.mentor?.email === mentorUser.email)
     );
-    if (internshipId) {
+    const internshipMap = new Map(internships.map((i) => [i.id, i]));
+    const allowedInternshipIds = new Set(internships.map((i) => i.id));
+
+    let milestones = Array.from(studentMentorStore.milestones.values()).filter(
+      (m) => m.organizationId === organizationId && allowedInternshipIds.has(m.internshipId)
+    );
+    if (internshipId && internshipId !== 'ALL') {
       milestones = milestones.filter((m) => m.internshipId === internshipId);
     }
+
     return milestones.map((m) => {
       const msTasks = Array.from(studentMentorStore.tasks.values()).filter((t) => t.milestoneId === m.id);
       const completed = msTasks.filter((t) => t.status === TaskStatus.APPROVED).length;
+      const internship = internshipMap.get(m.internshipId);
+      const student = internship ? authStore.users.get(internship.studentId) : null;
+      const company = internship ? internshipStore.companies.get(internship.companyId) : null;
+
       return {
         id: m.id,
         organizationId: m.organizationId,
@@ -1771,10 +1943,57 @@ export class StudentMentorService {
         completedTasks: completed,
         totalTasks: msTasks.length,
         status: m.status,
+        studentId: internship?.studentId,
+        studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
+        internshipTitle: internship?.title,
+        companyName: company?.name || 'Partner Company',
         createdAt: m.createdAt.toISOString(),
         updatedAt: m.updatedAt.toISOString(),
       };
     });
+  }
+
+  /**
+   * Get single milestone detail with assigned tasks
+   */
+  async getMentorMilestoneById(organizationId: string, mentorUser: AuthenticatedUser, milestoneId: string): Promise<MilestoneDto> {
+    const milestone = studentMentorStore.milestones.get(milestoneId);
+    if (!milestone) throw new NotFoundError('Milestone', milestoneId);
+    if (milestone.organizationId !== organizationId) throw new TenantViolationError();
+
+    const internship = internshipStore.details.get(milestone.internshipId);
+    if (!internship) throw new NotFoundError('Internship for milestone', milestone.internshipId);
+    if (internship.mentorId !== mentorUser.id && internship.mentor?.email !== mentorUser.email && mentorUser.role !== UserRole.ADMIN && mentorUser.role !== UserRole.SUPER_ADMIN) {
+      throw new ForbiddenError('You do not have permission to view this milestone');
+    }
+
+    const student = authStore.users.get(internship.studentId);
+    const company = internshipStore.companies.get(internship.companyId);
+
+    const msTasks = Array.from(studentMentorStore.tasks.values()).filter((t) => t.milestoneId === milestone.id);
+    const completed = msTasks.filter((t) => t.status === TaskStatus.APPROVED).length;
+
+    return {
+      id: milestone.id,
+      organizationId: milestone.organizationId,
+      internshipId: milestone.internshipId,
+      title: milestone.title,
+      description: milestone.description,
+      order: milestone.order,
+      startDate: milestone.startDate?.toISOString().split('T')[0],
+      dueDate: milestone.dueDate.toISOString().split('T')[0],
+      progress: msTasks.length > 0 ? Math.round((completed / msTasks.length) * 100) : milestone.progress,
+      completedTasks: completed,
+      totalTasks: msTasks.length,
+      status: milestone.status,
+      studentId: internship.studentId,
+      studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
+      internshipTitle: internship.title,
+      companyName: company?.name || 'Partner Company',
+      tasks: msTasks.map((t) => this.mapTaskToDto(t)),
+      createdAt: milestone.createdAt.toISOString(),
+      updatedAt: milestone.updatedAt.toISOString(),
+    };
   }
 
   /**
@@ -1805,26 +2024,82 @@ export class StudentMentorService {
 
     studentMentorStore.milestones.set(id, milestone);
 
+    const internship = internshipStore.details.get(dto.internshipId);
+    const student = internship ? authStore.users.get(internship.studentId) : null;
+    const company = internship ? internshipStore.companies.get(internship.companyId) : null;
+
     return {
       ...milestone,
       startDate: milestone.startDate?.toISOString().split('T')[0],
       dueDate: milestone.dueDate.toISOString().split('T')[0],
       completedTasks: 0,
       totalTasks: 0,
+      studentId: internship?.studentId,
+      studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
+      internshipTitle: internship?.title,
+      companyName: company?.name,
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
     };
   }
 
   /**
-   * List mentor tasks
+   * Mentor updates an existing milestone
+   */
+  async updateMentorMilestone(
+    organizationId: string,
+    mentorUser: AuthenticatedUser,
+    milestoneId: string,
+    dto: { title?: string; description?: string; dueDate?: string; startDate?: string; progress?: number; status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' }
+  ): Promise<MilestoneDto> {
+    const milestone = studentMentorStore.milestones.get(milestoneId);
+    if (!milestone) throw new NotFoundError('Milestone', milestoneId);
+    if (milestone.organizationId !== organizationId) throw new TenantViolationError();
+
+    if (dto.title !== undefined) milestone.title = dto.title.trim();
+    if (dto.description !== undefined) milestone.description = dto.description.trim();
+    if (dto.dueDate !== undefined) milestone.dueDate = new Date(dto.dueDate);
+    if (dto.startDate !== undefined) milestone.startDate = new Date(dto.startDate);
+    if (dto.progress !== undefined) milestone.progress = dto.progress;
+    if (dto.status !== undefined) milestone.status = dto.status;
+    milestone.updatedAt = new Date();
+
+    return this.getMentorMilestoneById(organizationId, mentorUser, milestoneId);
+  }
+
+  /**
+   * List mentor tasks with student and internship context
    */
   async getMentorTasks(organizationId: string, mentorUser: AuthenticatedUser, internshipId?: string): Promise<TaskItemDto[]> {
-    let tasks = Array.from(studentMentorStore.tasks.values()).filter((t) => t.organizationId === organizationId);
-    if (internshipId) {
+    const internships = Array.from(internshipStore.details.values()).filter(
+      (i) => i.organizationId === organizationId && (i.mentorId === mentorUser.id || i.mentor?.email === mentorUser.email)
+    );
+    const allowedInternshipIds = new Set(internships.map((i) => i.id));
+
+    let tasks = Array.from(studentMentorStore.tasks.values()).filter(
+      (t) => t.organizationId === organizationId && allowedInternshipIds.has(t.internshipId)
+    );
+    if (internshipId && internshipId !== 'ALL') {
       tasks = tasks.filter((t) => t.internshipId === internshipId);
     }
     return tasks.map((t) => this.mapTaskToDto(t));
+  }
+
+  /**
+   * Get task by ID for mentor
+   */
+  async getMentorTaskById(organizationId: string, mentorUser: AuthenticatedUser, taskId: string): Promise<TaskItemDto> {
+    const task = studentMentorStore.tasks.get(taskId);
+    if (!task) throw new NotFoundError('Task', taskId);
+    if (task.organizationId !== organizationId) throw new TenantViolationError();
+
+    const internship = internshipStore.details.get(task.internshipId);
+    if (!internship) throw new NotFoundError('Internship for task', task.internshipId);
+    if (internship.mentorId !== mentorUser.id && internship.mentor?.email !== mentorUser.email && mentorUser.role !== UserRole.ADMIN && mentorUser.role !== UserRole.SUPER_ADMIN) {
+      throw new ForbiddenError('You do not have permission to view this task');
+    }
+
+    return this.mapTaskToDto(task);
   }
 
   /**
@@ -1883,7 +2158,7 @@ export class StudentMentorService {
   }
 
   /**
-   * List mentor submissions awaiting review
+   * List mentor submissions awaiting review with student and internship context
    */
   async getMentorSubmissions(organizationId: string, mentorUser: AuthenticatedUser, filter?: { status?: string }) {
     const dashboard = await this.getMentorDashboard(organizationId, mentorUser);
@@ -1901,12 +2176,17 @@ export class StudentMentorService {
       const student = authStore.users.get(s.studentId);
       const task = studentMentorStore.tasks.get(s.taskId);
       const milestone = task?.milestoneId ? studentMentorStore.milestones.get(task.milestoneId) : null;
+      const internship = internshipStore.details.get(s.internshipId);
+      const company = internship ? internshipStore.companies.get(internship.companyId) : null;
 
       return {
         id: s.id,
         taskId: s.taskId,
         taskTitle: task?.title || 'Deliverable Task',
         milestoneTitle: milestone?.title || 'General Milestone',
+        internshipId: s.internshipId,
+        internshipTitle: internship?.title || 'Engineering Internship',
+        companyName: company?.name || 'Host Organization',
         studentId: s.studentId,
         studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
         studentEmail: student?.email,
@@ -1924,8 +2204,55 @@ export class StudentMentorService {
         mentorImprovements: s.mentorImprovements,
         mentorNextAction: s.mentorNextAction,
         reviewedAt: s.reviewedAt?.toISOString().split('T')[0],
+        history: s.history,
       };
     });
+  }
+
+  /**
+   * Get single submission detail for mentor
+   */
+  async getMentorSubmissionById(organizationId: string, mentorUser: AuthenticatedUser, submissionId: string) {
+    const s = studentMentorStore.submissions.get(submissionId);
+    if (!s) throw new NotFoundError('Submission', submissionId);
+    if (s.organizationId !== organizationId) throw new TenantViolationError();
+
+    const student = authStore.users.get(s.studentId);
+    const task = studentMentorStore.tasks.get(s.taskId);
+    const milestone = task?.milestoneId ? studentMentorStore.milestones.get(task.milestoneId) : null;
+    const internship = internshipStore.details.get(s.internshipId);
+    const company = internship ? internshipStore.companies.get(internship.companyId) : null;
+
+    return {
+      id: s.id,
+      taskId: s.taskId,
+      taskTitle: task?.title || 'Deliverable Task',
+      taskDescription: task?.description,
+      expectedEvidence: task?.expectedEvidence,
+      milestoneTitle: milestone?.title || 'General Milestone',
+      internshipId: s.internshipId,
+      internshipTitle: internship?.title || 'Engineering Internship',
+      companyName: company?.name || 'Host Organization',
+      studentId: s.studentId,
+      studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
+      studentEmail: student?.email,
+      title: s.title,
+      description: s.description,
+      notes: s.notes,
+      evidenceType: s.evidenceType,
+      evidenceUrl: s.evidenceUrl,
+      evidenceUrls: s.evidenceUrls,
+      attachmentName: s.attachmentName,
+      status: s.status,
+      submittedAt: s.submittedAt.toISOString().split('T')[0],
+      mentorFeedback: s.mentorFeedback,
+      mentorRating: s.mentorRating,
+      mentorStrengths: s.mentorStrengths,
+      mentorImprovements: s.mentorImprovements,
+      mentorNextAction: s.mentorNextAction,
+      reviewedAt: s.reviewedAt?.toISOString().split('T')[0],
+      history: s.history,
+    };
   }
 
   /**
@@ -1968,6 +2295,22 @@ export class StudentMentorService {
       }
     }
 
+    // Recalculate milestone progress if milestone exists
+    if (task?.milestoneId) {
+      const milestone = studentMentorStore.milestones.get(task.milestoneId);
+      if (milestone) {
+        const msTasks = Array.from(studentMentorStore.tasks.values()).filter((t) => t.milestoneId === milestone.id);
+        const approvedCount = msTasks.filter((t) => t.status === TaskStatus.APPROVED).length;
+        milestone.progress = msTasks.length > 0 ? Math.round((approvedCount / msTasks.length) * 100) : 0;
+        if (milestone.progress === 100) {
+          milestone.status = 'COMPLETED';
+        } else if (milestone.progress > 0) {
+          milestone.status = 'IN_PROGRESS';
+        }
+        milestone.updatedAt = now;
+      }
+    }
+
     await auditService.log({
       organizationId,
       actorId: mentorUser.id,
@@ -1981,7 +2324,219 @@ export class StudentMentorService {
   }
 
   /**
-   * Get all feedback provided across interns
+   * Learning Outcomes for Mentor with explicit student and internship context & server filters
+   */
+  async getMentorOutcomes(
+    organizationId: string,
+    mentorUser: AuthenticatedUser,
+    query?: {
+      studentId?: string;
+      internshipId?: string;
+      outcomeId?: string;
+      status?: string;
+      search?: string;
+    }
+  ) {
+    const internships = Array.from(internshipStore.details.values()).filter(
+      (i) => i.organizationId === organizationId && (i.mentorId === mentorUser.id || i.mentor?.email === mentorUser.email)
+    );
+
+    let filteredInternships = internships;
+    if (query?.internshipId && query.internshipId !== 'ALL') {
+      filteredInternships = filteredInternships.filter((i) => i.id === query.internshipId);
+    }
+    if (query?.studentId && query.studentId !== 'ALL') {
+      filteredInternships = filteredInternships.filter((i) => i.studentId === query.studentId);
+    }
+
+    const allOutcomeDefs = Array.from(studentMentorStore.outcomes.values()).filter(
+      (o) => o.organizationId === organizationId
+    );
+
+    const results: any[] = [];
+
+    for (const internship of filteredInternships) {
+      const student = authStore.users.get(internship.studentId);
+      const company = internshipStore.companies.get(internship.companyId);
+      const studentName = student ? `${student.firstName} ${student.lastName}` : 'Student';
+      const companyName = company?.name || 'Google Cloud Solutions';
+
+      const iTasks = Array.from(studentMentorStore.tasks.values()).filter((t) => t.internshipId === internship.id);
+
+      for (const o of allOutcomeDefs) {
+        if (query?.outcomeId && query.outcomeId !== 'ALL' && o.id !== query.outcomeId && o.code !== query.outcomeId) {
+          continue;
+        }
+
+        const mappedTasks = iTasks.filter((t) => t.learningOutcomeId === o.id);
+        const studentEvidence: any[] = [];
+
+        mappedTasks.forEach((t) => {
+          const subs = Array.from(studentMentorStore.submissions.values()).filter(
+            (s) => s.taskId === t.id && s.studentId === internship.studentId
+          );
+          subs.forEach((s) => {
+            studentEvidence.push({
+              submissionId: s.id,
+              taskTitle: t.title,
+              evidenceType: s.evidenceType,
+              evidenceUrl: s.evidenceUrl,
+              fileName: s.attachmentName,
+              submittedAt: s.submittedAt.toISOString().split('T')[0],
+              status: s.status,
+            });
+          });
+        });
+
+        let status: 'NOT_STARTED' | 'IN_PROGRESS' | 'EVIDENCE_SUBMITTED' | 'REVISION_NEEDED' | 'VERIFIED' = 'NOT_STARTED';
+        if (studentEvidence.some((e) => e.status === SubmissionStatus.ACCEPTED)) {
+          status = 'VERIFIED';
+        } else if (studentEvidence.some((e) => e.status === SubmissionStatus.SUBMITTED)) {
+          status = 'EVIDENCE_SUBMITTED';
+        } else if (studentEvidence.some((e) => e.status === SubmissionStatus.REVISION_NEEDED)) {
+          status = 'REVISION_NEEDED';
+        } else if (mappedTasks.length > 0) {
+          status = 'IN_PROGRESS';
+        }
+
+        if (query?.status && query.status !== 'ALL' && status !== query.status) {
+          continue;
+        }
+
+        const searchLower = query?.search?.toLowerCase().trim();
+        if (searchLower) {
+          const matches =
+            studentName.toLowerCase().includes(searchLower) ||
+            internship.title.toLowerCase().includes(searchLower) ||
+            companyName.toLowerCase().includes(searchLower) ||
+            o.code.toLowerCase().includes(searchLower) ||
+            o.name.toLowerCase().includes(searchLower);
+          if (!matches) continue;
+        }
+
+        const latestReviewed = studentEvidence.find(
+          (e) => e.status === SubmissionStatus.ACCEPTED || e.status === SubmissionStatus.REVISION_NEEDED
+        );
+        const latestSub = latestReviewed ? studentMentorStore.submissions.get(latestReviewed.submissionId) : undefined;
+
+        results.push({
+          id: `${o.id}-${internship.id}`,
+          outcomeId: o.id,
+          code: o.code,
+          name: o.name,
+          description: o.description,
+          studentId: internship.studentId,
+          studentName,
+          internshipId: internship.id,
+          internshipTitle: internship.title,
+          companyName,
+          expectedEvidence: o.expectedEvidence,
+          studentEvidence,
+          missingEvidenceCount: Math.max(0, o.expectedEvidence.length - studentEvidence.length),
+          status,
+          mentorAssessment: latestSub?.mentorFeedback,
+          feedback: latestSub?.mentorFeedback,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Get single outcome detail by ID
+   */
+  async getMentorOutcomeById(organizationId: string, mentorUser: AuthenticatedUser, outcomeId: string, studentId?: string) {
+    const list = await this.getMentorOutcomes(organizationId, mentorUser, { outcomeId, studentId });
+    if (list.length === 0) throw new NotFoundError('Learning Outcome', outcomeId);
+    return list[0];
+  }
+
+  /**
+   * List internship registrations requiring mentor review or management
+   */
+  async getMentorRegistrations(
+    organizationId: string,
+    mentorUser: AuthenticatedUser,
+    filter?: { status?: string; search?: string }
+  ) {
+    const internships = Array.from(internshipStore.details.values()).filter(
+      (i) => i.organizationId === organizationId && (i.mentorId === mentorUser.id || i.mentor?.email === mentorUser.email)
+    );
+
+    let list = internships.map((i) => {
+      const student = authStore.users.get(i.studentId);
+      const company = internshipStore.companies.get(i.companyId);
+      const dept = student?.departmentId ? tenantStore.departments.get(student.departmentId) : null;
+      const doc = Array.from(tenantStore.documents.values()).find(
+        (d) => d.internshipId === i.id || (d.uploaderId === i.studentId && d.name.toLowerCase().includes('offer'))
+      );
+
+      return {
+        id: i.id,
+        studentId: i.studentId,
+        studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
+        studentEmail: student?.email,
+        department: dept?.name || 'Computer Engineering',
+        title: i.title,
+        companyName: company?.name || 'Partner Organization',
+        companyWebsite: company?.website || 'https://cloud.google.com',
+        description: i.description || `${i.title} technical internship program with focus on production engineering.`,
+        startDate: i.startDate.toISOString().split('T')[0],
+        endDate: i.endDate.toISOString().split('T')[0],
+        workMode: i.type,
+        status: i.status === InternshipStatus.PENDING_APPROVAL ? 'PENDING_REVIEW' : i.status,
+        submittedAt: '2026-09-17',
+        mentorName: `${mentorUser.firstName} ${mentorUser.lastName}`,
+        offerLetterUrl: doc ? `/api/v1/student/documents/${doc.id}/view` : undefined,
+        offerLetterName: doc?.name || 'Offer_Letter.pdf',
+      };
+    });
+
+    if (filter?.status && filter.status !== 'ALL') {
+      list = list.filter((i) => i.status === filter.status);
+    }
+
+    if (filter?.search) {
+      const s = filter.search.toLowerCase();
+      list = list.filter(
+        (i) =>
+          i.studentName.toLowerCase().includes(s) ||
+          i.title.toLowerCase().includes(s) ||
+          i.companyName.toLowerCase().includes(s)
+      );
+    }
+
+    return list;
+  }
+
+  /**
+   * Mentor review of internship registration (approve or request changes)
+   */
+  async reviewMentorRegistration(
+    organizationId: string,
+    mentorUser: AuthenticatedUser,
+    registrationId: string,
+    decision: 'APPROVE' | 'REQUEST_CHANGES',
+    comments?: string
+  ) {
+    const i = internshipStore.details.get(registrationId);
+    if (!i) throw new NotFoundError('Internship Registration', registrationId);
+    if (i.organizationId !== organizationId) throw new TenantViolationError();
+
+    if (decision === 'APPROVE') {
+      i.status = InternshipStatus.ACTIVE;
+    } else {
+      i.status = InternshipStatus.CHANGES_REQUESTED;
+      i.rejectionReason = comments;
+    }
+    i.updatedAt = new Date();
+
+    return i;
+  }
+
+  /**
+   * Get all feedback provided across interns with student and task context
    */
   async getMentorFeedback(organizationId: string, mentorUser: AuthenticatedUser) {
     const dashboard = await this.getMentorDashboard(organizationId, mentorUser);
@@ -1993,10 +2548,15 @@ export class StudentMentorService {
     return subs.map((s) => {
       const student = authStore.users.get(s.studentId);
       const task = studentMentorStore.tasks.get(s.taskId);
+      const internship = internshipStore.details.get(s.internshipId);
+
       return {
         id: `fb-${s.id}`,
         submissionId: s.id,
+        taskId: s.taskId,
+        studentId: s.studentId,
         studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
+        internshipTitle: internship?.title || 'Engineering Internship',
         taskTitle: task?.title || 'Deliverable Task',
         submissionTitle: s.title,
         feedback: s.mentorFeedback!,
@@ -2011,7 +2571,7 @@ export class StudentMentorService {
   }
 
   /**
-   * Get documents across mentored internships
+   * Get documents across mentored internships with student context
    */
   async getMentorDocuments(organizationId: string, mentorUser: AuthenticatedUser) {
     const dashboard = await this.getMentorDashboard(organizationId, mentorUser);
@@ -2022,14 +2582,18 @@ export class StudentMentorService {
 
     return docs.map((d) => {
       const student = authStore.users.get(d.uploaderId);
+      const internship = d.internshipId ? internshipStore.details.get(d.internshipId) : null;
       return {
         id: d.id,
         internshipId: d.internshipId,
+        internshipTitle: internship?.title || 'Engineering Internship',
+        studentId: d.uploaderId,
         studentName: student ? `${student.firstName} ${student.lastName}` : 'Student',
         name: d.name,
         type: d.mimeType,
         size: d.size,
         url: d.url,
+        downloadUrl: `/api/v1/student/documents/${d.id}/download`,
         uploadedAt: d.createdAt.toISOString().split('T')[0],
       };
     });
@@ -2041,14 +2605,29 @@ export class StudentMentorService {
   private mapTaskToDto(t: InMemoryTask): TaskItemDto {
     const milestone = t.milestoneId ? studentMentorStore.milestones.get(t.milestoneId) : null;
     const outcome = t.learningOutcomeId ? studentMentorStore.outcomes.get(t.learningOutcomeId) : null;
+    const internship = internshipStore.details.get(t.internshipId);
+    const student = internship ? authStore.users.get(internship.studentId) : null;
+    const company = internship ? internshipStore.companies.get(internship.companyId) : null;
 
     const subs = Array.from(studentMentorStore.submissions.values()).filter((s) => s.taskId === t.id);
     const latestSub = subs.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime())[0];
+
+    let submissionStatus = 'Not Submitted';
+    if (latestSub) {
+      if (latestSub.status === SubmissionStatus.DRAFT) submissionStatus = 'Draft';
+      else if (latestSub.status === SubmissionStatus.SUBMITTED) submissionStatus = 'Submitted';
+      else if (latestSub.status === SubmissionStatus.REVISION_NEEDED) submissionStatus = 'Needs Revision';
+      else if (latestSub.status === SubmissionStatus.ACCEPTED) submissionStatus = 'Accepted';
+    }
 
     return {
       id: t.id,
       organizationId: t.organizationId,
       internshipId: t.internshipId,
+      internshipTitle: internship?.title,
+      studentId: internship?.studentId,
+      studentName: student ? `${student.firstName} ${student.lastName}` : undefined,
+      companyName: company?.name,
       milestoneId: t.milestoneId,
       milestoneTitle: milestone?.title,
       title: t.title,
@@ -2063,6 +2642,7 @@ export class StudentMentorService {
       expectedEvidence: t.expectedEvidence,
       requiredEvidence: t.expectedEvidence,
       submissionCount: subs.length,
+      submissionStatus,
       latestSubmission: latestSub
         ? {
             id: latestSub.id,

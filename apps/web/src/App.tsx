@@ -45,7 +45,9 @@ import { StudentProfilePage } from './pages/student/StudentProfilePage';
 import { MentorOverviewPage } from './pages/mentor/MentorOverviewPage';
 import { MentorInternsPage } from './pages/mentor/MentorInternsPage';
 import { MentorInternDetailPage } from './pages/mentor/MentorInternDetailPage';
+import { MentorRegistrationsPage } from './pages/mentor/MentorRegistrationsPage';
 import { MentorMilestonesPage } from './pages/mentor/MentorMilestonesPage';
+import { MentorMilestoneDetailPage } from './pages/mentor/MentorMilestoneDetailPage';
 import { MentorTasksPage } from './pages/mentor/MentorTasksPage';
 import { MentorSubmissionsPage } from './pages/mentor/MentorSubmissionsPage';
 import { MentorOutcomesPage } from './pages/mentor/MentorOutcomesPage';
@@ -114,15 +116,23 @@ export const App: React.FC = () => {
               <Route path="mentor" element={<MentorOverviewPage />} />
               <Route path="mentor/interns" element={<MentorInternsPage />} />
               <Route path="mentor/interns/:studentId" element={<MentorInternDetailPage />} />
-              <Route path="mentor/internships" element={<MentorInternsPage />} />
+              <Route path="mentor/internship-registrations" element={<MentorRegistrationsPage />} />
+              <Route path="mentor/internships" element={<Navigate to="/app/mentor/internship-registrations" replace />} />
               <Route path="mentor/milestones" element={<MentorMilestonesPage />} />
+              <Route path="mentor/milestones/:milestoneId" element={<MentorMilestoneDetailPage />} />
+              <Route path="mentor/milestones/:id" element={<MentorMilestoneDetailPage />} />
               <Route path="mentor/tasks" element={<MentorTasksPage />} />
+              <Route path="mentor/tasks/:taskId" element={<MentorTasksPage />} />
+              <Route path="mentor/tasks/:id" element={<MentorTasksPage />} />
               <Route path="mentor/submissions" element={<MentorSubmissionsPage />} />
+              <Route path="mentor/submissions/:submissionId" element={<MentorSubmissionsPage />} />
+              <Route path="mentor/submissions/:id" element={<MentorSubmissionsPage />} />
               <Route path="mentor/outcomes" element={<MentorOutcomesPage />} />
+              <Route path="mentor/outcomes/:outcomeId" element={<MentorOutcomesPage />} />
+              <Route path="mentor/outcomes/:id" element={<MentorOutcomesPage />} />
               <Route path="mentor/feedback" element={<MentorFeedbackPage />} />
               <Route path="mentor/documents" element={<MentorDocumentsPage />} />
               <Route path="mentor/profile" element={<MentorProfilePage />} />
-              <Route path="mentor/*" element={<Navigate to="/app/mentor" replace />} />
 
               {/* Common Routes */}
               <Route path="monitoring" element={<MonitoringPage />} />

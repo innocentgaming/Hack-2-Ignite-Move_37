@@ -31,6 +31,7 @@ export enum InternshipStatus {
   READY_FOR_COMPLETION = 'READY_FOR_COMPLETION',
   COMPLETED = 'COMPLETED',
   REJECTED = 'REJECTED',
+  CHANGES_REQUESTED = 'CHANGES_REQUESTED',
   CANCELLED = 'CANCELLED',
   TERMINATED = 'TERMINATED',
 }
@@ -1644,6 +1645,10 @@ export interface MilestoneDto {
   completedTasks: number;
   totalTasks: number;
   status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+  studentId?: string;
+  studentName?: string;
+  internshipTitle?: string;
+  companyName?: string;
   tasks?: TaskItemDto[];
   createdAt: string;
   updatedAt: string;
@@ -1663,6 +1668,7 @@ export interface UpdateMilestoneDto {
   description?: string;
   startDate?: string;
   dueDate?: string;
+  progress?: number;
   status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
@@ -1670,6 +1676,10 @@ export interface TaskItemDto {
   id: string;
   organizationId: string;
   internshipId: string;
+  internshipTitle?: string;
+  studentId?: string;
+  studentName?: string;
+  companyName?: string;
   milestoneId?: string;
   milestoneTitle?: string;
   title: string;
@@ -1685,6 +1695,7 @@ export interface TaskItemDto {
   expectedEvidence: string;
   requiredEvidence?: string;
   submissionCount?: number;
+  submissionStatus?: string;
   latestSubmission?: {
     id: string;
     title: string;
@@ -1729,9 +1740,16 @@ export interface StudentEvidenceItem {
 
 export interface StudentOutcomeViewDto {
   outcomeId: string;
+  id?: string;
   code: string;
   name: string;
+  title?: string;
   description?: string;
+  studentId?: string;
+  studentName?: string;
+  internshipId?: string;
+  internshipTitle?: string;
+  companyName?: string;
   expectedEvidence: string[];
   studentEvidence: Array<{
     submissionId: string;
@@ -1741,6 +1759,12 @@ export interface StudentOutcomeViewDto {
     fileName?: string;
     submittedAt: string;
     status: SubmissionStatus;
+  }>;
+  evidence?: Array<{
+    id?: string;
+    title?: string;
+    url?: string;
+    submittedAt?: string;
   }>;
   status: 'NOT_STARTED' | 'IN_PROGRESS' | 'EVIDENCE_SUBMITTED' | 'VERIFIED' | 'REVISION_NEEDED';
   mentorAssessment?: string;
@@ -1822,6 +1846,9 @@ export interface MentorDashboardDto {
     studentName: string;
     department: string;
     internshipTitle: string;
+    companyName?: string;
+    startDate?: string;
+    endDate?: string;
     progress: number;
     currentMilestoneTitle?: string;
     pendingSubmissionsCount: number;

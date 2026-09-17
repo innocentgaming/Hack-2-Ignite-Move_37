@@ -20,6 +20,9 @@ interface MentorSubmissionItem {
   taskId: string;
   taskTitle: string;
   milestoneTitle: string;
+  internshipId?: string;
+  internshipTitle?: string;
+  companyName?: string;
   studentId: string;
   studentName: string;
   studentEmail?: string;
@@ -87,8 +90,8 @@ export const MentorSubmissionsPage: React.FC = () => {
 
   const handleReviewSubmit = async (decision: 'ACCEPTED' | 'NEEDS_REVISION') => {
     if (!selectedSub) return;
-    if (!feedback.trim()) {
-      alert('Please provide evaluation feedback for the intern.');
+    if (decision === 'NEEDS_REVISION' && !feedback.trim()) {
+      alert('Feedback is required when requesting revisions.');
       return;
     }
 
@@ -96,7 +99,7 @@ export const MentorSubmissionsPage: React.FC = () => {
       setSubmitting(true);
       const res = await apiClient.post(`/api/v1/mentor/submissions/${selectedSub.id}/review`, {
         status: decision,
-        feedback: feedback.trim(),
+        feedback: feedback.trim() || 'Approved by mentor.',
         score: rating,
         rating: rating,
         strengths: strengths.trim(),
@@ -130,12 +133,14 @@ export const MentorSubmissionsPage: React.FC = () => {
       statusFilter === 'ALL' ||
       (statusFilter === 'SUBMITTED' && s.status === SubmissionStatus.SUBMITTED) ||
       (statusFilter === 'ACCEPTED' && s.status === SubmissionStatus.ACCEPTED) ||
-      (statusFilter === 'REVISION_NEEDED' && s.status === SubmissionStatus.REVISION_NEEDED);
+      (statusFilter === 'REVISION_NEEDED' && (s.status === SubmissionStatus.REVISION_NEEDED || (s.status as any) === 'NEEDS_REVISION'));
 
     const matchesSearch =
       s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.taskTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      s.taskTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.milestoneTitle && s.milestoneTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (s.internshipTitle && s.internshipTitle.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return matchesStatus && matchesSearch;
   });
@@ -144,9 +149,9 @@ export const MentorSubmissionsPage: React.FC = () => {
     <div className="space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Submission Review Queue</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Submissions</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Inspect actual evidence artifacts submitted by interns, assess quality, and approve deliverables.
+            What student work requires my attention?
           </p>
         </div>
       </div>
@@ -154,7 +159,7 @@ export const MentorSubmissionsPage: React.FC = () => {
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
-          {['ALL', 'SUBMITTED', 'ACCEPTED', 'REVISION_NEEDED'].map((st) => (
+          {['ALL', 'SUBMITTED', 'REVISION_NEEDED', 'ACCEPTED'].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
@@ -167,7 +172,7 @@ export const MentorSubmissionsPage: React.FC = () => {
               {st === 'SUBMITTED'
                 ? 'Pending Review'
                 : st === 'REVISION_NEEDED'
-                ? 'Revisions Requested'
+                ? 'Needs Revision'
                 : st === 'ACCEPTED'
                 ? 'Accepted'
                 : 'All Submissions'}
@@ -179,7 +184,7 @@ export const MentorSubmissionsPage: React.FC = () => {
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search student or task..."
+            placeholder="Search student, task, milestone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
@@ -199,86 +204,70 @@ export const MentorSubmissionsPage: React.FC = () => {
           <FileCheck className="w-12 h-12 mx-auto text-slate-300 mb-3" />
           <p className="text-base font-semibold text-slate-700">No Submissions Found</p>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-            When interns submit deliverables with verification links, they will be queued here for your assessment.
+            When interns submit deliverables, they will be queued here for your assessment.
           </p>
         </Card>
       ) : (
         <div className="space-y-4">
           {filteredSubmissions.map((sub) => (
-            <Card key={sub.id} className="p-5 hover:shadow-md transition-shadow">
+            <Card key={sub.id} className="p-5 hover:shadow-md transition-shadow border border-slate-200/80">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-sm font-bold text-slate-900">{sub.title}</h3>
+                <div className="space-y-2 flex-1">
+                  {/* Context Header */}
+                  <div className="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                        {sub.studentName}
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-slate-600 font-medium">{sub.internshipTitle || 'Internship'}</span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-indigo-700 font-medium">{sub.milestoneTitle}</span>
+                    </div>
+
                     <Badge
                       variant={
                         sub.status === SubmissionStatus.ACCEPTED
                           ? 'success'
                           : sub.status === SubmissionStatus.SUBMITTED
                           ? 'warning'
-                          : sub.status === SubmissionStatus.REVISION_NEEDED
-                          ? 'destructive'
-                          : 'default'
+                          : 'destructive'
                       }
                     >
-                      {sub.status === SubmissionStatus.SUBMITTED ? 'PENDING REVIEW' : sub.status}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px] py-0">
-                      {sub.evidenceType}
+                      {sub.status === SubmissionStatus.SUBMITTED
+                        ? 'SUBMITTED'
+                        : sub.status === SubmissionStatus.ACCEPTED
+                        ? 'ACCEPTED'
+                        : 'NEEDS REVISION'}
                     </Badge>
                   </div>
 
-                  <p className="text-xs text-slate-500">
-                    Intern: <span className="font-semibold text-slate-800">{sub.studentName}</span> • Task: <span className="font-semibold text-slate-700">{sub.taskTitle}</span>
-                  </p>
-
-                  <p className="text-xs text-slate-600 mt-2 line-clamp-2">{sub.description}</p>
-
-                  {/* Evidence Artifact Links */}
-                  <div className="flex items-center gap-3 pt-2 flex-wrap text-xs">
-                    {sub.evidenceUrl && (
-                      <a
-                        href={sub.evidenceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-600 font-semibold flex items-center gap-1 hover:underline bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" /> Open Submitted Evidence
-                      </a>
-                    )}
-                    {sub.attachmentName && (
-                      <span className="text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-                        📎 {sub.attachmentName}
-                      </span>
-                    )}
+                  <div className="pt-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Task: {sub.taskTitle}
+                    </span>
+                    <h3 className="text-sm font-bold text-slate-900 mt-0.5">{sub.title}</h3>
                   </div>
 
-                  {/* Previous Mentor Feedback Note */}
-                  {sub.mentorFeedback && (
-                    <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                      <div className="flex items-center justify-between text-slate-700 font-bold">
-                        <span>Mentor Assessment</span>
-                        {sub.mentorRating && <span>{sub.mentorRating}/5 Stars</span>}
-                      </div>
-                      <p className="text-slate-800">{sub.mentorFeedback}</p>
+                  <p className="text-xs text-slate-600 line-clamp-2">{sub.description}</p>
+
+                  <div className="flex items-center gap-4 text-[11px] text-slate-400 pt-1">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Submitted: {sub.submittedAt}</span>
                     </div>
-                  )}
-
-                  <div className="flex items-center gap-1 text-[11px] text-slate-400 pt-2">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>Submitted on {sub.submittedAt}</span>
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 flex items-center md:flex-col gap-2">
+                <div className="flex-shrink-0 flex items-center md:flex-col gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
                   <Button
-                    variant={sub.status === SubmissionStatus.SUBMITTED ? 'primary' : 'outline'}
+                    variant="primary"
                     size="sm"
-                    className="text-xs gap-1.5 shadow-sm"
+                    className="text-xs gap-1.5 shadow-sm font-semibold"
                     onClick={() => openReviewModal(sub)}
                   >
                     <FileCheck className="w-3.5 h-3.5" />
-                    {sub.status === SubmissionStatus.SUBMITTED ? 'Evaluate & Grade' : 'Update Review'}
+                    Review Evidence
                   </Button>
                 </div>
               </div>
@@ -290,12 +279,16 @@ export const MentorSubmissionsPage: React.FC = () => {
       {/* REVIEW MODAL */}
       {selectedSub && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Evaluate Deliverable Evidence</h3>
-                <p className="text-xs text-slate-500">
-                  {selectedSub.studentName} — {selectedSub.title}
+                <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">
+                  {selectedSub.studentName} • {selectedSub.internshipTitle || 'Internship'}
+                </span>
+                <h3 className="text-base font-bold text-slate-900 mt-1">Task: {selectedSub.taskTitle}</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Milestone: <span className="font-semibold text-slate-700">{selectedSub.milestoneTitle}</span> • Submitted: {selectedSub.submittedAt}
                 </p>
               </div>
               <button
@@ -306,90 +299,112 @@ export const MentorSubmissionsPage: React.FC = () => {
               </button>
             </div>
 
-            {selectedSub.evidenceUrl && (
-              <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs">
-                <span className="text-slate-600">Verification Artifact:</span>
-                <a
-                  href={selectedSub.evidenceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-indigo-600 font-semibold flex items-center gap-1 hover:underline"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" /> Open Evidence Link
-                </a>
-              </div>
-            )}
-
-            {/* Quality Rating */}
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Quality Rating (1 to 5 Stars): {rating}/5
-              </label>
-              <div className="flex items-center gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    className="p-1 text-amber-400 focus:outline-none"
-                  >
-                    <Star
-                      className={`w-6 h-6 ${
-                        star <= rating ? 'fill-amber-400 text-amber-500' : 'text-slate-200 fill-slate-100'
-                      }`}
-                    />
-                  </button>
-                ))}
+            {/* STUDENT EVIDENCE */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+                Student Evidence
+              </span>
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-2 text-xs">
+                {selectedSub.evidenceUrl && (
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-700">GitHub Pull Request / Link:</span>
+                    <a
+                      href={selectedSub.evidenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 font-semibold flex items-center gap-1 hover:underline bg-white px-2.5 py-1 rounded-lg border border-slate-200"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> View Artifact
+                    </a>
+                  </div>
+                )}
+                {selectedSub.attachmentName && (
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                    <span className="font-semibold text-slate-700">Additional Evidence:</span>
+                    <span className="text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                      📎 {selectedSub.attachmentName}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Feedback textarea */}
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Evaluation Notes & Feedback *
-              </label>
-              <textarea
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Assess correctness, implementation cleanliness, and conformance with criteria..."
-                rows={3}
-                className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                required
-              />
+            {/* STUDENT NOTES */}
+            <div className="space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+                Student Notes
+              </span>
+              <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                {selectedSub.description || 'No additional notes provided by student.'}
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* MENTOR REVIEW */}
+            <div className="space-y-3 pt-2 border-t border-slate-100">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 block">
+                Mentor Review
+              </span>
+
+              {/* Quality Rating */}
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Strengths Identified</label>
-                <input
-                  type="text"
-                  value={strengths}
-                  onChange={(e) => setStrengths(e.target.value)}
-                  placeholder="e.g. Robust error handling"
-                  className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Quality Rating: {rating}/5 Stars
+                </label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className="p-1 text-amber-400 focus:outline-none"
+                    >
+                      <Star
+                        className={`w-5 h-5 ${
+                          star <= rating ? 'fill-amber-400 text-amber-500' : 'text-slate-200 fill-slate-100'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Feedback textarea */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Feedback & Review Notes *
+                </label>
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  placeholder="Provide constructive assessment and actionable guidance..."
+                  rows={3}
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  required
                 />
               </div>
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Areas for Improvement</label>
-                <input
-                  type="text"
-                  value={improvements}
-                  onChange={(e) => setImprovements(e.target.value)}
-                  placeholder="e.g. Increase test coverage"
-                  className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">Recommended Next Action</label>
-              <input
-                type="text"
-                value={nextAction}
-                onChange={(e) => setNextAction(e.target.value)}
-                placeholder="e.g. Proceed with deploying to staging environment"
-                className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Strengths</label>
+                  <input
+                    type="text"
+                    value={strengths}
+                    onChange={(e) => setStrengths(e.target.value)}
+                    placeholder="e.g. Clean schema normalization"
+                    className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Improvements Needed</label>
+                  <input
+                    type="text"
+                    value={improvements}
+                    onChange={(e) => setImprovements(e.target.value)}
+                    placeholder="e.g. Add unit test coverage"
+                    className="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
@@ -402,9 +417,9 @@ export const MentorSubmissionsPage: React.FC = () => {
                 Cancel
               </Button>
               <Button
-                variant="danger"
+                variant="outline"
                 size="sm"
-                className="gap-1 bg-amber-600 hover:bg-amber-700 text-white"
+                className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50"
                 onClick={() => handleReviewSubmit('NEEDS_REVISION')}
                 disabled={submitting}
               >
@@ -413,7 +428,7 @@ export const MentorSubmissionsPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="sm"
-                className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                 onClick={() => handleReviewSubmit('ACCEPTED')}
                 disabled={submitting}
               >

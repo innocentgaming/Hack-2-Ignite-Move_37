@@ -59,10 +59,40 @@ export class MentorController {
     }
   }
 
+  async getMilestoneById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const data = await studentMentorService.getMentorMilestoneById(req.user!.organizationId, req.user!, id);
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateMilestone(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const data = await studentMentorService.updateMentorMilestone(req.user!.organizationId, req.user!, id, req.body);
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async getTasks(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { internshipId } = req.query as { internshipId?: string };
       const data = await studentMentorService.getMentorTasks(req.user!.organizationId, req.user!, internshipId);
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getTaskById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const data = await studentMentorService.getMentorTaskById(req.user!.organizationId, req.user!, id);
       res.status(200).json(formatSuccessResponse(data));
     } catch (err) {
       next(err);
@@ -101,9 +131,8 @@ export class MentorController {
   async getSubmissionById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const subs = await studentMentorService.getMentorSubmissions(req.user!.organizationId, req.user!);
-      const match = subs.find((s) => s.id === id);
-      res.status(200).json(formatSuccessResponse(match || null));
+      const data = await studentMentorService.getMentorSubmissionById(req.user!.organizationId, req.user!, id);
+      res.status(200).json(formatSuccessResponse(data));
     } catch (err) {
       next(err);
     }
@@ -156,15 +185,62 @@ export class MentorController {
 
   async getOutcomes(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const dashboard = await studentMentorService.getMentorDashboard(req.user!.organizationId, req.user!);
-      const firstIntern = dashboard.interns[0];
-      if (firstIntern) {
-        const student = { id: firstIntern.studentId, departmentId: 'dept-a-cs' };
-        const data = await studentMentorService.getStudentOutcomes(req.user!.organizationId, student as any);
-        res.status(200).json(formatSuccessResponse(data));
-      } else {
-        res.status(200).json(formatSuccessResponse([]));
-      }
+      const { studentId, internshipId, outcomeId, status, search } = req.query as {
+        studentId?: string;
+        internshipId?: string;
+        outcomeId?: string;
+        status?: string;
+        search?: string;
+      };
+      const data = await studentMentorService.getMentorOutcomes(req.user!.organizationId, req.user!, {
+        studentId,
+        internshipId,
+        outcomeId,
+        status,
+        search,
+      });
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getOutcomeById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { studentId } = req.query as { studentId?: string };
+      const data = await studentMentorService.getMentorOutcomeById(req.user!.organizationId, req.user!, id, studentId);
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getRegistrations(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { status, search } = req.query as { status?: string; search?: string };
+      const data = await studentMentorService.getMentorRegistrations(req.user!.organizationId, req.user!, {
+        status,
+        search,
+      });
+      res.status(200).json(formatSuccessResponse(data));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async reviewRegistration(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { decision, comments } = req.body;
+      const data = await studentMentorService.reviewMentorRegistration(
+        req.user!.organizationId,
+        req.user!,
+        id,
+        decision,
+        comments
+      );
+      res.status(200).json(formatSuccessResponse(data));
     } catch (err) {
       next(err);
     }

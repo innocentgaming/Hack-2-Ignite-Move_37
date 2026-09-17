@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { apiClient } from '../../services/apiClient';
 import { MilestoneDto } from '@internos/types';
 import { Card } from '../../components/Card';
@@ -106,11 +107,12 @@ export const MentorMilestonesPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
+      {/* Purpose text */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Milestone Management</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Milestones</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Organize internship journeys into structured developmental phases with measurable deliverables.
+            Plan each internship into meaningful phases and assign tasks to each phase.
           </p>
         </div>
 
@@ -145,26 +147,37 @@ export const MentorMilestonesPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {milestones.map((m) => (
-            <Card key={m.id} className="p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <Card key={m.id} className="p-5 flex flex-col justify-between hover:shadow-md transition-shadow border border-slate-200/80">
               <div>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-lg">
-                      Phase {m.order}
+                {/* Student & Internship Context Banner */}
+                <div className="pb-3 border-b border-slate-100 flex items-start justify-between gap-2">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 block">
+                      {m.studentName || 'Student'}
                     </span>
-                    <h3 className="text-base font-bold text-slate-900">{m.title}</h3>
+                    <p className="text-xs font-semibold text-slate-700">
+                      {m.internshipTitle || 'Internship'} • <span className="text-slate-500">{m.companyName || 'Host Enterprise'}</span>
+                    </p>
                   </div>
                   <Badge variant={m.status === 'COMPLETED' ? 'success' : 'default'}>
                     {m.status || 'IN_PROGRESS'}
                   </Badge>
                 </div>
 
-                <p className="text-xs text-slate-600 mt-2 line-clamp-2">{m.description}</p>
+                <div className="mt-3 flex items-start gap-2.5">
+                  <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg flex-shrink-0 mt-0.5">
+                    Milestone {m.order}
+                  </span>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">{m.title}</h3>
+                    <p className="text-xs text-slate-600 mt-1 line-clamp-2">{m.description}</p>
+                  </div>
+                </div>
 
                 {/* Progress bar */}
                 <div className="mt-4 space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Progress</span>
+                    <span className="text-slate-500 font-medium">Phase Progress</span>
                     <span className="font-bold text-slate-800">{m.progress}%</span>
                   </div>
                   <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
@@ -176,14 +189,23 @@ export const MentorMilestonesPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Due: {m.dueDate}</span>
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3 text-slate-500">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Due: {m.dueDate}</span>
+                  </div>
+                  <span>•</span>
+                  <span>
+                    {m.completedTasks ?? 0} / {m.totalTasks ?? 0} tasks
+                  </span>
                 </div>
-                <span>
-                  {m.completedTasks ?? 0} / {m.totalTasks ?? 0} Tasks Done
-                </span>
+
+                <Link to={`/app/mentor/milestones/${m.id}`}>
+                  <Button variant="primary" size="sm" className="gap-1 text-xs">
+                    Open Milestone &rarr;
+                  </Button>
+                </Link>
               </div>
             </Card>
           ))}

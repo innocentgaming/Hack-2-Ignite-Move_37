@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../../services/apiClient';
-import { MentorInternDetailDto } from '@internos/types';
+import { MentorInternDetailDto, TaskStatus } from '@internos/types';
 import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
@@ -188,70 +188,248 @@ export const MentorInternDetailPage: React.FC = () => {
 
       {/* TAB 1: OVERVIEW */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Users className="w-4 h-4 text-indigo-600" /> Student Profile
-            </h3>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Full Name</span>
-                <span className="font-semibold text-slate-800">{student.name}</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Users className="w-4 h-4 text-indigo-600" /> Student Profile
+              </h3>
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Full Name</span>
+                  <span className="font-semibold text-slate-800">{student.name}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Email Address</span>
+                  <span className="font-semibold text-slate-800">{student.email}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Department</span>
+                  <span className="font-semibold text-slate-800">{student.department}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Roll Number</span>
+                  <span className="font-mono text-slate-800">{student.rollNumber}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Batch Year</span>
+                  <span className="font-semibold text-slate-800">Class of {student.batchYear}</span>
+                </div>
+                <div className="flex justify-between py-1.5">
+                  <span className="text-slate-500">Institution</span>
+                  <span className="font-semibold text-slate-800">{student.college}</span>
+                </div>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Email Address</span>
-                <span className="font-semibold text-slate-800">{student.email}</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Department</span>
-                <span className="font-semibold text-slate-800">{student.department}</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Roll Number</span>
-                <span className="font-mono text-slate-800">{student.rollNumber}</span>
-              </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Batch Year</span>
-                <span className="font-semibold text-slate-800">Class of {student.batchYear}</span>
-              </div>
-              <div className="flex justify-between py-1.5">
-                <span className="text-slate-500">Institution</span>
-                <span className="font-semibold text-slate-800">{student.college}</span>
-              </div>
-            </div>
-          </Card>
+            </Card>
 
-          <Card className="p-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-indigo-600" /> Internship Details
-            </h3>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Role Title</span>
-                <span className="font-semibold text-slate-800">{internship.title}</span>
+            <Card className="p-6">
+              <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-indigo-600" /> Internship Details
+              </h3>
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Role Title</span>
+                  <span className="font-semibold text-slate-800">{internship.title}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Host Enterprise</span>
+                  <span className="font-semibold text-slate-800">{internship.companyName}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Start Date</span>
+                  <span className="font-semibold text-slate-800">{internship.startDate}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Scheduled End Date</span>
+                  <span className="font-semibold text-slate-800">{internship.endDate}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Work Mode</span>
+                  <Badge variant="outline">{internship.workMode}</Badge>
+                </div>
+                <div className="flex justify-between py-1.5">
+                  <span className="text-slate-500">Status</span>
+                  <Badge variant="success">{internship.status}</Badge>
+                </div>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Host Enterprise</span>
-                <span className="font-semibold text-slate-800">{internship.companyName}</span>
+            </Card>
+          </div>
+
+          {/* Quick Action & Progress Overview Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* CURRENT MILESTONE */}
+            <Card className="p-5 border border-slate-200/80">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <GitBranch className="w-4 h-4 text-indigo-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Current Milestone</h4>
+                </div>
+                <button
+                  onClick={() => setActiveTab('milestones')}
+                  className="text-xs text-indigo-600 font-semibold hover:underline"
+                >
+                  View All &rarr;
+                </button>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Start Date</span>
-                <span className="font-semibold text-slate-800">{internship.startDate}</span>
+              {(() => {
+                const currentMs = milestones.find((m) => m.status === 'IN_PROGRESS') || milestones[0];
+                if (!currentMs) {
+                  return <p className="text-xs text-slate-400 mt-3">No milestones configured yet.</p>;
+                }
+                return (
+                  <div className="mt-3 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h5 className="text-sm font-bold text-slate-900">{currentMs.title}</h5>
+                        <p className="text-xs text-slate-500 mt-0.5">{currentMs.description}</p>
+                      </div>
+                      <Badge variant="outline">{currentMs.progress}%</Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-slate-500">
+                        <span>Tasks Completed</span>
+                        <span className="font-semibold text-slate-700">
+                          {currentMs.completedTasks ?? 0} / {currentMs.totalTasks ?? 0} tasks
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-indigo-600 h-2 rounded-full transition-all"
+                          style={{ width: `${currentMs.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </Card>
+
+            {/* UPCOMING TASKS */}
+            <Card className="p-5 border border-slate-200/80">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-indigo-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Upcoming Tasks</h4>
+                </div>
+                <button
+                  onClick={() => setActiveTab('tasks')}
+                  className="text-xs text-indigo-600 font-semibold hover:underline"
+                >
+                  View All ({tasks.length}) &rarr;
+                </button>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Scheduled End Date</span>
-                <span className="font-semibold text-slate-800">{internship.endDate}</span>
+              {(() => {
+                const pendingTasks = tasks.filter((t) => t.status !== 'APPROVED').slice(0, 3);
+                if (pendingTasks.length === 0) {
+                  return <p className="text-xs text-slate-400 mt-3">All assigned tasks completed!</p>;
+                }
+                return (
+                  <div className="mt-3 space-y-2.5">
+                    {pendingTasks.map((t) => (
+                      <div
+                        key={t.id}
+                        className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <p className="text-xs font-bold text-slate-900 truncate">{t.title}</p>
+                          <p className="text-[11px] text-slate-500">Due: {t.dueDate || 'Flexible'}</p>
+                        </div>
+                        <Badge variant={t.status === TaskStatus.APPROVED ? 'success' : 'warning'}>
+                          {t.status.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </Card>
+
+            {/* PENDING REVIEWS */}
+            <Card className="p-5 border border-slate-200/80">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <FileCheck className="w-4 h-4 text-amber-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Pending Reviews</h4>
+                </div>
+                <button
+                  onClick={() => setActiveTab('submissions')}
+                  className="text-xs text-indigo-600 font-semibold hover:underline"
+                >
+                  View Submissions &rarr;
+                </button>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-slate-500">Work Mode</span>
-                <Badge variant="outline">{internship.workMode}</Badge>
+              {(() => {
+                const pendingSubmissions = submissions.filter((s) => s.status === 'SUBMITTED');
+                if (pendingSubmissions.length === 0) {
+                  return (
+                    <div className="mt-3 py-2 text-center text-xs text-slate-400">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
+                      No pending submissions waiting for review.
+                    </div>
+                  );
+                }
+                return (
+                  <div className="mt-3 space-y-2">
+                    {pendingSubmissions.map((s) => (
+                      <div
+                        key={s.id}
+                        className="flex items-center justify-between p-2.5 bg-amber-50/50 rounded-xl border border-amber-200/60"
+                      >
+                        <div>
+                          <p className="text-xs font-bold text-slate-900">{s.title}</p>
+                          <p className="text-[11px] text-amber-700">Submitted: {s.submittedAt.split('T')[0]}</p>
+                        </div>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => {
+                            setReviewModalSub(s);
+                            setReviewFeedback((s as any).feedback || '');
+                          }}
+                        >
+                          Review Evidence
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </Card>
+
+            {/* LEARNING OUTCOMES */}
+            <Card className="p-5 border border-slate-200/80">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-indigo-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Learning Outcomes</h4>
+                </div>
+                <button
+                  onClick={() => setActiveTab('outcomes')}
+                  className="text-xs text-indigo-600 font-semibold hover:underline"
+                >
+                  View Outcomes &rarr;
+                </button>
               </div>
-              <div className="flex justify-between py-1.5">
-                <span className="text-slate-500">Lifecycle Status</span>
-                <Badge variant="success">{internship.status}</Badge>
-              </div>
-            </div>
-          </Card>
+              {outcomes.length === 0 ? (
+                <p className="text-xs text-slate-400 mt-3">No learning outcomes mapped.</p>
+              ) : (
+                <div className="mt-3 space-y-2.5">
+                  {outcomes.slice(0, 2).map((o) => (
+                    <div key={o.outcomeId || (o as any).id} className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-indigo-700">{o.code}</span>
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          {(o.evidence?.length || o.studentEvidence?.length || 0)} / {(o.expectedEvidence?.length || 4)} criteria
+                        </span>
+                      </div>
+                      <p className="text-xs font-semibold text-slate-800 truncate">{o.name || (o as any).title}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
         </div>
       )}
 

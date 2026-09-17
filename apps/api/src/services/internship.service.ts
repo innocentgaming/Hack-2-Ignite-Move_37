@@ -136,7 +136,7 @@ export class InternshipStore {
       'FULL_TIME',
       InternshipStatus.ACTIVE,
       new Date('2026-06-01'),
-      new Date('2026-12-01'),
+      new Date('2027-01-12'),
       'user-a-mentor',
       {
         name: 'Mark Mentor',
@@ -169,8 +169,8 @@ export class InternshipStore {
       'internship-a-3',
       'org-a-id',
       'user-a-student-3',
-      'company-a-tech',
-      'Cloud Infrastructure & DevOps Intern',
+      'company-a-cloud',
+      'Cloud Infrastructure & DevOps Internship',
       'FULL_TIME',
       InternshipStatus.ACTIVE,
       new Date('2026-07-01'),
@@ -213,6 +213,25 @@ export class InternshipStore {
       InternshipStatus.ACTIVE,
       new Date('2026-05-01'),
       new Date('2026-11-01')
+    );
+
+    this.syncSeedInternship(
+      'internship-reg-1',
+      'org-a-id',
+      'user-a-student',
+      'company-a-tech',
+      'Full Stack Engineering Internship',
+      'FULL_TIME',
+      InternshipStatus.PENDING_APPROVAL,
+      new Date('2026-06-01'),
+      new Date('2027-01-12'),
+      'user-a-mentor',
+      {
+        name: 'Mark Mentor',
+        email: 'mentor@org-a.com',
+        designation: 'Staff Solutions Architect',
+        phone: '+1 555-0199',
+      }
     );
   }
 

@@ -31,6 +31,7 @@ interface NavItem {
   to: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: UserRole[];
+  section?: string;
 }
 
 export const Sidebar: React.FC = () => {
@@ -107,18 +108,20 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.MENTOR],
     },
     {
+      section: 'SUPERVISION',
       label: 'My Interns',
       to: '/app/mentor/interns',
       icon: Users,
       roles: [UserRole.MENTOR],
     },
     {
-      label: 'Internships',
-      to: '/app/mentor/internships',
+      label: 'Internship Registrations',
+      to: '/app/mentor/internship-registrations',
       icon: Briefcase,
       roles: [UserRole.MENTOR],
     },
     {
+      section: 'WORK MANAGEMENT',
       label: 'Milestones',
       to: '/app/mentor/milestones',
       icon: GitBranch,
@@ -137,24 +140,27 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.MENTOR],
     },
     {
-      label: 'Feedback',
-      to: '/app/mentor/feedback',
-      icon: MessageSquare,
-      roles: [UserRole.MENTOR],
-    },
-    {
+      section: 'EVALUATION',
       label: 'Learning Outcomes',
       to: '/app/mentor/outcomes',
       icon: Target,
       roles: [UserRole.MENTOR],
     },
     {
+      label: 'Feedback',
+      to: '/app/mentor/feedback',
+      icon: MessageSquare,
+      roles: [UserRole.MENTOR],
+    },
+    {
+      section: 'DOCUMENTS',
       label: 'Documents',
       to: '/app/mentor/documents',
       icon: FolderArchive,
       roles: [UserRole.MENTOR],
     },
     {
+      section: 'ACCOUNT',
       label: 'Profile',
       to: '/app/mentor/profile',
       icon: User,
@@ -249,21 +255,27 @@ export const Sidebar: React.FC = () => {
 
       <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
         {visibleItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/app/student' || item.to === '/app/mentor' || item.to === '/app/admin'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-              }`
-            }
-          >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{item.label}</span>
-          </NavLink>
+          <React.Fragment key={item.to}>
+            {item.section && (
+              <div className="pt-3 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                {item.section}
+              </div>
+            )}
+            <NavLink
+              to={item.to}
+              end={item.to === '/app/student' || item.to === '/app/mentor' || item.to === '/app/admin'}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-sm font-semibold'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`
+              }
+            >
+              <item.icon className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{item.label}</span>
+            </NavLink>
+          </React.Fragment>
         ))}
       </nav>
 

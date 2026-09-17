@@ -14,6 +14,74 @@ import {
   Search,
 } from 'lucide-react';
 
+interface TaskDetailModalProps {
+  task: TaskItemDto | null;
+  onClose: () => void;
+}
+
+const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, onClose }) => {
+  if (!task) return null;
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+        <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">
+              {task.studentName || 'Student'} • {task.internshipTitle || 'Internship'}
+            </span>
+            <h3 className="text-base font-bold text-slate-900 mt-1">{task.title}</h3>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-lg font-bold">
+            ✕
+          </button>
+        </div>
+
+        <div className="space-y-3 text-xs">
+          <div>
+            <span className="text-slate-400 font-bold block mb-1">Milestone Phase</span>
+            <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg inline-block">
+              {task.milestoneTitle || 'General Phase'}
+            </span>
+          </div>
+
+          <div>
+            <span className="text-slate-400 font-bold block mb-1">Instructions & Description</span>
+            <p className="text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+              {task.instructions || task.description || 'No specific instructions provided.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <div>
+              <span className="text-slate-400 font-bold block">Target Due Date</span>
+              <span className="font-semibold text-slate-800">{task.dueDate || 'Flexible'}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-bold block">Task Priority</span>
+              <span className="font-semibold text-slate-800">{task.priority}</span>
+            </div>
+          </div>
+
+          <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100">
+            <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider block mb-1">
+              Expected Evidence
+            </span>
+            <p className="font-medium text-slate-800">
+              {Array.isArray(task.expectedEvidence) ? task.expectedEvidence.join(', ') : task.expectedEvidence || 'GitHub PR / Test Suite'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-3 border-t border-slate-100">
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const MentorTasksPage: React.FC = () => {
   const [tasks, setTasks] = useState<TaskItemDto[]>([]);
   const [milestones, setMilestones] = useState<MilestoneDto[]>([]);
@@ -23,6 +91,7 @@ export const MentorTasksPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewTask, setViewTask] = useState<TaskItemDto | null>(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,7 +163,7 @@ export const MentorTasksPage: React.FC = () => {
         instructions: formInstructions.trim(),
         priority: formPriority,
         dueDate: formDueDate,
-        expectedEvidence: formExpectedEvidence.trim() || 'GitHub Pull Request link and summary report',
+        expectedEvidence: formExpectedEvidence.trim() ? [formExpectedEvidence.trim()] : ['GitHub PR / Test Suite'],
       });
 
       if (res.success && res.data) {
@@ -133,8 +202,10 @@ export const MentorTasksPage: React.FC = () => {
 
     const matchesSearch =
       t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.studentName && t.studentName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (t.internshipTitle && t.internshipTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (t.milestoneTitle && t.milestoneTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (t.expectedEvidence && t.expectedEvidence.toLowerCase().includes(searchQuery.toLowerCase()));
+      (t.expectedEvidence && JSON.stringify(t.expectedEvidence).toLowerCase().includes(searchQuery.toLowerCase()));
 
     return matchesStatus && matchesSearch;
   });
@@ -143,9 +214,9 @@ export const MentorTasksPage: React.FC = () => {
     <div className="space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Task & Deliverable Manager</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tasks</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Assign technical tasks, define expected evidence, and connect deliverables to accredited outcomes.
+            What work have I assigned to my interns?
           </p>
         </div>
 
@@ -181,7 +252,7 @@ export const MentorTasksPage: React.FC = () => {
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search tasks..."
+            placeholder="Search tasks, interns, milestones..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-4 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
@@ -201,16 +272,59 @@ export const MentorTasksPage: React.FC = () => {
           <CheckSquare className="w-12 h-12 mx-auto text-slate-300 mb-3" />
           <p className="text-base font-semibold text-slate-700">No Tasks Found</p>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-            Create structured deliverable tasks with due dates and required evidence criteria for your interns.
+            Assign deliverable tasks with due dates and required evidence criteria for your interns.
           </p>
         </Card>
       ) : (
         <div className="space-y-3">
           {filteredTasks.map((t) => (
-            <Card key={t.id} className="p-5 hover:shadow-md transition-shadow">
+            <Card key={t.id} className="p-5 hover:shadow-md transition-shadow border border-slate-200/80">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
+                <div className="space-y-2 flex-1">
+                  {/* Context: Student, Internship, Milestone */}
+                  <div className="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-bold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                        {t.studentName || 'Student'}
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-slate-600 font-medium">{t.internshipTitle || 'Internship'}</span>
+                      {t.milestoneTitle && (
+                        <>
+                          <span className="text-slate-400">•</span>
+                          <span className="text-indigo-700 font-medium flex items-center gap-1">
+                            <GitBranch className="w-3.5 h-3.5" />
+                            {t.milestoneTitle}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-semibold text-slate-500">
+                        Submission:
+                      </span>
+                      <Badge
+                        variant={
+                          t.submissionStatus === 'ACCEPTED'
+                            ? 'success'
+                            : t.submissionStatus === 'SUBMITTED'
+                            ? 'warning'
+                            : 'outline'
+                        }
+                      >
+                        {t.submissionStatus === 'SUBMITTED'
+                          ? 'Submitted'
+                          : t.submissionStatus === 'ACCEPTED'
+                          ? 'Accepted'
+                          : t.submissionStatus === 'NEEDS_REVISION'
+                          ? 'Needs Revision'
+                          : 'Not Submitted'}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap pt-1">
                     <h3 className="text-sm font-bold text-slate-900">{t.title}</h3>
                     <Badge
                       variant={
@@ -223,7 +337,7 @@ export const MentorTasksPage: React.FC = () => {
                           : 'default'
                       }
                     >
-                      {t.status}
+                      {t.status.replace('_', ' ')}
                     </Badge>
                     <Badge variant="outline" className="text-[10px] py-0">
                       {t.priority}
@@ -232,43 +346,38 @@ export const MentorTasksPage: React.FC = () => {
 
                   <p className="text-xs text-slate-600 line-clamp-2">{t.description}</p>
 
-                  <div className="p-2.5 bg-indigo-50/50 border border-indigo-100 rounded-xl mt-2 text-xs">
-                    <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider block">
-                      Required Evidence:
-                    </span>
-                    <span className="text-indigo-950 font-medium">{t.expectedEvidence}</span>
-                  </div>
-
                   <div className="flex items-center gap-4 text-xs text-slate-400 pt-1 flex-wrap">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>Due {t.dueDate}</span>
+                    <div className="flex items-center gap-1 font-medium text-slate-700">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Due: {t.dueDate || 'Flexible'}</span>
                     </div>
-                    {t.milestoneTitle && (
-                      <div className="flex items-center gap-1 text-slate-600">
-                        <GitBranch className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>{t.milestoneTitle}</span>
-                      </div>
-                    )}
                     {t.learningOutcomeCode && (
-                      <div className="flex items-center gap-1 text-slate-600">
+                      <div className="flex items-center gap-1 text-purple-700 font-medium">
                         <Target className="w-3.5 h-3.5 text-purple-600" />
-                        <span>{t.learningOutcomeCode}</span>
+                        <span>Outcome: {t.learningOutcomeCode}</span>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="text-right flex-shrink-0 flex sm:flex-col items-center sm:items-end justify-between gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
-                  <div className="text-xs text-slate-500">
-                    <span className="font-bold text-slate-800">{t.submissionCount ?? 0}</span> Submissions
-                  </div>
+                <div className="text-right flex-shrink-0 flex sm:flex-col items-center sm:items-end justify-between gap-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs font-semibold"
+                    onClick={() => setViewTask(t)}
+                  >
+                    Open Task
+                  </Button>
                 </div>
               </div>
             </Card>
           ))}
         </div>
       )}
+
+      {/* Task Detail Modal */}
+      <TaskDetailModal task={viewTask} onClose={() => setViewTask(null)} />
 
       {/* CREATE TASK MODAL */}
       {isModalOpen && (
