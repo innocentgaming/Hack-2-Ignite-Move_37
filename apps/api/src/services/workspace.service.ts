@@ -22,6 +22,9 @@ import {
   OutcomeStatus,
   OutcomeVersionDto,
   InternshipDetailsDto,
+  SubmissionFileDto,
+  SubmissionVersionDto,
+  ReviewCriteriaScore,
 } from '@internos/types';
 import {
   NotFoundError,
@@ -41,11 +44,17 @@ export interface InMemorySubmission {
   internshipId: string;
   taskId: string;
   studentId: string;
+  currentVersion?: number;
   title: string;
   content: string;
   documentUrl?: string;
+  evidenceUrls?: string[];
+  files?: SubmissionFileDto[];
   status: SubmissionStatus;
   submittedAt: Date;
+  dueAt?: Date;
+  isLate?: boolean;
+  revisionReason?: string;
   updatedAt: Date;
 }
 
@@ -53,12 +62,15 @@ export interface InMemoryReview {
   id: string;
   organizationId: string;
   submissionId: string;
+  version?: number;
   reviewerId: string;
   reviewerName: string;
   reviewerRole: UserRole;
   feedback: string;
   score?: number;
+  criteria?: ReviewCriteriaScore[];
   status: 'ACCEPTED' | 'CHANGES_REQUESTED';
+  revisionReason?: string;
   createdAt: Date;
 }
 
@@ -880,6 +892,28 @@ export class WorkspaceService {
       .map((r) => this.mapReviewToDto(r));
 
     const student = authStore.users.get(s.studentId);
+    const currentVersion = s.currentVersion || 1;
+    const isLate = !!s.isLate;
+
+    const versionSnapshot: SubmissionVersionDto = {
+      id: `ver-${s.id}-v${currentVersion}`,
+      version: currentVersion,
+      submissionId: s.id,
+      studentId: s.studentId,
+      internshipId: s.internshipId,
+      taskId: s.taskId,
+      title: s.title,
+      content: s.content,
+      documentUrl: s.documentUrl,
+      evidenceUrls: s.evidenceUrls || (s.documentUrl ? [s.documentUrl] : []),
+      files: s.files || [],
+      submittedAt: s.submittedAt.toISOString(),
+      dueAt: s.dueAt?.toISOString(),
+      isLate,
+      revisionReason: s.revisionReason,
+      status: s.status,
+      review: reviews[0],
+    };
 
     return {
       id: s.id,
@@ -888,14 +922,20 @@ export class WorkspaceService {
       taskId: s.taskId,
       studentId: s.studentId,
       studentName: student ? `${student.firstName} ${student.lastName}`.trim() : 'Student',
+      currentVersion,
       title: s.title,
       content: s.content,
       documentUrl: s.documentUrl,
-      evidenceUrls: s.documentUrl ? [s.documentUrl] : [],
+      evidenceUrls: s.evidenceUrls || (s.documentUrl ? [s.documentUrl] : []),
+      files: s.files || [],
       status: s.status,
       submittedAt: s.submittedAt.toISOString(),
+      dueAt: s.dueAt?.toISOString(),
+      isLate,
+      revisionReason: s.revisionReason,
       updatedAt: s.updatedAt.toISOString(),
       reviews,
+      versions: [versionSnapshot],
     };
   }
 
@@ -904,12 +944,15 @@ export class WorkspaceService {
       id: r.id,
       organizationId: r.organizationId,
       submissionId: r.submissionId,
+      version: r.version || 1,
       reviewerId: r.reviewerId,
       reviewerName: r.reviewerName,
       reviewerRole: r.reviewerRole,
       feedback: r.feedback,
       score: r.score,
+      criteria: r.criteria || [],
       status: r.status,
+      revisionReason: r.revisionReason,
       createdAt: r.createdAt.toISOString(),
     };
   }

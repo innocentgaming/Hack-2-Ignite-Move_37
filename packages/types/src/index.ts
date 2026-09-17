@@ -110,6 +110,9 @@ export enum AuditAction {
   MENTOR_CONCERN_RAISE = 'MENTOR_CONCERN_RAISE',
   EVALUATION_CREATE = 'EVALUATION_CREATE',
   TERMINATION_REQUEST = 'TERMINATION_REQUEST',
+  // Phase 6 actions
+  SUBMISSION_REVISION = 'SUBMISSION_REVISION',
+  SUBMISSION_FILE_UPLOAD = 'SUBMISSION_FILE_UPLOAD',
 }
 
 // ==========================================
@@ -851,24 +854,86 @@ export interface InternshipDetailsDto {
 }
 
 // ==========================================
-// Phase 5: Role-Specific Workspaces & Reviews DTOs
+// Phase 5 & 6: Submission System, Versioning & Reviews DTOs
 // ==========================================
+
+export interface SubmissionFileDto {
+  id: string;
+  name: string;
+  originalName: string;
+  size: number;
+  mimeType: string;
+  storageKey: string;
+  url?: string;
+  uploadedAt: string;
+}
+
+export interface ReviewCriteriaScore {
+  criteriaId?: string;
+  name: string;
+  score: number;
+  maxScore: number;
+  comments?: string;
+}
+
+export interface SubmissionVersionDto {
+  id: string;
+  version: number;
+  submissionId: string;
+  studentId: string;
+  internshipId: string;
+  taskId: string;
+  title: string;
+  content: string;
+  documentUrl?: string;
+  evidenceUrls?: string[];
+  files: SubmissionFileDto[];
+  submittedAt: string;
+  dueAt?: string;
+  isLate: boolean;
+  revisionReason?: string;
+  status: SubmissionStatus;
+  review?: ReviewDto;
+  aiAnalysis?: AISubmissionAnalysisResponse | null;
+  aiAnalysisStatus?: 'PENDING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
+}
+
+export interface SubmissionTimelineEventDto {
+  id: string;
+  timestamp: string;
+  type: 'SUBMITTED' | 'REVISED' | 'REVIEWED' | 'REVISION_REQUESTED' | 'APPROVED';
+  version: number;
+  actorId: string;
+  actorName: string;
+  actorRole: UserRole;
+  title: string;
+  description: string;
+  data?: Record<string, any>;
+}
 
 export interface SubmissionDto {
   id: string;
   organizationId: string;
   internshipId: string;
   taskId: string;
+  taskTitle?: string;
+  taskType?: WorkflowStepType;
   studentId: string;
   studentName?: string;
+  currentVersion: number;
   title: string;
   content: string;
   documentUrl?: string;
   evidenceUrls?: string[];
+  files: SubmissionFileDto[];
   status: SubmissionStatus;
   submittedAt: string;
+  dueAt?: string;
+  isLate: boolean;
+  revisionReason?: string;
   updatedAt: string;
   reviews: ReviewDto[];
+  versions: SubmissionVersionDto[];
 }
 
 export interface CreateSubmissionDto {
@@ -878,26 +943,36 @@ export interface CreateSubmissionDto {
   content: string;
   documentUrl?: string;
   evidenceUrls?: string[];
+  files?: SubmissionFileDto[];
+  fileIds?: string[];
+  isRevision?: boolean;
+  revisionReason?: string;
 }
 
 export interface ReviewDto {
   id: string;
   organizationId: string;
   submissionId: string;
+  version?: number;
   reviewerId: string;
   reviewerName: string;
   reviewerRole: UserRole;
   feedback: string;
   score?: number;
+  criteria?: ReviewCriteriaScore[];
   status: 'ACCEPTED' | 'CHANGES_REQUESTED';
+  revisionReason?: string;
   createdAt: string;
 }
 
 export interface CreateReviewDto {
   submissionId: string;
+  version?: number;
   feedback: string;
   score?: number;
+  criteria?: ReviewCriteriaScore[];
   requestRevision?: boolean;
+  revisionReason?: string;
 }
 
 export interface EvaluationDto {

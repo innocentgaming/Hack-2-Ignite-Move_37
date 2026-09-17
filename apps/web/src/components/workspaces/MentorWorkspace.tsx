@@ -18,10 +18,11 @@ import {
   AlertTriangle,
   FileCheck,
   Target,
-  Edit,
   Plus,
   UserX,
   ExternalLink,
+  Paperclip,
+  Download,
 } from 'lucide-react';
 
 export const MentorWorkspace: React.FC = () => {
@@ -30,11 +31,15 @@ export const MentorWorkspace: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Review Modal State
+  // Review Modal State (Structured Rubric Criteria)
   const [reviewSubmission, setReviewSubmission] = useState<SubmissionDto | null>(null);
-  const [reviewScore, setReviewScore] = useState<number>(85);
+  const [reviewScore, setReviewScore] = useState<number>(88);
+  const [criteriaTech, setCriteriaTech] = useState<number>(26); // max 30
+  const [criteriaDoc, setCriteriaDoc] = useState<number>(26); // max 30
+  const [criteriaComplete, setCriteriaComplete] = useState<number>(36); // max 40
   const [reviewFeedback, setReviewFeedback] = useState<string>('');
   const [requestRevision, setRequestRevision] = useState<boolean>(false);
+  const [revisionReason, setRevisionReason] = useState<string>('');
   const [submittingReview, setSubmittingReview] = useState<boolean>(false);
 
   // Outcome Modification Modal State
@@ -89,6 +94,11 @@ export const MentorWorkspace: React.FC = () => {
     e.preventDefault();
     if (!reviewSubmission) return;
 
+    if (requestRevision && !revisionReason.trim()) {
+      setError('Please provide a specific revision reason detailing requested changes.');
+      return;
+    }
+
     setSubmittingReview(true);
     try {
       const res = await apiClient.post<ReviewDto>('/api/v1/workspaces/reviews', {
@@ -96,16 +106,23 @@ export const MentorWorkspace: React.FC = () => {
         score: reviewScore,
         feedback: reviewFeedback.trim(),
         requestRevision,
+        revisionReason: requestRevision ? revisionReason.trim() : undefined,
+        criteria: [
+          { name: 'Technical Depth', score: criteriaTech, maxScore: 30 },
+          { name: 'Documentation Quality', score: criteriaDoc, maxScore: 30 },
+          { name: 'Completeness & Evidence', score: criteriaComplete, maxScore: 40 },
+        ],
       });
 
       if (res.success) {
         setSuccessMessage(
           requestRevision
-            ? 'Revision requested from student with comments.'
-            : 'Deliverable reviewed and accepted successfully!'
+            ? 'Revision requested with required guidance. Task re-opened for student resubmission.'
+            : 'Deliverable evaluated and approved successfully!'
         );
         setReviewSubmission(null);
         setReviewFeedback('');
+        setRevisionReason('');
         setRequestRevision(false);
         await fetchWorkspace();
       } else {
@@ -356,12 +373,32 @@ export const MentorWorkspace: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-slate-900 text-sm">{sub.title}</span>
                       <Badge variant="indigo" size="sm">
+                        v{sub.currentVersion || 1}
+                      </Badge>
+                      <Badge variant={sub.status === 'REVISION_NEEDED' ? 'amber' : 'indigo'} size="sm">
                         {sub.status}
                       </Badge>
+                      {sub.isLate && (
+                        <Badge variant="rose" size="sm">
+                          Late Submission
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-xs text-slate-700">{sub.content}</p>
-                    <div className="flex items-center gap-4 text-[11px] text-slate-400">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
                       <span>Submitted: {new Date(sub.submittedAt).toLocaleDateString()}</span>
+                      {(sub.files || []).map((f) => (
+                        <a
+                          key={f.id}
+                          href={`/api/v1/submissions/files/${f.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-indigo-600 hover:text-indigo-800 underline flex items-center gap-1 font-medium"
+                        >
+                          <Paperclip className="w-3 h-3 text-indigo-500" />
+                          {f.name}
+                        </a>
+                      ))}
                       {sub.documentUrl && (
                         <a
                           href={sub.documentUrl}
@@ -382,13 +419,17 @@ export const MentorWorkspace: React.FC = () => {
                     className="self-start md:self-auto flex items-center gap-1.5"
                     onClick={() => {
                       setReviewSubmission(sub);
-                      setReviewScore(85);
+                      setCriteriaTech(26);
+                      setCriteriaDoc(26);
+                      setCriteriaComplete(36);
+                      setReviewScore(88);
                       setReviewFeedback('');
+                      setRevisionReason('');
                       setRequestRevision(false);
                     }}
                   >
                     <FileCheck className="w-3.5 h-3.5" />
-                    Audit & Review
+                    Audit & Review (v{sub.currentVersion || 1})
                   </Button>
                 </div>
               ))}
@@ -408,18 +449,18 @@ export const MentorWorkspace: React.FC = () => {
             {assignedInternships.map((intern) => (
               <div key={intern.id} className="p-5 space-y-4 hover:bg-slate-50/50 transition-colors">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                  <div>
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-base">{intern.title}</span>
+                      <span className="font-bold text-slate-900 text-sm">{intern.title}</span>
+                      <Badge variant="indigo" size="sm">
+                        {intern.type}
+                      </Badge>
                       <Badge variant={intern.status === 'ACTIVE' ? 'emerald' : 'slate'} size="sm">
                         {intern.status}
                       </Badge>
-                      <Badge variant="purple" size="sm">
-                        Outcome v{intern.outcomeVersion || 1}
-                      </Badge>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Company: {intern.company?.name || 'Partner Host'} • Start: {new Date(intern.startDate).toLocaleDateString()}
+                    <p className="text-xs text-slate-500">
+                      Intern Candidate: <span className="font-semibold text-slate-700">{intern.studentName}</span> • Host: {intern.company?.name}
                     </p>
                   </div>
 
@@ -428,59 +469,79 @@ export const MentorWorkspace: React.FC = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-xs flex items-center gap-1"
+                      className="flex items-center gap-1 text-xs"
                       onClick={() => {
                         setSelectedInternshipForOutcomes(intern);
-                        setEditingOutcomes([...intern.expectedOutcomes]);
+                        setEditingOutcomes(intern.expectedOutcomes ? [...intern.expectedOutcomes] : []);
+                        setChangeReason('');
                       }}
                     >
-                      <Edit className="w-3 h-3 text-indigo-600" />
-                      Modify Outcomes
+                      <Target className="w-3.5 h-3.5 text-indigo-600" />
+                      Modify Outcomes (v{intern.outcomeVersion || 1})
                     </Button>
 
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-xs flex items-center gap-1 text-amber-700 border-amber-200 hover:bg-amber-50"
-                      onClick={() => setConcernInternship(intern)}
+                      className="flex items-center gap-1 text-xs text-amber-700 hover:bg-amber-50"
+                      onClick={() => {
+                        setConcernInternship(intern);
+                        setConcernReason('');
+                        setConcernSeverity('HIGH');
+                      }}
                     >
-                      <AlertTriangle className="w-3 h-3 text-amber-600" />
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                       Raise Concern
                     </Button>
 
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-xs flex items-center gap-1"
-                      onClick={() => setEvalInternship(intern)}
+                      className="flex items-center gap-1 text-xs text-indigo-700 hover:bg-indigo-50"
+                      onClick={() => {
+                        setEvalInternship(intern);
+                        setEvalOverall(90);
+                        setEvalTechnical(92);
+                        setEvalSoftSkills(88);
+                        setEvalRecommendation('STRONG_HIRE');
+                        setEvalComments('');
+                      }}
                     >
-                      <Award className="w-3 h-3 text-indigo-600" />
+                      <Award className="w-3.5 h-3.5 text-indigo-600" />
                       Final Evaluation
                     </Button>
 
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-xs flex items-center gap-1 text-rose-700 border-rose-200 hover:bg-rose-50"
-                      onClick={() => setTerminationInternship(intern)}
+                      className="flex items-center gap-1 text-xs text-rose-700 hover:bg-rose-50"
+                      onClick={() => {
+                        setTerminationInternship(intern);
+                        setTerminationReason('');
+                      }}
                     >
-                      <UserX className="w-3 h-3 text-rose-600" />
+                      <UserX className="w-3.5 h-3.5 text-rose-600" />
                       Request Termination
                     </Button>
                   </div>
                 </div>
 
-                {/* Outcomes mini-grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
-                  {intern.expectedOutcomes.map((o, idx) => (
-                    <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-800">{o.title}</span>
-                        <span className="text-[10px] text-slate-500 uppercase font-bold">{o.status || 'PLANNED'}</span>
+                {/* Expected Outcomes Checklist Preview */}
+                <div className="pt-2 border-t border-slate-100">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+                    Expected Outcomes Checklist (Version {intern.outcomeVersion || 1})
+                  </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {(intern.expectedOutcomes || []).map((o, idx) => (
+                      <div key={idx} className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/70 text-xs space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-slate-800 truncate">{o.title}</span>
+                          <span className="text-[10px] text-slate-400 uppercase font-mono">{o.status || 'PLANNED'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate">Evidence: {o.expectedEvidence}</p>
                       </div>
-                      <p className="text-slate-500 text-[11px] line-clamp-2">{o.expectedEvidence}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -488,13 +549,18 @@ export const MentorWorkspace: React.FC = () => {
         </CardBody>
       </Card>
 
-      {/* Review Modal */}
+      {/* Audit & Review Modal (Structured Rubric) */}
       {reviewSubmission && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 text-lg">Review Deliverable</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-slate-900 text-lg">Review Deliverable</h3>
+                  <Badge variant="indigo" size="sm">
+                    Version {reviewSubmission.currentVersion || 1}
+                  </Badge>
+                </div>
                 <p className="text-xs text-slate-500">Submission: {reviewSubmission.title}</p>
               </div>
               <button
@@ -505,24 +571,105 @@ export const MentorWorkspace: React.FC = () => {
               </button>
             </div>
 
+            {/* Submission Content & Attached Files Preview */}
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+              <span className="font-bold text-slate-800">Student Deliverable Body:</span>
+              <p className="text-slate-700 whitespace-pre-wrap">{reviewSubmission.content}</p>
+              {(reviewSubmission.files || []).length > 0 && (
+                <div className="pt-2 border-t border-slate-200 flex flex-wrap gap-2">
+                  {reviewSubmission.files.map((f) => (
+                    <a
+                      key={f.id}
+                      href={`/api/v1/submissions/files/${f.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-md text-indigo-600 font-medium hover:bg-indigo-50"
+                    >
+                      <Paperclip className="w-3 h-3 text-indigo-500" />
+                      {f.name}
+                      <Download className="w-3 h-3 text-indigo-600 ml-1" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Evaluation Score (0 - 100)</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={reviewScore}
-                  onChange={(e) => setReviewScore(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  required
-                />
+              {/* Structured Rubric Breakdown */}
+              <div className="space-y-3 p-3 bg-indigo-50/40 border border-indigo-100 rounded-xl">
+                <span className="text-xs font-bold text-indigo-950 uppercase tracking-wider block">
+                  Structured Rubric Criteria Breakdown
+                </span>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Technical Depth & Code Quality</span>
+                    <span className="text-indigo-600">{criteriaTech} / 30</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={30}
+                    value={criteriaTech}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setCriteriaTech(val);
+                      setReviewScore(val + criteriaDoc + criteriaComplete);
+                    }}
+                    className="w-full accent-indigo-600"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Documentation & Clarity</span>
+                    <span className="text-indigo-600">{criteriaDoc} / 30</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={30}
+                    value={criteriaDoc}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setCriteriaDoc(val);
+                      setReviewScore(criteriaTech + val + criteriaComplete);
+                    }}
+                    className="w-full accent-indigo-600"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs font-semibold text-slate-700">
+                    <span>Completeness & Evidentiary Proof</span>
+                    <span className="text-indigo-600">{criteriaComplete} / 40</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={40}
+                    value={criteriaComplete}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setCriteriaComplete(val);
+                      setReviewScore(criteriaTech + criteriaDoc + val);
+                    }}
+                    className="w-full accent-indigo-600"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-indigo-100 flex items-center justify-between text-xs font-black text-indigo-900">
+                  <span>Aggregated Score:</span>
+                  <span className="text-sm text-indigo-700 bg-white px-2.5 py-1 rounded-md border border-indigo-200">
+                    {reviewScore} / 100
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-700">Supervisor Feedback & Guidance</label>
                 <textarea
-                  rows={4}
+                  rows={3}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   placeholder="Provide technical critique, highlights, and improvements..."
                   value={reviewFeedback}
@@ -531,25 +678,49 @@ export const MentorWorkspace: React.FC = () => {
                 />
               </div>
 
-              <div className="p-3 bg-amber-50/60 border border-amber-200/80 rounded-xl flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="requestRevisionCheck"
-                  checked={requestRevision}
-                  onChange={(e) => setRequestRevision(e.target.checked)}
-                  className="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500"
-                />
-                <label htmlFor="requestRevisionCheck" className="text-xs font-semibold text-amber-900 cursor-pointer">
-                  Request Student Revision (Re-opens milestone task for resubmission)
-                </label>
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-2">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="requestRevisionCheck"
+                    checked={requestRevision}
+                    onChange={(e) => setRequestRevision(e.target.checked)}
+                    className="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500"
+                  />
+                  <label htmlFor="requestRevisionCheck" className="text-xs font-semibold text-amber-900 cursor-pointer">
+                    Request Student Revision (Re-opens milestone task for resubmission)
+                  </label>
+                </div>
+
+                {requestRevision && (
+                  <div className="space-y-1 pt-1">
+                    <label className="text-[11px] font-bold text-amber-950 block">
+                      Specific Revision Reason (Required)
+                    </label>
+                    <textarea
+                      rows={2}
+                      className="w-full px-2.5 py-1.5 text-xs border border-amber-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                      placeholder="Specify exactly what changes, UML diagrams, or tests the student must provide in Version 2..."
+                      value={revisionReason}
+                      onChange={(e) => setRevisionReason(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
                 <Button variant="outline" size="sm" type="button" onClick={() => setReviewSubmission(null)}>
                   Cancel
                 </Button>
-                <Button variant="primary" size="sm" type="submit" disabled={submittingReview}>
-                  {submittingReview ? 'Submitting...' : 'Complete Review'}
+                <Button
+                  variant={requestRevision ? 'outline' : 'primary'}
+                  size="sm"
+                  type="submit"
+                  disabled={submittingReview}
+                  className={requestRevision ? 'border-amber-500 text-amber-800 hover:bg-amber-50' : ''}
+                >
+                  {submittingReview ? 'Submitting...' : requestRevision ? 'Request Revision from Student' : 'Approve Deliverable'}
                 </Button>
               </div>
             </form>

@@ -11,6 +11,8 @@ import {
   OutcomeStatus,
   TaskStatus,
   OutcomeVersionDto,
+  SubmissionFileDto,
+  SubmissionTimelineEventDto,
 } from '@internos/types';
 import {
   Briefcase,
@@ -23,6 +25,9 @@ import {
   History,
   Target,
   ExternalLink,
+  Download,
+  Paperclip,
+  Trash2,
 } from 'lucide-react';
 
 export const StudentWorkspace: React.FC = () => {
@@ -38,8 +43,15 @@ export const StudentWorkspace: React.FC = () => {
   const [submitTitle, setSubmitTitle] = useState('');
   const [submitContent, setSubmitContent] = useState('');
   const [submitEvidenceUrl, setSubmitEvidenceUrl] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<SubmissionFileDto[]>([]);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+
+  // Timeline modal
+  const [timelineSubmission, setTimelineSubmission] = useState<SubmissionDto | null>(null);
+  const [timelineEvents, setTimelineEvents] = useState<SubmissionTimelineEventDto[]>([]);
+  const [loadingTimeline, setLoadingTimeline] = useState(false);
 
   // Outcome history modal
   const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -67,27 +79,91 @@ export const StudentWorkspace: React.FC = () => {
     fetchWorkspace();
   }, []);
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !data?.internship || !selectedTask) return;
+
+    setUploadingFile(true);
+    try {
+      // Read file as base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64String = (reader.result as string).split(',')[1] || '';
+        const res = await apiClient.post<SubmissionFileDto>('/api/v1/submissions/upload', {
+          filename: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          contentBase64: base64String,
+          internshipId: data.internship!.id,
+          taskId: selectedTask.id,
+        });
+
+        if (res.success && res.data) {
+          setUploadedFiles((prev) => [...prev, res.data!]);
+        } else {
+          setError(res.error?.message || 'File upload failed');
+        }
+        setUploadingFile(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+      setUploadingFile(false);
+    }
+  };
+
+  const handleRemoveFile = (fileId: string) => {
+    setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+  };
+
+  const handleOpenTimeline = async (sub: SubmissionDto) => {
+    setTimelineSubmission(sub);
+    setLoadingTimeline(true);
+    try {
+      const res = await apiClient.get<SubmissionTimelineEventDto[]>(
+        `/api/v1/submissions/${sub.id}/timeline`
+      );
+      if (res.success && res.data) {
+        setTimelineEvents(res.data);
+      } else {
+        setTimelineEvents([]);
+      }
+    } catch {
+      setTimelineEvents([]);
+    } finally {
+      setLoadingTimeline(false);
+    }
+  };
+
   const handleSubmitWork = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data?.internship || !selectedTask) return;
 
     setSubmitting(true);
     setSubmitSuccess(null);
+    const isRevision = selectedTask.status === TaskStatus.CHANGES_REQUESTED;
+
     try {
-      const res = await apiClient.post<SubmissionDto>('/api/v1/workspaces/submissions', {
+      const res = await apiClient.post<SubmissionDto>('/api/v1/submissions', {
         internshipId: data.internship.id,
         taskId: selectedTask.id,
+        isRevision,
         title: submitTitle.trim() || `Deliverable for ${selectedTask.title}`,
         content: submitContent.trim(),
+        fileIds: uploadedFiles.map((f) => f.id),
         evidenceUrls: submitEvidenceUrl.trim() ? [submitEvidenceUrl.trim()] : undefined,
       });
 
       if (res.success) {
-        setSubmitSuccess('Deliverable submitted successfully for mentor review!');
+        setSubmitSuccess(
+          isRevision
+            ? 'Revision (Version 2+) submitted successfully for mentor re-evaluation!'
+            : 'Deliverable submitted successfully for mentor review!'
+        );
         setSelectedTask(null);
         setSubmitTitle('');
         setSubmitContent('');
         setSubmitEvidenceUrl('');
+        setUploadedFiles([]);
         await fetchWorkspace();
       } else {
         setError(res.error?.message || 'Failed to submit deliverable');
@@ -321,42 +397,61 @@ export const StudentWorkspace: React.FC = () => {
                 {currentTasks.map((t) => {
                   const isOverdue = new Date(t.currentDueDate).getTime() < Date.now();
                   const isRevision = t.status === TaskStatus.CHANGES_REQUESTED;
+                  const matchingSub = data.submissions.find((s) => s.taskId === t.id);
 
                   return (
-                    <div key={t.id} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors">
-                      <div className="space-y-1 max-w-xl">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-900 text-sm">{t.title}</span>
-                          {isRevision ? (
-                            <Badge variant="amber" size="sm">
-                              Revision Requested
-                            </Badge>
-                          ) : isOverdue ? (
-                            <Badge variant="rose" size="sm">
-                              Overdue
-                            </Badge>
-                          ) : (
-                            <Badge variant="slate" size="sm">
-                              Pending
-                            </Badge>
-                          )}
+                    <div key={t.id} className="p-5 space-y-3 hover:bg-slate-50/70 transition-colors">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="space-y-1 max-w-xl">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-900 text-sm">{t.title}</span>
+                            {isRevision ? (
+                              <Badge variant="amber" size="sm">
+                                Revision Requested
+                              </Badge>
+                            ) : isOverdue ? (
+                              <Badge variant="rose" size="sm">
+                                Overdue
+                              </Badge>
+                            ) : (
+                              <Badge variant="slate" size="sm">
+                                Pending
+                              </Badge>
+                            )}
+                          </div>
+                          {t.description && <p className="text-xs text-slate-600">{t.description}</p>}
+                          <div className="flex items-center gap-4 text-[11px] text-slate-500">
+                            <span>Due: {new Date(t.currentDueDate).toLocaleDateString()}</span>
+                            {t.latePolicy && <span>Late Policy: {t.latePolicy}</span>}
+                          </div>
                         </div>
-                        {t.description && <p className="text-xs text-slate-600">{t.description}</p>}
-                        <div className="flex items-center gap-4 text-[11px] text-slate-500">
-                          <span>Due: {new Date(t.currentDueDate).toLocaleDateString()}</span>
-                          {t.latePolicy && <span>Late Policy: {t.latePolicy}</span>}
-                        </div>
+
+                        <Button
+                          size="sm"
+                          variant={isRevision ? 'primary' : 'outline'}
+                          className="self-start md:self-auto flex items-center gap-1.5"
+                          onClick={() => {
+                            setSelectedTask(t);
+                            setSubmitTitle(isRevision ? `${t.title} (Revision v${(matchingSub?.currentVersion || 1) + 1})` : `Deliverable for ${t.title}`);
+                            setSubmitContent('');
+                            setUploadedFiles([]);
+                          }}
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          {isRevision ? 'Submit Revision' : 'Submit Work'}
+                        </Button>
                       </div>
 
-                      <Button
-                        size="sm"
-                        variant={isRevision ? 'primary' : 'outline'}
-                        className="self-start md:self-auto flex items-center gap-1.5"
-                        onClick={() => setSelectedTask(t)}
-                      >
-                        <Upload className="w-3.5 h-3.5" />
-                        {isRevision ? 'Submit Revision' : 'Submit Work'}
-                      </Button>
+                      {/* Mentor Revision Reason Callout */}
+                      {isRevision && matchingSub?.revisionReason && (
+                        <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
+                          <span className="font-bold flex items-center gap-1.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                            Mentor Revision Request:
+                          </span>
+                          <p className="italic pl-5">"{matchingSub.revisionReason}"</p>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -369,17 +464,20 @@ export const StudentWorkspace: React.FC = () => {
       {/* Tab: Submissions */}
       {activeTab === 'submissions' && (
         <Card>
-          <CardHeader title="Delivered Submissions" subtitle="Review past submissions and mentor audit log." />
+          <CardHeader title="Delivered Submissions & Version History" subtitle="Review past submissions, version snapshots, and mentor audit log." />
           <CardBody className="p-0">
             {data.submissions.length === 0 ? (
               <div className="p-8 text-center text-slate-500 text-sm">No deliverables submitted yet.</div>
             ) : (
               <div className="divide-y divide-slate-100">
                 {data.submissions.map((s) => (
-                  <div key={s.id} className="p-5 space-y-2 hover:bg-slate-50/70 transition-colors">
-                    <div className="flex items-center justify-between">
+                  <div key={s.id} className="p-5 space-y-3 hover:bg-slate-50/70 transition-colors">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-900 text-sm">{s.title}</span>
+                        <Badge variant="indigo" size="sm">
+                          v{s.currentVersion || 1}
+                        </Badge>
                         <Badge
                           variant={
                             s.status === 'ACCEPTED' ? 'emerald' : s.status === 'REVISION_NEEDED' ? 'amber' : 'indigo'
@@ -388,27 +486,62 @@ export const StudentWorkspace: React.FC = () => {
                         >
                           {s.status}
                         </Badge>
+                        {s.isLate && (
+                          <Badge variant="rose" size="sm">
+                            Late Submission
+                          </Badge>
+                        )}
                       </div>
-                      <span className="text-xs text-slate-400">
-                        Submitted: {new Date(s.submittedAt).toLocaleDateString()}
-                      </span>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-slate-400">
+                          Submitted: {new Date(s.submittedAt).toLocaleDateString()}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex items-center gap-1 text-xs"
+                          onClick={() => handleOpenTimeline(s)}
+                        >
+                          <History className="w-3.5 h-3.5 text-indigo-600" />
+                          Timeline ({s.versions?.length || 1})
+                        </Button>
+                      </div>
                     </div>
 
-                    <p className="text-xs text-slate-700">{s.content}</p>
+                    <p className="text-xs text-slate-700 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                      {s.content}
+                    </p>
 
-                    {s.documentUrl && (
-                      <div className="pt-1">
+                    {/* Attached Files & Evidence */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      {(s.files || []).map((f) => (
+                        <a
+                          key={f.id}
+                          href={`/api/v1/submissions/files/${f.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-50 border border-indigo-200/60 text-indigo-700 text-xs hover:bg-indigo-100 transition-colors"
+                        >
+                          <Paperclip className="w-3 h-3 text-indigo-500" />
+                          <span className="font-medium truncate max-w-[180px]">{f.name}</span>
+                          <span className="text-[10px] text-indigo-400">({Math.round(f.size / 1024)} KB)</span>
+                          <Download className="w-3 h-3 text-indigo-600 ml-0.5" />
+                        </a>
+                      ))}
+
+                      {s.documentUrl && (
                         <a
                           href={s.documentUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 underline"
+                          className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 underline px-2 py-1"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          View Evidence Attachment
+                          External Evidence Link
                         </a>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -509,10 +642,12 @@ export const StudentWorkspace: React.FC = () => {
       {/* Submit Deliverable Modal */}
       {selectedTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-bold text-slate-900 text-lg">Submit Deliverable</h3>
+                <h3 className="font-bold text-slate-900 text-lg">
+                  {selectedTask.status === TaskStatus.CHANGES_REQUESTED ? 'Submit Revision' : 'Submit Deliverable'}
+                </h3>
                 <p className="text-xs text-slate-500">Task: {selectedTask.title}</p>
               </div>
               <button
@@ -522,6 +657,18 @@ export const StudentWorkspace: React.FC = () => {
                 ✕
               </button>
             </div>
+
+            {selectedTask.status === TaskStatus.CHANGES_REQUESTED && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
+                <span className="font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  Revision Note:
+                </span>
+                <p>
+                  Submitting revised work generates an immutable Version snapshot preserving previous submissions and feedback.
+                </p>
+              </div>
+            )}
 
             <form onSubmit={handleSubmitWork} className="space-y-4">
               <FormInput
@@ -533,7 +680,9 @@ export const StudentWorkspace: React.FC = () => {
               />
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Content / Deliverable Summary</label>
+                <label className="text-xs font-semibold text-slate-700">
+                  Content / Deliverable Body (Diary, Report, PPT notes)
+                </label>
                 <textarea
                   rows={4}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
@@ -544,9 +693,53 @@ export const StudentWorkspace: React.FC = () => {
                 />
               </div>
 
+              {/* Private File Upload Section */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
+                  <span>Attach Deliverable Files (Report, Diary, PPT, Evidence)</span>
+                  <span className="text-[11px] text-slate-400 font-normal">Private & secure</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg border border-indigo-200 transition-colors">
+                    <Paperclip className="w-3.5 h-3.5 text-indigo-600" />
+                    {uploadingFile ? 'Uploading...' : 'Choose File to Upload'}
+                    <input
+                      type="file"
+                      className="hidden"
+                      disabled={uploadingFile}
+                      onChange={handleFileUpload}
+                    />
+                  </label>
+                </div>
+
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    {uploadedFiles.map((f) => (
+                      <div
+                        key={f.id}
+                        className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs"
+                      >
+                        <div className="flex items-center gap-2 truncate">
+                          <Paperclip className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                          <span className="font-medium text-slate-800 truncate">{f.name}</span>
+                          <span className="text-[10px] text-slate-400">({Math.round(f.size / 1024)} KB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(f.id)}
+                          className="text-slate-400 hover:text-rose-600"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <FormInput
-                label="Evidence URL (GitHub PR, Cloud Docs, or Artifact)"
-                placeholder="https://github.com/... or https://drive.google.com/..."
+                label="Supporting URL (Optional GitHub PR or repository)"
+                placeholder="https://github.com/... or https://..."
                 value={submitEvidenceUrl}
                 onChange={(e) => setSubmitEvidenceUrl(e.target.value)}
               />
@@ -555,11 +748,84 @@ export const StudentWorkspace: React.FC = () => {
                 <Button variant="outline" size="sm" type="button" onClick={() => setSelectedTask(null)}>
                   Cancel
                 </Button>
-                <Button variant="primary" size="sm" type="submit" disabled={submitting}>
-                  {submitting ? 'Submitting...' : 'Upload & Submit'}
+                <Button variant="primary" size="sm" type="submit" disabled={submitting || uploadingFile}>
+                  {submitting ? 'Submitting...' : selectedTask.status === TaskStatus.CHANGES_REQUESTED ? 'Submit Revision (v2+)' : 'Upload & Submit'}
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Submission Timeline Modal */}
+      {timelineSubmission && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[85vh] flex flex-col animate-in fade-in">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                  <History className="w-5 h-5 text-indigo-600" />
+                  Submission Timeline & History
+                </h3>
+                <p className="text-xs text-slate-500 truncate max-w-md">{timelineSubmission.title}</p>
+              </div>
+              <button
+                onClick={() => setTimelineSubmission(null)}
+                className="text-slate-400 hover:text-slate-600 text-sm font-semibold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="overflow-y-auto space-y-4 flex-1 pr-1">
+              {loadingTimeline ? (
+                <div className="p-8 text-center text-sm text-slate-400">Loading timeline events...</div>
+              ) : timelineEvents.length === 0 ? (
+                <div className="p-8 text-center text-sm text-slate-400">No timeline events recorded.</div>
+              ) : (
+                <div className="relative border-l-2 border-indigo-100 ml-4 space-y-6 pl-6 py-2">
+                  {timelineEvents.map((e) => (
+                    <div key={e.id} className="relative space-y-1">
+                      <div className="absolute -left-[31px] top-0 w-4 h-4 rounded-full bg-white border-2 border-indigo-600" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 text-xs">{e.title}</span>
+                          <Badge
+                            variant={
+                              e.type === 'APPROVED'
+                                ? 'emerald'
+                                : e.type === 'REVISION_REQUESTED'
+                                ? 'amber'
+                                : 'indigo'
+                            }
+                            size="sm"
+                          >
+                            v{e.version} • {e.type}
+                          </Badge>
+                        </div>
+                        <span className="text-[10px] text-slate-400">
+                          {new Date(e.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        {e.description}
+                      </p>
+                      {e.data?.revisionReason && (
+                        <p className="text-[11px] text-amber-700 font-medium">
+                          Reason: {e.data.revisionReason}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-3 border-t border-slate-100">
+              <Button size="sm" variant="outline" onClick={() => setTimelineSubmission(null)}>
+                Close
+              </Button>
+            </div>
           </div>
         </div>
       )}
