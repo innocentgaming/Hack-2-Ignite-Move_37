@@ -18,7 +18,7 @@ describe('InternOS Phase 8: Final Evaluation & Completion Engine Suite', () => {
   let baseUrl: string;
 
   // Tokens for ORG_A
-  let tokenAdminA: string;
+  let _tokenAdminA: string;
   let tokenHodA: string;
   let tokenFacultyA: string;
   let tokenStudentA: string;
@@ -50,7 +50,7 @@ describe('InternOS Phase 8: Final Evaluation & Completion Engine Suite', () => {
       body: JSON.stringify({ email: 'admin@org-a.com', password: 'Password123!', organizationCode: 'ORG_A' }),
     });
     const dataAdminA = await resAdminA.json();
-    tokenAdminA = dataAdminA.data.token;
+    _tokenAdminA = dataAdminA.data.token;
 
     // 2. Login HOD Org A
     const resHodA = await fetch(`${baseUrl}/api/v1/auth/login`, {
