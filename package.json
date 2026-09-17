@@ -13,12 +13,23 @@
     "dev:web": "npm run dev --workspace=@internos/web",
     "build": "npm run build --workspaces",
     "typecheck": "npm run typecheck --workspaces",
-    "prisma:generate": "npm run generate --workspace=@internos/prisma",
-    "prisma:migrate": "npm run migrate --workspace=@internos/prisma",
-    "prisma:seed": "npm run seed --workspace=@internos/prisma",
-    "prisma:studio": "npm run studio --workspace=@internos/prisma"
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "npm run test --workspace=@internos/api",
+    "prisma:validate": "prisma validate",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:studio": "prisma studio"
   },
   "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "@types/node": "^20.12.12",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "eslint": "^8.57.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.10.5",
     "typescript": "^5.4.5"
   }
 }

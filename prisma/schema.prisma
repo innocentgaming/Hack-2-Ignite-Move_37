@@ -15,11 +15,15 @@ datasource db {
 // ==========================================
 
 enum UserRole {
+  ADMIN
+  HOD
+  FACULTY
+  STUDENT
+  MENTOR
   SUPER_ADMIN
   INSTITUTION_ADMIN
   FACULTY_SUPERVISOR
   INDUSTRY_MENTOR
-  STUDENT
 }
 
 enum UserStatus {

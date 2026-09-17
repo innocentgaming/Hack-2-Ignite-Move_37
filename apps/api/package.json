@@ -8,10 +8,11 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -b",
     "start": "node dist/index.js",
+    "test": "tsx --test test/tenant-isolation-rbac.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@internos/prisma": "*",
+    "@prisma/client": "^5.22.0",
     "@internos/shared": "*",
     "@internos/types": "*",
     "bcryptjs": "^2.4.3",

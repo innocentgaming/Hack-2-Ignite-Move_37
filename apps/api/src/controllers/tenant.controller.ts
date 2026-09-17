@@ -1,63 +1,103 @@
 import { Request, Response, NextFunction } from 'express';
 import { formatSuccessResponse } from '@internos/shared';
-import { prisma } from '@internos/prisma';
-import { withTenantScope } from '../middleware/tenantIsolation.js';
+import { tenantService } from '../services/tenant.service.js';
 
-export async function getCurrentTenant(req: Request, res: Response): Promise<void> {
+export async function getCurrentTenant(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const org = await prisma.organization.findUnique({
-      where: { id: req.organizationId },
-      include: {
-        departments: true,
-        _count: {
-          select: {
-            users: true,
-            internships: true,
-            companies: true,
-          },
-        },
-      },
-    });
-
-    if (org) {
-      res.status(200).json(formatSuccessResponse(org));
-      return;
-    }
+    const org = await tenantService.getCurrentTenant(req.organizationId!);
+    res.status(200).json(formatSuccessResponse(org));
   } catch (error) {
-    console.warn('⚠️ Live database offline, serving tenant data fallback:', (error as Error).message);
+    next(error);
   }
-
-  // Graceful fallback for Phase 0 local preview
-  res.status(200).json(
-    formatSuccessResponse({
-      id: req.organizationId || 'apex-org-demo-uuid',
-      code: 'apex-inst',
-      name: 'Apex Institute of Technology',
-      domain: 'apex.edu',
-      _count: { users: 5, internships: 1, companies: 1 },
-      departments: [
-        { id: 'dept-cse-uuid', code: 'CSE', name: 'Department of Computer Science & Engineering' },
-        { id: 'dept-ece-uuid', code: 'ECE', name: 'Department of Electronics & Communication Engineering' },
-      ],
-    })
-  );
 }
 
-export async function getDepartments(req: Request, res: Response): Promise<void> {
+export async function getDepartments(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const departments = await prisma.department.findMany({
-      where: withTenantScope(req),
-      orderBy: { name: 'asc' },
-    });
-
+    const departments = await tenantService.getDepartments(req.organizationId!);
     res.status(200).json(formatSuccessResponse(departments));
   } catch (error) {
-    console.warn('⚠️ Live database offline, serving departments fallback:', (error as Error).message);
-    res.status(200).json(
-      formatSuccessResponse([
-        { id: 'dept-cse-uuid', code: 'CSE', name: 'Department of Computer Science & Engineering' },
-        { id: 'dept-ece-uuid', code: 'ECE', name: 'Department of Electronics & Communication Engineering' },
-      ])
-    );
+    next(error);
+  }
+}
+
+export async function getInternships(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const internships = await tenantService.getInternships(req.organizationId!);
+    res.status(200).json(formatSuccessResponse(internships));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getInternshipById(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const internship = await tenantService.getInternshipById(req.organizationId!, req.params.id);
+    res.status(200).json(formatSuccessResponse(internship));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createInternship(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const studentId = req.user?.id || 'student-default';
+    const internship = await tenantService.createInternship(req.organizationId!, studentId, req.body);
+    res.status(201).json(formatSuccessResponse(internship));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateInternship(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const internship = await tenantService.updateInternship(req.organizationId!, req.params.id, req.body);
+    res.status(200).json(formatSuccessResponse(internship));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteInternship(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await tenantService.deleteInternship(req.organizationId!, req.params.id);
+    res.status(200).json(formatSuccessResponse(result));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getDocuments(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const documents = await tenantService.getDocuments(req.organizationId!);
+    res.status(200).json(formatSuccessResponse(documents));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getDocumentById(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const doc = await tenantService.getDocumentById(req.organizationId!, req.params.id);
+    res.status(200).json(formatSuccessResponse(doc));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await tenantService.deleteDocument(req.organizationId!, req.params.id);
+    res.status(200).json(formatSuccessResponse(result));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const users = await tenantService.getUsers(req.organizationId!);
+    res.status(200).json(formatSuccessResponse(users));
+  } catch (error) {
+    next(error);
   }
 }

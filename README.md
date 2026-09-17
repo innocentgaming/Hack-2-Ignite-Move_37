@@ -1,159 +1,134 @@
-# InternOS — Smart Internship Management System
+# 🚀 InternOS — Multi-Tenant Smart Internship Intelligence Operating System
 
-> **InternOS** is a multi-tenant Smart Internship Management and Monitoring System designed specifically for educational institutions (universities, colleges, polytechnics) to standardize industrial training governance, mentor feedback, outcome-based education (OBE) rubrics, and internship monitoring.
+> **Phase 0 Foundation Release**  
+> Architected for higher-education academic institutions, faculty supervisors, industry corporate mentors, and students.
 
 ---
 
-## 🏗️ Architecture
-
-InternOS is built as a clean modular monorepo using npm workspaces:
+## 🏛️ Monorepo Architecture
 
 ```
 internos/
 ├── apps/
-│   ├── api/                 # Express.js REST API with TypeScript, JWT, RBAC & Tenant Isolation
-│   └── web/                 # React 18 + Vite + Tailwind CSS with Role-Aware Application Shell
+│   ├── web/                 # React, TypeScript, Tailwind CSS, React Router SPA
+│   └── api/                 # Node.js, Express, TypeScript, JWT & RBAC Engine
+│
 ├── packages/
-│   ├── prisma/              # PostgreSQL schema (20 models), migrations & seed scripts
-│   ├── shared/              # Centralized error classes, response formatters, RBAC matrices
-│   └── types/               # Domain models, enums, DTOs, API contracts
-└── docs/                    # Architecture and security documentation
+│   ├── shared/              # Shared error classes, standard responses & utilities
+│   └── types/               # Authoritative TypeScript types, enums, DTOs & AI abstractions
+│
+├── prisma/                  # PostgreSQL schema, migrations & development seed
+│   ├── migrations/          # Verifiable SQL schema migrations
+│   ├── schema.prisma        # 20 Prisma domain models with multi-tenant scoping
+│   └── seed.ts              # Deterministic development seed dataset
+│
+├── docs/                    # Technical & Architectural Documentation
+│   ├── ARCHITECTURE.md      # Multi-tenancy, RBAC, API contracts & design patterns
+│   ├── DATABASE.md          # 20 Data models, relational graph & audit specifications
+│   └── DEVELOPMENT.md       # Local developer guide, Docker Compose & workflows
+│
+├── .env.example             # Environment variable template
+├── .eslintrc.cjs            # Monorepo-wide ESLint configuration
+├── .prettierrc              # Monorepo-wide code formatting rules
+├── docker-compose.yml       # Production-parity PostgreSQL 16 container
+├── README.md                # Root architectural guide
+└── package.json             # Monorepo workspace configuration
 ```
-
-### Core Architecture Principles:
-1. **TypeScript Strict Mode**: Zero implicit `any` across all apps and packages.
-2. **Multi-Tenant Server-Side Isolation**: Every tenant-owned record is scoped using `organizationId`. Untrusted client IDs are rejected. Frontend visibility is never treated as a security boundary.
-3. **Database Foundation**: 20 relational models in Prisma ORM targeting PostgreSQL.
-4. **Standard Envelope**: All API endpoints return `{ success, data, error, meta }`.
-5. **Storage Abstraction**: Pluggable storage driver (`LocalStorageService` / S3 / GCS).
 
 ---
 
-## 🚀 Quick Start & Local Setup
+## 📦 System Foundations (Phase 0)
 
-### 1. Prerequisites
-- **Node.js**: >= 18.x (tested on v24.19.0)
-- **npm**: >= 9.x
-- **PostgreSQL**: (or compatible PostgreSQL instance)
+1. **Modular Monorepo**: Decoupled `apps/` (web, api), `packages/` (shared, types), and `prisma/`.
+2. **Multi-Tenant Isolation**: Hard isolation keyed on `organizationId` across all entities.
+3. **Database Foundation**: 20 relational models in Prisma ORM targeting PostgreSQL.
+4. **JWT & RBAC Architecture**: 5-tier role hierarchy (`SUPER_ADMIN`, `INSTITUTION_ADMIN`, `FACULTY_SUPERVISOR`, `INDUSTRY_MENTOR`, `STUDENT`).
+5. **Storage Abstraction Layer**: Interface-driven file storage (`IStorageService`) with local filesystem driver and cloud-ready provider abstraction.
+6. **AI Abstraction Layer**: Standardized `IAIService` interface with Phase 0 stubs strictly enforcing no premature speculative execution.
+7. **Production Quality Standards**: Strict TypeScript (`strict: true`), ESLint, Prettier formatting, Zod schema validation, centralized error handling, and structured request logging.
+8. **Comprehensive UI Suite**: 12 reusable components (`Button`, `Input`, `Select`, `Modal`, `Table`, `Badge`, `Card`, `Dialog`, `Toast`, `Loading`, `EmptyState`, `ErrorState`).
 
-### 2. Install Monorepo Dependencies
-From the repository root:
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 18, TypeScript, Tailwind CSS, React Router v6, Lucide Icons, Vite |
+| **Backend** | Node.js, Express, TypeScript, Zod, JWT, Helmet, CORS |
+| **Database** | PostgreSQL, Prisma ORM, Prisma Client |
+| **DevOps & QA**| Docker Compose, ESLint, Prettier, TypeScript Strict Mode |
+
+---
+
+## 🚦 Quick Start
+
+### 1. Installation
 ```bash
 npm install
 ```
 
-### 3. Configure Environment Variables
-Copy `.env.example` to `.env`:
+### 2. Environment Setup
 ```bash
 cp .env.example .env
 ```
 
-Key environment configuration:
-| Variable | Description | Default |
-|---|---|---|
-| `PORT` | API Server Port | `4000` |
-| `API_URL` | Base API URL | `http://localhost:4000` |
-| `FRONTEND_URL` | Web Frontend URL | `http://localhost:5173` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:postgres@localhost:5432/internos` |
-| `JWT_SECRET` | Secret key for JWT signing | Minimum 32 characters |
-| `JWT_EXPIRES_IN` | Token lifespan | `7d` |
-| `STORAGE_DRIVER` | Document storage driver | `local` |
-
----
-
-## 🗄️ Database & Prisma Commands
-
-Navigate to `packages/prisma` or use root shortcuts:
-
+### 3. Database (Docker Compose)
 ```bash
-# Validate Prisma schema
-npm run prisma:validate
-
-# Generate Prisma Client
-npm run prisma:generate
-
-# Apply migrations
-npm run prisma:migrate
-
-# Seed demo dataset
-npm run prisma:seed
-
-# Launch Prisma Studio GUI
-npm run prisma:studio
+docker compose up -d
 ```
 
----
-
-## 🖥️ Development Commands
-
-Run both the API and Web applications concurrently, or individually:
-
+### 4. Prisma Validation & Generation
 ```bash
-# Start both API and Web concurrently
+npm run prisma:validate
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+```
+
+### 5. Start Development Servers
+```bash
+# Start both API and Web concurrently:
 npm run dev
 
-# Start backend API only (http://localhost:4000)
-npm run dev:api
-
-# Start frontend web app only (http://localhost:5173)
-npm run dev:web
-
-# Run TypeScript typechecks across all packages
-npm run typecheck
-
-# Build all packages for production
-npm run build
+# Or start individually:
+npm run dev:api    # API on http://localhost:4000
+npm run dev:web    # Web on http://localhost:5173
 ```
 
 ---
 
-## 📡 API Endpoints (Foundation)
+## 🩺 Health Check Endpoint
 
-| Method | Path | Description | Access |
-|---|---|---|---|
-| `GET` | `/api/health` | System health, uptime, memory, version | Public |
-| `POST` | `/api/v1/auth/login` | Authenticate user & issue JWT | Public |
-| `GET` | `/api/v1/auth/me` | Current authenticated user profile | Authenticated |
-| `GET` | `/api/v1/tenants/current` | Current organization details | Authenticated + Isolated |
-| `GET` | `/api/v1/tenants/departments` | Active departments in tenant | Authenticated + Isolated |
+```http
+GET /api/v1/health
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "service": "internos-api",
+  "status": "healthy"
+}
+```
 
 ---
 
-## 👥 Seeded Demo Accounts
+## 🔑 Demo Credentials (Phase 0)
 
-All demo accounts use password: `Password123!` with organization code `apex-inst`:
-
-| Role | Demo Email | Purpose |
+| Role | Email | Password |
 |---|---|---|
-| **Super Admin** | `superadmin@internos.local` | Cross-tenant platform administration |
-| **Institution Admin** | `admin@apex.edu` | Academic departments & user registry |
-| **Faculty Supervisor** | `dr.sharma@apex.edu` | Student monitoring & rubric evaluation |
-| **Industry Mentor** | `raj.patel@acmecloud.com` | Milestone reviews & industry feedback |
-| **Student Intern** | `alex.student@apex.edu` | Report submissions & outcome tracking |
-
-The web interface also includes an instant **Quick Switcher** bar at the top of the screen to toggle between roles without manual re-typing.
+| Institution Admin | `admin@apex.edu` | `Password123!` |
+| Faculty Supervisor | `dr.sharma@apex.edu` | `Password123!` |
+| Industry Mentor | `raj.patel@acmecloud.com` | `Password123!` |
+| Student | `alex.student@apex.edu` | `Password123!` |
+| Super Admin | `superadmin@internos.local` | `Password123!` |
 
 ---
 
-## 📦 Database Models Foundation (20 Models)
+## 📄 Documentation Links
 
-1. `Organization` (Tenant root)
-2. `User` (RBAC accounts)
-3. `Department` (Academic units)
-4. `StudentProfile`
-5. `FacultyProfile`
-6. `MentorProfile`
-7. `Company` (Industry partners)
-8. `Internship` (Lifecycle record)
-9. `WorkflowTemplate`
-10. `WorkflowInstance`
-11. `WorkflowTask`
-12. `Outcome` (Academic objectives)
-13. `OutcomeVersion` (Rubrics)
-14. `Submission` (Student deliverables)
-15. `Review` (Qualitative feedback)
-16. `Evaluation` (Scored rubrics)
-17. `AIAnalysis` (Automated insights foundation)
-18. `Notification` (Alerts)
-19. `AuditLog` (Tamper-evident logs)
-20. `Document` (Uploaded artifacts)
+- [System Architecture](file:///docs/ARCHITECTURE.md)
+- [Database Models & Schema](file:///docs/DATABASE.md)
+- [Developer & Testing Guide](file:///docs/DEVELOPMENT.md)

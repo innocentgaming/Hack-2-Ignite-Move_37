@@ -42,7 +42,7 @@ async function main() {
     },
   });
 
-  const deptEce = await prisma.department.upsert({
+  const _deptEce = await prisma.department.upsert({
     where: {
       organizationId_code: {
         organizationId: org.id,
@@ -61,7 +61,7 @@ async function main() {
 
   // 3. Create Demo Users for each role
   // Super Admin
-  const superAdmin = await prisma.user.upsert({
+  const _superAdmin = await prisma.user.upsert({
     where: {
       organizationId_email: {
         organizationId: org.id,
@@ -81,7 +81,7 @@ async function main() {
   });
 
   // Institution Admin
-  const instAdmin = await prisma.user.upsert({
+  const _instAdmin = await prisma.user.upsert({
     where: {
       organizationId_email: {
         organizationId: org.id,

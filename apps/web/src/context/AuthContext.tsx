@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AuthenticatedUser, UserRole, LoginRequestDto, LoginResponseData } from '@internos/types';
+import { AuthenticatedUser, UserRole, LoginRequestDto, LoginResponseData, ActivateAccountDto } from '@internos/types';
+import { Permission, hasPermission as checkPermission, normalizeRole } from '@internos/shared';
 import { apiClient } from '../services/apiClient';
 
 interface AuthContextType {
@@ -7,10 +8,12 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (dto: LoginRequestDto) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
-  hasRole: (...roles: UserRole[]) => boolean;
-  switchDemoRole: (role: UserRole) => Promise<void>;
+  login: (dto: LoginRequestDto) => Promise<{ success: boolean; user?: AuthenticatedUser; error?: string }>;
+  logout: () => Promise<void>;
+  activateAccount: (dto: ActivateAccountDto) => Promise<{ success: boolean; error?: string; message?: string }>;
+  hasRole: (...roles: (UserRole | string)[]) => boolean;
+  hasPermission: (permission: Permission) => boolean;
+  switchDemoRole: (role: UserRole | string, orgCode?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,6 +39,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (response.success && response.data) {
           setUser(response.data);
           localStorage.setItem('internos_user', JSON.stringify(response.data));
+        } else {
+          // Token invalid
+          localStorage.removeItem('internos_token');
+          localStorage.removeItem('internos_user');
+          setToken(null);
+          setUser(null);
         }
       } catch {
         // Keep cached user if offline
@@ -57,7 +66,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(receivedUser);
         localStorage.setItem('internos_token', receivedToken);
         localStorage.setItem('internos_user', JSON.stringify(receivedUser));
-        return { success: true };
+        return { success: true, user: receivedUser };
       }
       return {
         success: false,
@@ -73,36 +82,62 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('internos_token');
-    localStorage.removeItem('internos_user');
-  };
-
-  const hasRole = (...roles: UserRole[]) => {
-    if (!user) return false;
-    if (user.role === UserRole.SUPER_ADMIN) return true;
-    return roles.includes(user.role);
-  };
-
-  const switchDemoRole = async (role: UserRole) => {
-    const credentials: Record<UserRole, { email: string; pass: string }> = {
-      [UserRole.INSTITUTION_ADMIN]: { email: 'admin@apex.edu', pass: 'Password123!' },
-      [UserRole.FACULTY_SUPERVISOR]: { email: 'dr.sharma@apex.edu', pass: 'Password123!' },
-      [UserRole.INDUSTRY_MENTOR]: { email: 'raj.patel@acmecloud.com', pass: 'Password123!' },
-      [UserRole.STUDENT]: { email: 'alex.student@apex.edu', pass: 'Password123!' },
-      [UserRole.SUPER_ADMIN]: { email: 'superadmin@internos.local', pass: 'Password123!' },
-    };
-
-    const target = credentials[role];
-    if (target) {
-      await login({
-        email: target.email,
-        password: target.pass,
-        organizationCode: 'apex-inst',
-      });
+  const logout = async () => {
+    try {
+      await apiClient.post('/api/v1/auth/logout');
+    } catch {
+      // ignore network errors on logout
+    } finally {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('internos_token');
+      localStorage.removeItem('internos_user');
     }
+  };
+
+  const activateAccount = async (dto: ActivateAccountDto) => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.post<{ message: string }>('/api/v1/auth/activate', dto);
+      if (response.success) {
+        return { success: true, message: response.data?.message || 'Account activated successfully!' };
+      }
+      return {
+        success: false,
+        error: response.error?.message || 'Account activation failed. Token may be invalid or expired.',
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to activate account',
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const hasRole = (...roles: (UserRole | string)[]) => {
+    if (!user) return false;
+    const current = normalizeRole(user.role);
+    const normalized = roles.map(normalizeRole);
+    return normalized.includes(current);
+  };
+
+  const hasPermission = (permission: Permission): boolean => {
+    if (!user) return false;
+    return checkPermission(user.role, permission);
+  };
+
+  const switchDemoRole = async (role: UserRole | string, orgCode = 'ORG_A') => {
+    const roleKey = normalizeRole(role);
+    const domain = orgCode === 'ORG_B' ? 'org-b.com' : 'org-a.com';
+    const email = `${roleKey.toLowerCase()}@${domain}`;
+
+    await login({
+      email,
+      password: 'Password123!',
+      organizationCode: orgCode,
+    });
   };
 
   return (
@@ -114,7 +149,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoading,
         login,
         logout,
+        activateAccount,
         hasRole,
+        hasPermission,
         switchDemoRole,
       }}
     >

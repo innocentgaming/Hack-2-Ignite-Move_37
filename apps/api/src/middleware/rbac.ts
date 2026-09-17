@@ -1,23 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
-import { ForbiddenError, UnauthorizedError, Permission, hasPermission } from '@internos/shared';
+import { ForbiddenError, UnauthorizedError, Permission, hasPermission, normalizeRole } from '@internos/shared';
 import { UserRole } from '@internos/types';
 
 /**
  * Require specific user role(s) to access the endpoint.
+ * Returns 403 Forbidden on role mismatch.
  */
-export function requireRoles(...allowedRoles: UserRole[]) {
+export function requireRoles(...allowedRoles: (UserRole | string)[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       throw new UnauthorizedError('Authentication required');
     }
 
-    if (req.user.role === UserRole.SUPER_ADMIN) {
-      return next(); // Super admin has global bypass
-    }
+    const currentRole = normalizeRole(req.user.role);
+    const normalizedAllowed = allowedRoles.map(normalizeRole);
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!normalizedAllowed.includes(currentRole)) {
       throw new ForbiddenError(
-        `Role '${req.user.role}' is not authorized to access this resource. Allowed: ${allowedRoles.join(', ')}`
+        `Role '${req.user.role}' is not authorized to access this resource. Required one of: ${allowedRoles.join(', ')}`
       );
     }
 
@@ -27,15 +27,12 @@ export function requireRoles(...allowedRoles: UserRole[]) {
 
 /**
  * Require specific granular permission(s).
+ * Centralized authorization check returning 403 on permission lack.
  */
 export function requirePermission(permission: Permission) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       throw new UnauthorizedError('Authentication required');
-    }
-
-    if (req.user.role === UserRole.SUPER_ADMIN) {
-      return next();
     }
 
     if (!hasPermission(req.user.role, permission)) {
@@ -47,3 +44,7 @@ export function requirePermission(permission: Permission) {
     next();
   };
 }
+
+// Explicit naming requirements: role middleware, permission middleware
+export const roleMiddleware = requireRoles;
+export const permissionMiddleware = requirePermission;

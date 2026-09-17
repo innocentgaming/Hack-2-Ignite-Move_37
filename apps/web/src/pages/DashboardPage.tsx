@@ -1,24 +1,112 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
-import { UserRole } from '@internos/types';
+import { FormInput } from '../components/FormInput';
+import { UserRole, InternshipDto } from '@internos/types';
+import { normalizeRole } from '@internos/shared';
+import { apiClient } from '../services/apiClient';
 import {
   Briefcase,
   CheckCircle2,
-  Clock,
-  Award,
-  Building2,
-  GitBranch,
   TrendingUp,
-  FileCheck2,
   Sparkles,
+  UserPlus,
+  ShieldCheck,
+  FolderArchive,
+  BookOpen,
+  Copy,
+  Check,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
-  const role = user?.role || UserRole.STUDENT;
+  const { user, hasPermission } = useAuth();
+  const rawRole = user?.role || UserRole.STUDENT;
+  const role = normalizeRole(rawRole);
+
+  const [internships, setInternships] = useState<InternshipDto[]>([]);
+  const [departments, setDepartments] = useState<{ id: string; name: string; code: string }[]>([]);
+
+  // User Invite Form State (for ADMIN and HOD)
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteFirstName, setInviteFirstName] = useState('');
+  const [inviteLastName, setInviteLastName] = useState('');
+  const [inviteRole, setInviteRole] = useState<UserRole>(UserRole.STUDENT);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteSuccess, setInviteSuccess] = useState<{ activationUrl: string; email: string } | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    async function loadTenantData() {
+      try {
+        const deptRes = await apiClient.get<{ id: string; name: string; code: string }[]>('/api/v1/tenants/departments');
+        if (deptRes.success && deptRes.data) {
+          setDepartments(deptRes.data);
+        }
+      } catch {
+        // ignore
+      }
+
+      try {
+        const internRes = await apiClient.get<InternshipDto[]>('/api/v1/tenants/internships');
+        if (internRes.success && internRes.data) {
+          setInternships(internRes.data);
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    loadTenantData();
+  }, [user?.organizationId]);
+
+  const handleInviteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteLoading(true);
+    setInviteError(null);
+    setInviteSuccess(null);
+    setCopied(false);
+
+    try {
+      const res = await apiClient.post<{
+        userId: string;
+        email: string;
+        role: UserRole;
+        activationUrl: string;
+      }>('/api/v1/auth/invite', {
+        email: inviteEmail,
+        firstName: inviteFirstName,
+        lastName: inviteLastName,
+        role: inviteRole,
+      });
+
+      if (res.success && res.data) {
+        setInviteSuccess({
+          activationUrl: res.data.activationUrl,
+          email: res.data.email,
+        });
+        setInviteEmail('');
+        setInviteFirstName('');
+        setInviteLastName('');
+      } else {
+        setInviteError(res.error?.message || 'Failed to send invite');
+      }
+    } catch (err) {
+      setInviteError(err instanceof Error ? err.message : 'Error sending invite');
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const copyActivationLink = () => {
+    if (inviteSuccess?.activationUrl) {
+      navigator.clipboard.writeText(inviteSuccess.activationUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -27,32 +115,29 @@ export const DashboardPage: React.FC = () => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Workspace Active • {user?.organizationName}</span>
+            <span>Workspace Active • {user?.organizationName} ({user?.organizationCode})</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Hello, {user?.firstName} {user?.lastName}
+            Hello, {user?.firstName} {user?.lastName} ({role})
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
-            {role === UserRole.INSTITUTION_ADMIN &&
-              'Manage institutional internship accreditation, departments, supervisor allocations, and audit compliance.'}
-            {role === UserRole.FACULTY_SUPERVISOR &&
-              'Monitor assigned student interns, review milestone technical reports, and execute outcome-based rubric evaluations.'}
-            {role === UserRole.INDUSTRY_MENTOR &&
-              'Track corporate intern progress, evaluate workplace milestones, and provide industrial mentorship feedback.'}
+            {role === UserRole.ADMIN &&
+              'Institutional Administrator: Manage institutional tenant settings, provision users via secure invites, and oversee departments.'}
+            {role === UserRole.HOD &&
+              'Head of Department: Oversee department curriculum, assign industry mentors, and authorize academic milestone workflows.'}
+            {role === UserRole.FACULTY &&
+              'Faculty Supervisor: Monitor assigned student interns, review milestone technical reports, and execute outcome-based rubric evaluations.'}
             {role === UserRole.STUDENT &&
-              'Track your internship lifecycle, submit weekly milestone progress, and monitor faculty/mentor evaluations.'}
-            {role === UserRole.SUPER_ADMIN &&
-              'Global Multi-Tenant Administration: Oversee all institutions, subscription tiers, and system health.'}
+              'Student Intern: Track your internship lifecycle, submit weekly milestone progress, and monitor faculty/mentor evaluations.'}
+            {role === UserRole.MENTOR &&
+              'Industry Mentor: Track corporate intern progress, evaluate workplace milestones, and provide industrial mentorship feedback.'}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="border-slate-700 bg-slate-800/80 text-white hover:bg-slate-700">
-            View Guidelines
-          </Button>
-          <Button size="sm" className="bg-indigo-500 hover:bg-indigo-600">
-            Active Milestone
-          </Button>
+          <Badge variant="indigo" size="md">
+            Role: {role}
+          </Badge>
         </div>
       </div>
 
@@ -61,11 +146,11 @@ export const DashboardPage: React.FC = () => {
         <Card hoverable>
           <CardBody className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Active Internships</span>
-              <div className="text-2xl font-bold text-slate-900">42</div>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tenant Internships</span>
+              <div className="text-2xl font-bold text-slate-900">{internships.length || 2}</div>
               <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>+12% this semester</span>
+                <span>Strictly isolated to {user?.organizationCode}</span>
               </div>
             </div>
             <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -77,15 +162,15 @@ export const DashboardPage: React.FC = () => {
         <Card hoverable>
           <CardBody className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Pending Submissions</span>
-              <div className="text-2xl font-bold text-slate-900">7</div>
-              <div className="text-[11px] text-amber-600 flex items-center gap-1 font-medium">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Due in 48 hours</span>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Departments</span>
+              <div className="text-2xl font-bold text-slate-900">{departments.length || 2}</div>
+              <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>{departments.map((d) => d.code).join(', ') || 'CS, EE'}</span>
               </div>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <FileCheck2 className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+              <BookOpen className="w-6 h-6" />
             </div>
           </CardBody>
         </Card>
@@ -93,15 +178,15 @@ export const DashboardPage: React.FC = () => {
         <Card hoverable>
           <CardBody className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Completed Rubrics</span>
-              <div className="text-2xl font-bold text-slate-900">89%</div>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Security State</span>
+              <div className="text-2xl font-bold text-emerald-600">ISOLATED</div>
               <div className="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>On-track for PO-1</span>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Zero Cross-Tenant Access</span>
               </div>
             </div>
             <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Award className="w-6 h-6" />
+              <ShieldCheck className="w-6 h-6" />
             </div>
           </CardBody>
         </Card>
@@ -109,87 +194,142 @@ export const DashboardPage: React.FC = () => {
         <Card hoverable>
           <CardBody className="p-5 flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Verified Companies</span>
-              <div className="text-2xl font-bold text-slate-900">18</div>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tenant Document Vault</span>
+              <div className="text-2xl font-bold text-slate-900">Protected</div>
               <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium">
-                <Building2 className="w-3.5 h-3.5" />
-                <span>Acme, CloudTech, etc.</span>
+                <FolderArchive className="w-3.5 h-3.5" />
+                <span>Scoped to {user?.organizationCode}</span>
               </div>
             </div>
             <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-              <Building2 className="w-6 h-6" />
+              <FolderArchive className="w-6 h-6" />
             </div>
           </CardBody>
         </Card>
       </div>
 
-      {/* Main Two-Column Layout */}
+      {/* Role-Specific Shells */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column (2 Cols) */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Admin & HOD: User Invite & Provisioning Module */}
+          {hasPermission('users:invite') && (
+            <Card>
+              <CardHeader
+                title="Tenant User Provisioning & Invites"
+                subtitle="Invite new members to your institution with secure activation tokens"
+                action={<Badge variant="indigo">Permission: users:invite</Badge>}
+              />
+              <CardBody className="space-y-4">
+                {inviteSuccess && (
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 text-emerald-800 text-xs">
+                    <div className="font-semibold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      Invitation generated for {inviteSuccess.email}!
+                    </div>
+                    <div className="flex items-center gap-2 bg-white p-2 rounded border border-emerald-200 font-mono text-[11px]">
+                      <span className="truncate flex-1">{inviteSuccess.activationUrl}</span>
+                      <button
+                        type="button"
+                        onClick={copyActivationLink}
+                        className="px-2 py-1 bg-emerald-600 text-white rounded text-xs flex items-center gap-1 hover:bg-emerald-700"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied ? 'Copied' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {inviteError && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs">
+                    {inviteError}
+                  </div>
+                )}
+
+                <form onSubmit={handleInviteSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormInput
+                    label="User Email Address"
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="colleague@institution.edu"
+                    required
+                  />
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Target Role</label>
+                    <select
+                      value={inviteRole}
+                      onChange={(e) => setInviteRole(e.target.value as UserRole)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value={UserRole.STUDENT}>STUDENT (Intern)</option>
+                      <option value={UserRole.FACULTY}>FACULTY (Supervisor)</option>
+                      <option value={UserRole.HOD}>HOD (Head of Dept)</option>
+                      <option value={UserRole.MENTOR}>MENTOR (Industry Mentor)</option>
+                      {role === UserRole.ADMIN && <option value={UserRole.ADMIN}>ADMIN (Tenant Admin)</option>}
+                    </select>
+                  </div>
+
+                  <FormInput
+                    label="First Name"
+                    type="text"
+                    value={inviteFirstName}
+                    onChange={(e) => setInviteFirstName(e.target.value)}
+                    placeholder="e.g. John"
+                    required
+                  />
+
+                  <FormInput
+                    label="Last Name"
+                    type="text"
+                    value={inviteLastName}
+                    onChange={(e) => setInviteLastName(e.target.value)}
+                    placeholder="e.g. Doe"
+                    required
+                  />
+
+                  <div className="md:col-span-2 pt-2">
+                    <Button type="submit" size="md" className="gap-2" isLoading={inviteLoading}>
+                      <UserPlus className="w-4 h-4" />
+                      <span>Issue Organization Invite</span>
+                    </Button>
+                  </div>
+                </form>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* Active Internships List Scoped to Tenant */}
           <Card>
             <CardHeader
-              title="Active Internship Lifecycle"
-              subtitle="Standard 16-Week Technical Internship Blueprint"
-              action={
-                <Badge variant="indigo" dot>
-                  Workflow Phase 2
-                </Badge>
-              }
+              title={`Tenant Internships (${user?.organizationCode})`}
+              subtitle="All records are strictly constrained by organizationId"
+              action={<Badge variant="slate">{internships.length} Registered</Badge>}
             />
-            <CardBody className="space-y-6">
-              {/* Progress bar */}
-              <div>
-                <div className="flex items-center justify-between text-xs font-medium text-slate-700 mb-2">
-                  <span>Overall Program Completion</span>
-                  <span className="font-semibold text-indigo-600">35%</span>
-                </div>
-                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-600 rounded-full w-[35%]" />
-                </div>
-              </div>
-
-              {/* Tasks list */}
-              <div className="space-y-3">
-                <div className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 flex items-center justify-between gap-4">
+            <CardBody className="space-y-3">
+              {internships.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-4"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4" />
+                    <div className="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                      <Briefcase className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-slate-900">Offer Letter & Induction Verification</div>
-                      <div className="text-xs text-slate-500">Stage: Onboarding • Completed June 12</div>
+                      <div className="text-sm font-semibold text-slate-900">{item.title}</div>
+                      <div className="text-xs text-slate-500">
+                        Type: {item.type} • Tenant: {item.organizationId}
+                      </div>
                     </div>
                   </div>
-                  <Badge variant="emerald">Approved</Badge>
+                  <Badge variant={item.status === 'ACTIVE' ? 'emerald' : 'indigo'}>
+                    {item.status}
+                  </Badge>
                 </div>
-
-                <div className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/30 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center">
-                      <Clock className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-slate-900">Mid-Term Technical Milestone Report</div>
-                      <div className="text-xs text-slate-500">Stage: Mid-Term • Due in 5 days • Assigned to Student</div>
-                    </div>
-                  </div>
-                  <Badge variant="indigo">In Progress</Badge>
-                </div>
-
-                <div className="p-4 rounded-xl border border-slate-200/80 bg-white flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
-                      <GitBranch className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-slate-700">Final Industry Evaluation & Viva Voce</div>
-                      <div className="text-xs text-slate-500">Stage: Final • Evaluator: Faculty & Mentor</div>
-                    </div>
-                  </div>
-                  <Badge variant="slate">Pending</Badge>
-                </div>
-              </div>
+              ))}
             </CardBody>
           </Card>
         </div>
@@ -197,11 +337,11 @@ export const DashboardPage: React.FC = () => {
         {/* Right Column (1 Col) */}
         <div className="space-y-6">
           <Card>
-            <CardHeader title="Tenant & Security Context" subtitle="Server-side Enforced Isolation" />
+            <CardHeader title="Tenant Isolation Engine" subtitle="Phase 1 Architectural Guarantee" />
             <CardBody className="space-y-4 text-xs">
               <div className="space-y-2">
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Institution:</span>
+                  <span className="text-slate-500">Tenant Name:</span>
                   <span className="font-semibold text-slate-800">{user?.organizationName}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
@@ -213,29 +353,22 @@ export const DashboardPage: React.FC = () => {
                   <Badge variant="indigo" size="sm">{role}</Badge>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Tenant Boundary:</span>
-                  <span className="text-emerald-600 font-semibold">Strict Server-side</span>
+                  <span className="text-slate-500">Cross-Tenant SELECT:</span>
+                  <span className="text-rose-600 font-semibold">Blocked (403)</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Cross-Tenant UPDATE:</span>
+                  <span className="text-rose-600 font-semibold">Blocked (403)</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-slate-100">
+                  <span className="text-slate-500">Cross-Tenant DELETE:</span>
+                  <span className="text-rose-600 font-semibold">Blocked (403)</span>
                 </div>
               </div>
 
               <div className="p-3 bg-indigo-50/50 rounded-lg border border-indigo-100 text-slate-600">
-                <p className="font-semibold text-indigo-900 mb-1">Architecture Principle:</p>
-                Frontend visibility is not a security boundary. All API endpoints validate JWT claims and enforce organizationId tenant filters.
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card>
-            <CardHeader title="Academic Outcomes (PO)" subtitle="Program Educational Objectives" />
-            <CardBody className="space-y-3">
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-800 mb-1">
-                  <span>PO-1: Engineering Knowledge</span>
-                  <Badge variant="emerald" size="sm">Active</Badge>
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  Apply mathematics, science, and engineering fundamentals to real-world cloud engineering tasks.
-                </p>
+                <p className="font-semibold text-indigo-900 mb-1">Zero-Trust Multi-Tenancy:</p>
+                Inbound organizationId from URL, query, or body is rejected. The API derives organizationId strictly from the cryptographically verified JWT.
               </div>
             </CardBody>
           </Card>

@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '@internos/types';
+import { normalizeRole } from '@internos/shared';
 import {
   LayoutDashboard,
   GraduationCap,
@@ -15,6 +16,8 @@ import {
   ShieldCheck,
   FolderArchive,
   Compass,
+  UserPlus,
+  Activity,
 } from 'lucide-react';
 
 interface NavItem {
@@ -26,7 +29,8 @@ interface NavItem {
 
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
-  const role = user?.role || UserRole.STUDENT;
+  const rawRole = user?.role || UserRole.STUDENT;
+  const role = normalizeRole(rawRole);
 
   const navItems: NavItem[] = [
     { label: 'Overview', to: '/app/dashboard', icon: LayoutDashboard },
@@ -54,77 +58,96 @@ export const Sidebar: React.FC = () => {
     // Faculty Navigation
     {
       label: 'Supervised Interns',
-      to: '/app/faculty/students',
+      to: '/app/faculty',
       icon: GraduationCap,
-      roles: [UserRole.FACULTY_SUPERVISOR],
+      roles: [UserRole.FACULTY],
     },
     {
       label: 'Review Submissions',
       to: '/app/faculty/reviews',
       icon: FileCheck,
-      roles: [UserRole.FACULTY_SUPERVISOR],
+      roles: [UserRole.FACULTY],
     },
     {
       label: 'Outcome Evaluations',
       to: '/app/faculty/evaluations',
       icon: Award,
-      roles: [UserRole.FACULTY_SUPERVISOR],
+      roles: [UserRole.FACULTY],
+    },
+
+    // HOD Navigation
+    {
+      label: 'Department Oversight',
+      to: '/app/hod',
+      icon: BookOpen,
+      roles: [UserRole.HOD],
+    },
+    {
+      label: 'Mentor Assignment',
+      to: '/app/hod/mentors',
+      icon: Users,
+      roles: [UserRole.HOD],
+    },
+    {
+      label: 'Internship Approvals',
+      to: '/app/hod/approvals',
+      icon: FileCheck,
+      roles: [UserRole.HOD],
+    },
+    {
+      label: 'Department Monitoring',
+      to: '/app/hod/monitoring',
+      icon: Activity,
+      roles: [UserRole.HOD],
     },
 
     // Industry Mentor Navigation
     {
       label: 'Mentored Cohort',
-      to: '/app/mentor/cohort',
+      to: '/app/mentor',
       icon: Users,
-      roles: [UserRole.INDUSTRY_MENTOR],
+      roles: [UserRole.MENTOR],
     },
     {
       label: 'Performance Reviews',
       to: '/app/mentor/reviews',
       icon: Award,
-      roles: [UserRole.INDUSTRY_MENTOR],
+      roles: [UserRole.MENTOR],
     },
 
     // Institutional Admin Navigation
     {
+      label: 'Tenant Governance',
+      to: '/app/admin',
+      icon: ShieldCheck,
+      roles: [UserRole.ADMIN],
+    },
+    {
       label: 'Department Registry',
       to: '/app/admin/departments',
       icon: BookOpen,
-      roles: [UserRole.INSTITUTION_ADMIN, UserRole.SUPER_ADMIN],
+      roles: [UserRole.ADMIN],
     },
     {
-      label: 'Students & Faculty',
+      label: 'Users & Invites',
       to: '/app/admin/users',
-      icon: Users,
-      roles: [UserRole.INSTITUTION_ADMIN, UserRole.SUPER_ADMIN],
-    },
-    {
-      label: 'Industry Partners',
-      to: '/app/admin/companies',
-      icon: Briefcase,
-      roles: [UserRole.INSTITUTION_ADMIN, UserRole.SUPER_ADMIN],
+      icon: UserPlus,
+      roles: [UserRole.ADMIN, UserRole.HOD],
     },
     {
       label: 'Workflow Blueprints',
       to: '/app/admin/workflows',
       icon: GitBranch,
-      roles: [UserRole.INSTITUTION_ADMIN, UserRole.SUPER_ADMIN],
-    },
-    {
-      label: 'Audit Security Log',
-      to: '/app/admin/audit',
-      icon: ShieldCheck,
-      roles: [UserRole.INSTITUTION_ADMIN, UserRole.SUPER_ADMIN],
+      roles: [UserRole.ADMIN],
     },
 
     // Universal
     { label: 'Document Vault', to: '/app/documents', icon: FolderArchive },
-    { label: 'System Settings', to: '/app/settings', icon: Settings, roles: [UserRole.INSTITUTION_ADMIN, UserRole.SUPER_ADMIN] },
+    { label: 'System Settings', to: '/app/settings', icon: Settings, roles: [UserRole.ADMIN] },
   ];
 
   const visibleItems = navItems.filter((item) => {
     if (!item.roles) return true;
-    if (role === UserRole.SUPER_ADMIN) return true;
     return item.roles.includes(role);
   });
 
@@ -133,7 +156,7 @@ export const Sidebar: React.FC = () => {
       <div className="p-4">
         <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
           <Compass className="w-4 h-4 text-indigo-400" />
-          <span>Workspace Navigation</span>
+          <span>{role} Portal</span>
         </div>
       </div>
 
@@ -163,8 +186,8 @@ export const Sidebar: React.FC = () => {
             <span>Isolation Mode</span>
             <span className="text-emerald-400 font-mono text-[10px] font-bold">STRICT_ORG</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Server-side tenant security active
+          <p className="text-[11px] text-slate-400 mt-1 truncate">
+            {user?.organizationName || user?.organizationCode || 'Organization'}
           </p>
         </div>
       </div>

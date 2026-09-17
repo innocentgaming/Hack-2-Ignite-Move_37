@@ -1,115 +1,119 @@
-# InternOS Architecture & Design Document (Phase 0)
+# InternOS Architecture Specification (Phase 0)
 
-## 1. Architectural Overview
+## 1. Executive System Overview
 
-InternOS is a multi-tenant Smart Internship Management and Monitoring System for educational institutions. The architecture follows a modular monorepo pattern using standard TypeScript across both backend and frontend.
+InternOS is an enterprise multi-tenant internship intelligence and monitoring operating system engineered for higher-education academic institutions, faculty supervisors, corporate industry mentors, and students.
+
+Phase 0 establishes the foundational architectural framework, strictly decoupling persistence, domain types, shared contracts, presentation, and service boundaries without implementing premature speculative business logic.
+
+---
+
+## 2. Monorepo Structure
 
 ```
 internos/
 ├── apps/
-│   ├── api/                 # Express.js REST API with strict server-side RBAC & tenant scoping
-│   └── web/                 # React 18 + Vite + Tailwind CSS Single Page Application
+│   ├── web/                     # React 18, TypeScript, Tailwind CSS, React Router SPA
+│   └── api/                     # Node.js, Express, TypeScript REST API
+│
 ├── packages/
-│   ├── shared/              # Centralized error classes, response formatters, RBAC matrices
-│   ├── types/               # Domain models, enums, DTOs, API contracts
-│   └── prisma/              # PostgreSQL schema, migrations, seeders, Prisma client
-└── docs/                    # Architectural and developer documentation
+│   ├── shared/                  # Shared error classes, standard response helpers, formatters
+│   └── types/                   # Shared TypeScript interfaces, Enums, DTOs, API envelopes
+│
+├── prisma/                      # PostgreSQL schema (20 models), migrations & seed scripts
+│   ├── migrations/              # Verifiable SQL schema migrations
+│   ├── schema.prisma            # Authoritative database model definition
+│   └── seed.ts                  # Deterministic development seed dataset
+│
+├── docs/                        # Architectural, Database, and Developer documentation
+│   ├── ARCHITECTURE.md          # System architecture, RBAC, tenant isolation & contracts
+│   ├── DATABASE.md              # 20 Data models, relational graph, indexes & audit rules
+│   └── DEVELOPMENT.md           # Local setup, Docker Compose, commands & workflows
+│
+├── .env.example                 # Comprehensive environment variable template
+├── .eslintrc.cjs                # Monorepo-wide ESLint linting configuration
+├── .prettierrc                  # Monorepo-wide code formatting rules
+├── docker-compose.yml           # Production-parity PostgreSQL 16 local container
+├── README.md                    # Root project documentation
+└── package.json                 # Monorepo workspace orchestration
 ```
 
 ---
 
-## 2. Multi-Tenant Isolation Model
+## 3. Core Architectural Principles
 
-### 2.1 The Core Rule
-> **"Every tenant-owned record must be scoped using `organizationId`. Never trust `organizationId` supplied by the frontend. Tenant isolation must be enforced server-side. Frontend visibility is NOT a security boundary."**
+### 3.1 Multi-Tenancy & Tenant Scoping
+- **Tenant Root**: Every tenant is anchored by an `Organization` entity with a unique immutable `code` (e.g., `apex-inst`).
+- **Scoping Rule**: All database models (User, Department, Company, Internship, WorkflowInstance, Task, Outcome, Submission, Review, Evaluation, Notification, AuditLog, Document) contain a mandatory foreign key `organizationId`.
+- **Tenant Isolation Middleware**: Express middleware intercepts all inbound requests, verifies organization context from the verified JWT or header `X-Organization-Code`, and enforces cross-tenant boundary isolation.
 
-### 2.2 Server-Side Enforcement Flow
-1. **Authentication**: The user logs in via `POST /api/v1/auth/login`. Upon verifying credentials, a signed JWT is issued containing:
-   - `userId`
-   - `email`
-   - `role`
-   - `organizationId` (immutable tenant identity)
-   - `organizationCode`
-2. **Context Binding**: The `authenticate` middleware verifies the cryptographic JWT signature and sets `req.user` and `req.organizationId`.
-3. **Tenant Isolation Guard**: The `tenantIsolation` middleware inspects the incoming request:
-   - If the request includes an untrusted `organizationId` in the body, query parameters, or headers that differs from `req.user.organizationId`, the request is rejected with `403 FORBIDDEN (TENANT_ISOLATION_VIOLATION)` unless the actor is `SUPER_ADMIN`.
-   - The authoritative `req.organizationId` is injected into downstream database queries using `withTenantScope(req, whereClause)`.
+### 3.2 Authentication & Role-Based Access Control (RBAC)
+- **Token Mechanism**: Stateless JSON Web Tokens (JWT) signed with HMAC-SHA256 containing `userId`, `email`, `role`, `organizationId`, and `organizationCode`.
+- **Role Hierarchy**:
+  1. `SUPER_ADMIN`: Cross-tenant platform administration and governance.
+  2. `INSTITUTION_ADMIN`: Institutional tenant management, department setup, user provisioning.
+  3. `FACULTY_SUPERVISOR`: Student internship tracking, progress verification, rubric evaluation.
+  4. `INDUSTRY_MENTOR`: Corporate milestone review, technical log verification, feedback scoring.
+  5. `STUDENT`: Task submission, document upload, internship status view, evaluation review.
 
----
-
-## 3. Role-Based Access Control (RBAC)
-
-InternOS supports 5 distinct roles:
-
-| Role | Domain Scope | Primary Responsibilities |
-|---|---|---|
-| `SUPER_ADMIN` | Global (Cross-tenant) | Platform infrastructure, provisioning new institutions |
-| `INSTITUTION_ADMIN` | Tenant-wide | Department setup, user roster, workflow template management, audit logs |
-| `FACULTY_SUPERVISOR` | Departmental / Assigned Students | Internship approval, milestone report reviews, outcome rubric scoring |
-| `INDUSTRY_MENTOR` | Company / Assigned Interns | Corporate deliverable verification, workplace competency evaluations |
-| `STUDENT` | Self | Deliverable submission, task completion, outcome progress tracking |
-
----
-
-## 4. Database Schema Design (Prisma ORM)
-
-The initial foundation specifies 20 relational models:
-
-1. **`Organization`**: Multi-tenant root entity.
-2. **`Department`**: Academic units (e.g., Computer Science, Electrical Engineering).
-3. **`User`**: Account identity with salted bcrypt password and role.
-4. **`StudentProfile`**: Student-specific attributes (roll number, batch year, CGPA).
-5. **`FacultyProfile`**: Supervisor attributes (employee ID, designation).
-6. **`MentorProfile`**: Industry mentor attributes (company affiliation, designation).
-7. **`Company`**: Employer records and industry classifications.
-8. **`Internship`**: Quad-party relational record linking Student, Company, Faculty, and Mentor.
-9. **`WorkflowTemplate`**: Configurable stage and milestone task blueprints.
-10. **`WorkflowInstance`**: Active lifecycle instance tied 1:1 with an Internship.
-11. **`WorkflowTask`**: Individual stage tasks (due dates, assignee roles).
-12. **`Outcome`**: Accreditation and academic goals (e.g. Program Outcomes - POs).
-13. **`OutcomeVersion`**: Rubric scoring matrices for each outcome.
-14. **`Submission`**: Student deliverables submitted against tasks.
-15. **`Review`**: Qualitative and quantitative feedback by Faculty/Mentors.
-16. **`Evaluation`**: Rubric assessments mapped to specific academic outcomes.
-17. **`AIAnalysis`**: Database schema placeholder for future automated assessment phases.
-18. **`Notification`**: System and workflow notification dispatch queue.
-19. **`AuditLog`**: Tamper-evident logging of administrative and security events.
-20. **`Document`**: Metadata and storage keys for uploaded files.
-
----
-
-## 5. Storage Abstraction
-
-The system encapsulates file operations behind `IStorageService`:
-- `LocalStorageService`: Implements disk-based storage with organization folder sandboxing (`./uploads/{organizationId}/{hash}.{ext}`).
-- Future S3 / GCS drivers conform to the same interface without requiring changes to business logic or database schemas.
-
----
-
-## 6. Standard API Contract
-
-All endpoints return a uniform envelope:
-
-```json
-{
-  "success": true,
-  "data": { ... },
-  "meta": {
-    "timestamp": "2026-09-16T18:00:00.000Z"
+### 3.3 Unified API Contract & Centralized Error Handling
+- **API Versioning**: All production API endpoints are mounted under `/api/v1/*`.
+- **Envelope Standard**:
+  ```typescript
+  // Success Envelope
+  {
+    "success": true,
+    "data": T,
+    "meta": { "timestamp": string, "requestId": string }
   }
+
+  // Error Envelope
+  {
+    "success": false,
+    "error": {
+      "code": string,
+      "message": string,
+      "details": unknown,
+      "timestamp": string,
+      "path": string
+    }
+  }
+  ```
+- **Explicit Health Endpoint**:
+  ```
+  GET /api/v1/health
+  Response:
+  {
+    "success": true,
+    "service": "internos-api",
+    "status": "healthy"
+  }
+  ```
+
+### 3.4 Storage Abstraction
+File storage operations are abstracted behind the `IStorageService` interface (`apps/api/src/services/storage.service.ts`), allowing plug-and-play transitions between local disk storage, AWS S3, Google Cloud Storage, or Azure Blob Storage without modifying route handlers.
+
+```typescript
+export interface IStorageService {
+  uploadFile(buffer: Buffer, filename: string, mimeType: string, organizationId: string): Promise<StorageUploadResult>;
+  getFile(key: string): Promise<Buffer>;
+  deleteFile(key: string): Promise<void>;
+  getUrl(key: string): Promise<string>;
 }
 ```
 
-In the event of an error:
+### 3.5 AI Abstraction Layer
+As mandated by Phase 0 requirements, no AI/LLM functionality is executed. Instead, an explicit interface abstraction (`IAIService`) defines future capabilities (submission analysis, outcome mapping, rubric suggestion). Calling these stubs in Phase 0 throws an explicit `501 NOT_IMPLEMENTED_PHASE_0` error.
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "TENANT_ISOLATION_VIOLATION",
-    "message": "Cross-tenant access prohibited",
-    "timestamp": "2026-09-16T18:00:00.000Z",
-    "path": "GET /api/v1/tenants/current"
-  }
-}
-```
+---
+
+## 4. Frontend Application Shell Architecture
+
+- **React 18 + TypeScript + Vite**: Fast HMR, type-safe development.
+- **Tailwind CSS Design System**: Cohesive color tokens, accessible contrast, smooth transitions.
+- **Application Shell**:
+  - `Navbar` / `Header`: Multi-tenant organization badge, quick role-switcher, notification triggers, user profile menu.
+  - `Sidebar`: Dynamic role-filtered navigation items with active indicators.
+  - `AppLayout`: Shell wrapper providing authentication guards and layout constraints.
+- **Reusable Component Suite**:
+  `Button`, `Input`, `Select`, `Modal`, `Table`, `Badge`, `Card`, `Dialog`, `Toast`, `Loading`, `EmptyState`, `ErrorState`.

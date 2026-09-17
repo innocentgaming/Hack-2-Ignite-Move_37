@@ -1,15 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { TenantViolationError, ForbiddenError, UnauthorizedError } from '@internos/shared';
-import { UserRole } from '@internos/types';
 
 /**
  * Server-side Multi-Tenant Isolation Middleware
  *
  * Rules:
  * 1. An authenticated session determines the tenant context (req.user.organizationId).
- * 2. Never trust client-supplied organizationId headers or body fields.
- * 3. Any attempt by non-SUPER_ADMIN users to supply a differing organizationId is blocked.
- * 4. Ensures req.organizationId is strictly bound for downstream controllers and Prisma queries.
+ * 2. Never trust client-supplied organizationId headers, query params, or body fields.
+ * 3. Any attempt to supply a differing organizationId is strictly blocked with 403.
+ * 4. Ensures req.organizationId is strictly bound for downstream controllers and database queries.
  */
 export function tenantIsolation(req: Request, res: Response, next: NextFunction): void {
   if (!req.user) {
@@ -22,28 +21,33 @@ export function tenantIsolation(req: Request, res: Response, next: NextFunction)
     throw new ForbiddenError('User is not assigned to any active organization/institution');
   }
 
-  // Check if client attempted to pass an untrusted organizationId in query or body
+  // Check if client attempted to pass an untrusted organizationId in body, query, params, or headers
   const untrustedOrgId =
     req.body?.organizationId ||
     req.query?.organizationId ||
+    req.params?.organizationId ||
+    req.headers['x-organization-id'] ||
     req.headers['x-organization-override'];
 
   if (untrustedOrgId && untrustedOrgId !== authenticatedOrgId) {
-    // Only SUPER_ADMIN can cross-cut or switch tenant views
-    if (req.user.role !== UserRole.SUPER_ADMIN) {
-      throw new TenantViolationError(
-        `Cross-tenant access prohibited. You cannot access or modify records for organization '${untrustedOrgId}'.`
-      );
-    }
+    throw new TenantViolationError(
+      `Cross-tenant access prohibited. You cannot access or modify records outside your organization.`
+    );
   }
 
   // Force authoritative organizationId on the request
   req.organizationId = authenticatedOrgId;
+
+  // Overwrite body organizationId if body exists
+  if (req.body && typeof req.body === 'object') {
+    req.body.organizationId = authenticatedOrgId;
+  }
+
   next();
 }
 
 /**
- * Tenant scoping helper for Prisma queries.
+ * Tenant scoping helper for database queries.
  * Guarantees every query filter has { organizationId } attached.
  */
 export function withTenantScope<T extends Record<string, unknown>>(
@@ -58,3 +62,6 @@ export function withTenantScope<T extends Record<string, unknown>>(
     organizationId: req.organizationId,
   };
 }
+
+// Explicit naming requirement: tenant middleware
+export const tenantMiddleware = tenantIsolation;

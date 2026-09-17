@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { formatSuccessResponse } from '@internos/shared';
 import { SystemHealthData } from '@internos/types';
-import { prisma } from '@internos/prisma';
+import { prisma } from '../lib/prisma.js';
 import { env } from '../config/env.js';
 
 const startTime = Date.now();

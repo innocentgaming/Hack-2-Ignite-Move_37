@@ -4,11 +4,16 @@
  */
 
 export enum UserRole {
+  ADMIN = 'ADMIN',
+  HOD = 'HOD',
+  FACULTY = 'FACULTY',
+  STUDENT = 'STUDENT',
+  MENTOR = 'MENTOR',
+  // Backwards compatibility legacy aliases
   SUPER_ADMIN = 'SUPER_ADMIN',
   INSTITUTION_ADMIN = 'INSTITUTION_ADMIN',
   FACULTY_SUPERVISOR = 'FACULTY_SUPERVISOR',
   INDUSTRY_MENTOR = 'INDUSTRY_MENTOR',
-  STUDENT = 'STUDENT',
 }
 
 export enum UserStatus {
@@ -151,6 +156,68 @@ export interface LoginResponseData {
   };
 }
 
+export interface InviteUserDto {
+  email: string;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+  departmentId?: string;
+}
+
+export interface InviteResponseData {
+  userId: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  activationToken: string;
+  activationUrl: string;
+  organizationId: string;
+}
+
+export interface ActivateAccountDto {
+  token: string;
+  password: string;
+}
+
+export interface LogoutResponseData {
+  message: string;
+  timestamp: string;
+}
+
+export interface CreateInternshipDto {
+  title: string;
+  companyName?: string;
+  type?: string;
+  startDate?: string;
+  endDate?: string;
+  studentId?: string;
+}
+
+export interface InternshipDto {
+  id: string;
+  organizationId: string;
+  title: string;
+  type: string;
+  status: InternshipStatus;
+  startDate?: string;
+  endDate?: string;
+  studentId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DocumentDto {
+  id: string;
+  organizationId: string;
+  name: string;
+  mimeType: string;
+  size: number;
+  storageKey: string;
+  url: string;
+  uploaderId?: string;
+  createdAt?: string;
+}
+
 export interface SystemHealthData {
   status: 'healthy' | 'degraded' | 'unhealthy';
   uptimeSeconds: number;
@@ -163,3 +230,68 @@ export interface SystemHealthData {
     memoryUsageMB: number;
   };
 }
+
+// ==========================================
+// AI Service Abstraction Layer (Phase 0 Spec)
+// NOTE: Architecture defines interface contracts only.
+// NO AI functionality or external LLM execution in Phase 0.
+// ==========================================
+
+export interface AISubmissionAnalysisRequest {
+  submissionId: string;
+  submissionContent: string;
+  documentUrls?: string[];
+  rubricCriteria?: {
+    criteriaId: string;
+    description: string;
+    maxScore: number;
+  }[];
+}
+
+export interface AISubmissionAnalysisResponse {
+  submissionId: string;
+  scoreEstimate?: number;
+  suggestedFeedback: string;
+  rubricAlignment: {
+    criteriaId: string;
+    suggestedScore: number;
+    rationale: string;
+  }[];
+  confidenceScore: number;
+  generatedAt: string;
+}
+
+export interface AIOutcomeMappingRequest {
+  internshipDescription: string;
+  departmentCode: string;
+  availableOutcomeCodes: string[];
+}
+
+export interface AIOutcomeMappingResponse {
+  mappedOutcomes: {
+    outcomeCode: string;
+    relevanceScore: number;
+    reasoning: string;
+  }[];
+}
+
+export interface AIRubricRecommendationRequest {
+  outcomeCode: string;
+  bloomsLevel: string;
+  courseContext: string;
+}
+
+export interface AIRubricRecommendationResponse {
+  levels: {
+    level: string;
+    score: number;
+    description: string;
+  }[];
+}
+
+export interface IAIService {
+  analyzeSubmission(request: AISubmissionAnalysisRequest): Promise<AISubmissionAnalysisResponse>;
+  mapInternshipOutcomes(request: AIOutcomeMappingRequest): Promise<AIOutcomeMappingResponse>;
+  recommendRubric(request: AIRubricRecommendationRequest): Promise<AIRubricRecommendationResponse>;
+}
+
