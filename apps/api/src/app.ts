@@ -12,9 +12,23 @@ export const app = express();
 
 // Security and utility middleware
 app.use(helmet());
+
+// Strict Production CORS Configuration
+const allowedOrigins =
+  env.NODE_ENV === 'production'
+    ? [env.FRONTEND_URL]
+    : [env.FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'];
+
 app.use(
   cors({
-    origin: [env.FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. server-to-server or mobile apps)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS policy violation: Origin ${origin} not permitted.`));
+    },
     credentials: true,
   })
 );
