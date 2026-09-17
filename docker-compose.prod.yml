@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: internos-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-internos}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d internos"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: internos-api-prod
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-internos}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change_this_to_a_secure_random_string_min_32_chars}
+      JWT_EXPIRES_IN: 7d
+      DEFAULT_ORGANIZATION_CODE: ${DEFAULT_ORGANIZATION_CODE:-apex-inst}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_UPLOAD_DIR: ./uploads
+    volumes:
+      - api_uploads:/app/uploads
+
+volumes:
+  postgres_data_prod:
+    driver: local
+  api_uploads:
+    driver: local

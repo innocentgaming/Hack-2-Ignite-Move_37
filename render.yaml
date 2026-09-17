@@ -1,0 +1,40 @@
+databases:
+  - name: internos-db
+    databaseName: internos
+    user: internos
+    plan: free
+    region: oregon
+
+services:
+  - type: web
+    name: internos-api
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run prisma:generate && npm run build:api
+    preDeployCommand: npx prisma migrate deploy
+    startCommand: node apps/api/dist/index.js
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: internos-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DEFAULT_ORGANIZATION_CODE
+        value: apex-inst
+      - key: FRONTEND_URL
+        value: https://internos.vercel.app
+      - key: STORAGE_DRIVER
+        value: local
+      - key: STORAGE_LOCAL_UPLOAD_DIR
+        value: ./uploads
+      - key: STORAGE_MAX_FILE_SIZE_MB
+        value: 25
