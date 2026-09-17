@@ -168,6 +168,21 @@ InternOS solves these systemic inefficiencies through a modular, deterministic, 
 
 InternOS is architectured as a multi-tier modular monorepo. Presentation, business logic, persistence, shared contracts, and domain types are strictly decoupled.
 
+### High-Level Topology
+
+```mermaid
+flowchart TD
+    Users(["👥 USERS (Students, Faculty, Mentors, Admins)"])
+    Users -->|"Browser Interactions"| Frontend["💻 FRONTEND<br/>React + Vite"]
+    Frontend -->|"HTTPS / REST API / JWT"| Backend["⚙️ BACKEND<br/>Node.js + Express"]
+    Backend -->|"Prisma ORM"| Postgres[("🗄️ PostgreSQL<br/>Managed Multi-Tenant DB")]
+    Backend -->|"Upload & Stream"| Storage[("📦 Object Storage<br/>Documents / PPTs / Deliverables")]
+    Postgres -.->|"Grounding Context"| AI["🤖 AI API<br/>Advisory Intelligence Pipeline"]
+    Backend -->|"Structured Analysis"| AI
+```
+
+### Detailed Component & Security Flow
+
 ```mermaid
 flowchart TD
     subgraph ClientLayer["Frontend Presentation Layer (React 18 + Vite)"]
