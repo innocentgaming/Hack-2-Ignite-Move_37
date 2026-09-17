@@ -8,8 +8,10 @@ import { useAuth } from '../context/AuthContext';
 import {
   WorkflowTaskDto,
   UserRole,
+  AIAnalysisRecordDto,
 } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
+import { AIInsightsPanel } from '../components/AIInsightsPanel';
 import {
   Calendar,
   Clock,
@@ -24,6 +26,7 @@ import {
   Sparkles,
   Info,
   X,
+  Brain,
 } from 'lucide-react';
 
 export const TasksPage: React.FC = () => {
@@ -53,6 +56,56 @@ export const TasksPage: React.FC = () => {
 
   // Extension History Modal
   const [historyTask, setHistoryTask] = useState<WorkflowTaskDto | null>(null);
+
+  // Phase 9: AI Insights Modal
+  const [selectedTaskAI, setSelectedTaskAI] = useState<WorkflowTaskDto | null>(null);
+  const [taskAIAnalysis, setTaskAIAnalysis] = useState<AIAnalysisRecordDto | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleOpenTaskAI = async (task: WorkflowTaskDto) => {
+    setSelectedTaskAI(task);
+    setAiLoading(true);
+    try {
+      const subRes = await apiClient.get<any>(`/api/v1/submissions?taskId=${task.id}`);
+      let subId = '';
+      if (subRes.success && Array.isArray(subRes.data) && subRes.data.length > 0) {
+        subId = subRes.data[0].id;
+      }
+      if (subId) {
+        const aiRes = await apiClient.get<AIAnalysisRecordDto>(`/api/v1/ai/submissions/${subId}/analysis`);
+        if (aiRes.success && aiRes.data) {
+          setTaskAIAnalysis(aiRes.data);
+        } else {
+          setTaskAIAnalysis(null);
+        }
+      } else {
+        setTaskAIAnalysis(null);
+      }
+    } catch {
+      setTaskAIAnalysis(null);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleRetryAI = async () => {
+    if (!taskAIAnalysis) return;
+    setIsRetrying(true);
+    try {
+      const res = await apiClient.post<AIAnalysisRecordDto>(
+        `/api/v1/ai/submissions/${taskAIAnalysis.submissionId}/analyze`,
+        {}
+      );
+      if (res.success && res.data) {
+        setTaskAIAnalysis(res.data);
+      }
+    } catch (err: any) {
+      alert(err?.message || 'AI retry failed');
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -467,6 +520,18 @@ export const TasksPage: React.FC = () => {
                             <Send className="w-3.5 h-3.5 mr-1" /> Submit Work
                           </Button>
                         )}
+
+                        {/* AI Evidence Insights Button */}
+                        {(task.status === 'SUBMITTED' || task.status === 'APPROVED') && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenTaskAI(task)}
+                            className="text-xs text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                          >
+                            <Brain className="w-3.5 h-3.5 mr-1 text-indigo-600" /> AI Insights
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -686,6 +751,52 @@ export const TasksPage: React.FC = () => {
                   Close
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PHASE 9: AI EVIDENCE INSIGHTS MODAL */}
+      {selectedTaskAI && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in">
+          <div className="bg-slate-900 rounded-2xl border border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Brain className="w-5 h-5 text-indigo-400" />
+                <h3 className="font-bold text-white text-base">
+                  AI Evidence Insights: {selectedTaskAI.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedTaskAI(null);
+                  setTaskAIAnalysis(null);
+                }}
+                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <AIInsightsPanel
+              analysis={taskAIAnalysis}
+              loading={aiLoading}
+              onRetry={handleRetryAI}
+              isRetrying={isRetrying}
+            />
+
+            <div className="pt-3 border-t border-slate-800 flex justify-end">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setSelectedTaskAI(null);
+                  setTaskAIAnalysis(null);
+                }}
+              >
+                Close Insights
+              </Button>
             </div>
           </div>
         </div>

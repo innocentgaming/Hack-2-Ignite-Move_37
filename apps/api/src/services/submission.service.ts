@@ -28,6 +28,7 @@ import { authStore } from './auth.service.js';
 import { auditService } from './audit.service.js';
 import { storageService } from './storage.service.js';
 import { aiService } from './ai.service.js';
+import { aiAnalysisService } from './ai/ai-analysis.service.js';
 import { workspaceStore, InMemorySubmission, InMemoryReview } from './workspace.service.js';
 
 export interface InMemorySubmissionFile {
@@ -280,6 +281,7 @@ export class SubmissionService {
       if (
         sub.organizationId === organizationId &&
         sub.internshipId === dto.internshipId &&
+        Boolean(dto.taskId) &&
         sub.taskId === dto.taskId
       ) {
         existingSubmission = sub;
@@ -417,16 +419,9 @@ export class SubmissionService {
   // Resilient non-blocking AI submission analysis
   private async runResilientAIAnalysis(versionRecord: InMemorySubmissionVersion): Promise<void> {
     try {
-      const response = await aiService.analyzeSubmission({
-        submissionId: versionRecord.id,
-        submissionContent: versionRecord.content,
-        documentUrls: versionRecord.evidenceUrls,
-      });
-
-      versionRecord.aiAnalysis = response;
-      versionRecord.aiAnalysisStatus = 'COMPLETED';
+      await aiAnalysisService.analyzeSubmission(versionRecord.organizationId, versionRecord);
     } catch {
-      // Resilient: ignore or log error, mark as SKIPPED/FAILED without throwing
+      // Resilient: ignore error, mark as FAILED without throwing or failing submission
       versionRecord.aiAnalysisStatus = 'FAILED';
     }
   }

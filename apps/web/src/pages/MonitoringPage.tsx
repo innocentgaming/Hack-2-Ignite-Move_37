@@ -13,8 +13,10 @@ import {
   UserRole,
   DepartmentDto,
   CompanyDto,
+  AIInternshipInsightsDto,
 } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
+import { AIInsightsPanel } from '../components/AIInsightsPanel';
 import {
   AlertTriangle,
   AlertCircle,
@@ -29,6 +31,8 @@ import {
   Calendar,
   Layers,
   ChevronRight,
+  Brain,
+  Sparkles,
 } from 'lucide-react';
 
 export const MonitoringPage: React.FC = () => {
@@ -60,6 +64,28 @@ export const MonitoringPage: React.FC = () => {
   const [timelineInternshipTitle, setTimelineInternshipTitle] = useState<string>('');
   const [timelineEvents, setTimelineEvents] = useState<LifecycleTimelineEventDto[]>([]);
   const [timelineLoading, setTimelineLoading] = useState(false);
+
+  // Phase 9: AI Evidence Insights Modal
+  const [aiInternshipId, setAiInternshipId] = useState<string | null>(null);
+  const [aiInternshipTitle, setAiInternshipTitle] = useState<string>('');
+  const [aiInsights, setAiInsights] = useState<AIInternshipInsightsDto | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const openAIInsights = async (id: string, title: string) => {
+    setAiInternshipId(id);
+    setAiInternshipTitle(title);
+    setAiLoading(true);
+    try {
+      const res = await apiClient.get<AIInternshipInsightsDto>(`/api/v1/ai/internships/${id}/insights`);
+      if (res.success && res.data) {
+        setAiInsights(res.data);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Fetch initial datasets
   const fetchOverview = async () => {
@@ -473,6 +499,14 @@ export const MonitoringPage: React.FC = () => {
                             <Calendar className="w-3 h-3 text-indigo-600" />
                             <span>Timeline</span>
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => openAIInsights(row.internship.id, row.internship.title)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium rounded-lg border border-indigo-200 text-indigo-700 bg-indigo-50/50 hover:bg-indigo-100 ml-1"
+                          >
+                            <Sparkles className="w-3 h-3 text-indigo-600" />
+                            <span>AI Insights</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -757,6 +791,47 @@ export const MonitoringPage: React.FC = () => {
             <div className="p-4 border-t border-slate-200 flex justify-end">
               <Button size="sm" onClick={() => setTimelineInternshipId(null)}>
                 Close Timeline
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 9: AI Evidence Insights Modal */}
+      {aiInternshipId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-4">
+          <div className="bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-700 p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Brain className="w-5 h-5 text-indigo-400" />
+                <h3 className="font-bold text-white text-base">
+                  AI Evidence Insights: {aiInternshipTitle}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setAiInternshipId(null);
+                  setAiInsights(null);
+                }}
+                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <AIInsightsPanel insights={aiInsights} loading={aiLoading} />
+
+            <div className="pt-3 border-t border-slate-800 flex justify-end">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setAiInternshipId(null);
+                  setAiInsights(null);
+                }}
+              >
+                Close Insights
               </Button>
             </div>
           </div>

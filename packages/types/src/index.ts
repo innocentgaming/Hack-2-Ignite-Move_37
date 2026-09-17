@@ -1309,3 +1309,89 @@ export interface CancelInternshipDto {
   internshipId: string;
   reason: string;
 }
+
+// ==========================================
+// Phase 9: Evidence-Based AI Intelligence DTOs
+// ==========================================
+
+export type AIAnalysisStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'SKIPPED';
+
+export interface AIActivityDto {
+  description: string;
+  evidenceRef: string;
+}
+
+export interface AITechnologyDto {
+  name: string;
+  category: string;
+  evidenceRef: string;
+}
+
+export interface AISkillDto {
+  name: string;
+  category: string;
+  evidenceRef: string;
+}
+
+export interface AIEvidenceDto {
+  quote: string;
+  context: string;
+  confidence: number;
+}
+
+export interface AIOutcomeMatchDto {
+  outcomeCode: string;
+  outcomeName: string;
+  matchStatus: 'MATCHED' | 'PARTIAL' | 'NO_EVIDENCE';
+  confidence: number;
+  evidenceQuote: string;
+  analysis: string;
+}
+
+export interface AIExtractedDataDto {
+  activities: AIActivityDto[];
+  technologies: AITechnologyDto[];
+  skills: AISkillDto[];
+  evidence: AIEvidenceDto[];
+  outcomes: AIOutcomeMatchDto[];
+}
+
+export interface AIAnalysisRecordDto {
+  id: string;
+  submissionId: string;
+  submissionVersion: number;
+  internshipId: string;
+  organizationId: string;
+  analysisVersion: string;
+  promptVersion: string;
+  model: string;
+  timestamp: string;
+  status: AIAnalysisStatus;
+  extractedInfo: AIExtractedDataDto;
+  confidence: number;
+  evidenceReferences: string[];
+  isAdvisory: true;
+  errorMessage?: string;
+  durationMs?: number;
+}
+
+export interface AIInternshipInsightsDto {
+  internshipId: string;
+  organizationId: string;
+  totalSubmissions: number;
+  analyzedSubmissions: number;
+  overallConfidence: number;
+  technologiesMastered: string[];
+  skillsDemonstrated: string[];
+  outcomeAttainments: {
+    outcomeCode: string;
+    outcomeName: string;
+    matchCount: number;
+    partialCount: number;
+    highestConfidence: number;
+    evidenceQuotes: string[];
+  }[];
+  analyses: AIAnalysisRecordDto[];
+  isAdvisory: true;
+}
+
