@@ -6,6 +6,7 @@ import { workflowRouter } from './workflow.router.js';
 import { internshipRouter, companyRouter } from './internship.router.js';
 import { workspaceRouter } from './workspace.router.js';
 import { submissionRouter } from './submission.router.js';
+import { monitoringRouter } from './monitoring.router.js';
 
 const router = Router();
 
@@ -26,6 +27,7 @@ router.use('/internships', internshipRouter);
 router.use('/companies', companyRouter);
 router.use('/workspaces', workspaceRouter);
 router.use('/submissions', submissionRouter);
+router.use('/monitoring', monitoringRouter);
 
 export const v1Router = router;
 

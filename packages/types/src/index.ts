@@ -1087,3 +1087,98 @@ export interface MentorWorkspaceDto {
   recentSubmissions: SubmissionDto[];
   activeConcerns: MentorConcernDto[];
 }
+
+// ==========================================
+// Phase 7: Deterministic Monitoring & Health Engine
+// ==========================================
+
+export type InternshipHealthStatus = 'ON_TRACK' | 'ATTENTION' | 'CRITICAL';
+
+export interface HealthMetricsDto {
+  totalTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+  pendingReviews: number;
+  daysSinceLastActivity: number;
+  outcomeCoveragePercentage: number;
+  openConcernsCount: number;
+}
+
+export interface InternshipHealthResultDto {
+  status: InternshipHealthStatus;
+  reasons: string[];
+  calculatedAt: string;
+  metrics: HealthMetricsDto;
+}
+
+export interface HealthThresholdConfigDto {
+  maxOverdueDaysAttention: number; // default: 1 day
+  maxOverdueDaysCritical: number; // default: 7 days
+  maxPendingReviewDaysAttention: number; // default: 3 days
+  maxPendingReviewDaysCritical: number; // default: 7 days
+  maxInactiveDaysAttention: number; // default: 14 days
+  maxInactiveDaysCritical: number; // default: 30 days
+  multipleOverdueThreshold: number; // default: 2 overdue tasks
+}
+
+export interface MonitoringOverviewDto {
+  totalInternships: number;
+  active: number;
+  completed: number;
+  onTrack: number;
+  attention: number;
+  critical: number;
+  overdue: number;
+  pendingReviews: number;
+}
+
+export interface MonitoredInternshipDto {
+  internship: InternshipDetailsDto;
+  studentName: string;
+  studentEmail: string;
+  departmentId?: string;
+  departmentName?: string;
+  companyName: string;
+  facultyName?: string;
+  mentorName?: string;
+  health: InternshipHealthResultDto;
+}
+
+export interface AttentionQueueItemDto {
+  id: string;
+  internshipId: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  departmentName?: string;
+  companyName: string;
+  facultyName?: string;
+  mentorName?: string;
+  status: InternshipHealthStatus; // ATTENTION or CRITICAL
+  reasons: string[];
+  metrics: HealthMetricsDto;
+  calculatedAt: string;
+}
+
+export interface LifecycleTimelineEventDto {
+  id: string;
+  type:
+    | 'REGISTRATION'
+    | 'APPROVAL'
+    | 'ASSIGNMENT'
+    | 'WORKFLOW_TASK'
+    | 'SUBMISSION'
+    | 'REVIEW'
+    | 'REVISION'
+    | 'OUTCOME_CHANGE'
+    | 'CONCERN'
+    | 'EVALUATION'
+    | 'STATE_TRANSITION';
+  title: string;
+  description: string;
+  actorName: string;
+  actorRole?: string;
+  timestamp: string;
+  severity?: 'info' | 'warning' | 'critical' | 'success';
+  metadata?: Record<string, any>;
+}

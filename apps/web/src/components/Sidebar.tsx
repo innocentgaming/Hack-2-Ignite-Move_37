@@ -65,6 +65,12 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.FACULTY],
     },
     {
+      label: 'Cohort Monitoring',
+      to: '/app/faculty/monitoring',
+      icon: Activity,
+      roles: [UserRole.FACULTY],
+    },
+    {
       label: 'Review Submissions',
       to: '/app/faculty/reviews',
       icon: FileCheck,
@@ -122,6 +128,12 @@ export const Sidebar: React.FC = () => {
       label: 'Tenant Governance',
       to: '/app/admin',
       icon: ShieldCheck,
+      roles: [UserRole.ADMIN],
+    },
+    {
+      label: 'Institution Health',
+      to: '/app/admin/monitoring',
+      icon: Activity,
       roles: [UserRole.ADMIN],
     },
     {

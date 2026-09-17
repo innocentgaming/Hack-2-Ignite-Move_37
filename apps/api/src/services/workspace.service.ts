@@ -996,7 +996,7 @@ export class WorkspaceService {
     };
   }
 
-  private mapInternshipDetailToDto(d: any) {
+  public mapInternshipDetailToDto(d: any) {
     const comp = internshipStore.companies.get(d.companyId) || {
       id: d.companyId,
       organizationId: d.organizationId,

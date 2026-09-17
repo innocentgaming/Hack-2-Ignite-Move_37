@@ -18,6 +18,7 @@ import { AdminWorkflowsPage } from './pages/AdminWorkflowsPage';
 import { TasksPage } from './pages/TasksPage';
 import { InternshipsPage } from './pages/InternshipsPage';
 import { InternshipRegistrationPage } from './pages/InternshipRegistrationPage';
+import { MonitoringPage } from './pages/MonitoringPage';
 import { LoadingPage } from './pages/LoadingPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -56,16 +57,19 @@ export const App: React.FC = () => {
               <Route path="admin/audit" element={<AdminAuditLogsPage />} />
               <Route path="admin/workflows" element={<AdminWorkflowsPage />} />
               <Route path="admin/settings" element={<AdminSettingsPage />} />
+              <Route path="admin/monitoring" element={<MonitoringPage />} />
               <Route path="admin/*" element={<DashboardPage />} />
 
               <Route path="hod/approvals" element={<InternshipsPage />} />
               <Route path="hod/mentors" element={<InternshipsPage />} />
+              <Route path="hod/monitoring" element={<MonitoringPage />} />
               <Route path="hod" element={<DashboardPage />} />
               <Route path="hod/*" element={<DashboardPage />} />
 
               <Route path="faculty" element={<InternshipsPage />} />
               <Route path="faculty/reviews" element={<InternshipsPage />} />
               <Route path="faculty/evaluations" element={<TasksPage />} />
+              <Route path="faculty/monitoring" element={<MonitoringPage />} />
               <Route path="faculty/*" element={<DashboardPage />} />
 
               <Route path="student/*" element={<DashboardPage />} />
@@ -74,6 +78,7 @@ export const App: React.FC = () => {
               <Route path="mentor/reviews" element={<TasksPage />} />
               <Route path="mentor/*" element={<DashboardPage />} />
 
+              <Route path="monitoring" element={<MonitoringPage />} />
               <Route path="internships" element={<InternshipsPage />} />
               <Route path="internships/new" element={<InternshipRegistrationPage />} />
               <Route path="tasks" element={<TasksPage />} />
