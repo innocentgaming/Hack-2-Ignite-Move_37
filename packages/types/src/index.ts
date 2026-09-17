@@ -85,6 +85,12 @@ export enum AuditAction {
   DEPARTMENT_ASSIGNMENT = 'DEPARTMENT_ASSIGNMENT',
   STUDENTS_CSV_IMPORT = 'STUDENTS_CSV_IMPORT',
   INSTITUTION_PROFILE_UPDATE = 'INSTITUTION_PROFILE_UPDATE',
+  // Phase 3 actions
+  WORKFLOW_TEMPLATE_CREATE = 'WORKFLOW_TEMPLATE_CREATE',
+  WORKFLOW_TEMPLATE_UPDATE = 'WORKFLOW_TEMPLATE_UPDATE',
+  WORKFLOW_ASSIGNED = 'WORKFLOW_ASSIGNED',
+  TASK_SUBMITTED = 'TASK_SUBMITTED',
+  TASK_EXTENDED = 'TASK_EXTENDED',
 }
 
 // ==========================================
@@ -542,4 +548,143 @@ export interface IAIService {
   mapInternshipOutcomes(request: AIOutcomeMappingRequest): Promise<AIOutcomeMappingResponse>;
   recommendRubric(request: AIRubricRecommendationRequest): Promise<AIRubricRecommendationResponse>;
 }
+
+// ==========================================
+// Phase 3: Configurable Workflow Engine DTOs
+// ==========================================
+
+export enum WorkflowStepType {
+  SUBMISSION = 'SUBMISSION',
+  REVIEW = 'REVIEW',
+  EVALUATION = 'EVALUATION',
+  APPROVAL = 'APPROVAL',
+}
+
+export enum WorkflowStepFrequency {
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  BIWEEKLY = 'BIWEEKLY',
+  MONTHLY = 'MONTHLY',
+  CUSTOM = 'CUSTOM',
+  ONE_TIME = 'ONE_TIME',
+}
+
+export enum LatePolicyType {
+  ALLOW_WITH_PENALTY = 'ALLOW_WITH_PENALTY',
+  ALLOW_NO_PENALTY = 'ALLOW_NO_PENALTY',
+  STRICT_LOCK = 'STRICT_LOCK',
+}
+
+export enum WorkflowTemplateStatus {
+  DRAFT = 'DRAFT',
+  ACTIVE = 'ACTIVE',
+  ARCHIVED = 'ARCHIVED',
+}
+
+export interface WorkflowStepConfig {
+  id: string;
+  order: number;
+  type: WorkflowStepType;
+  frequency: WorkflowStepFrequency;
+  actor: UserRole;
+  required: boolean;
+  deadlineDays: number; // Offset from internship start date in days
+  title: string;
+  description?: string;
+  evaluationCriteria?: string;
+  maxMarks?: number;
+  latePolicy: LatePolicyType;
+}
+
+export interface WorkflowAssignmentRules {
+  departmentIds?: string[];
+  internshipTypes?: string[];
+  isDefault?: boolean;
+}
+
+export interface WorkflowTemplateDto {
+  id: string;
+  organizationId: string;
+  name: string;
+  description?: string;
+  internshipType: string;
+  status: WorkflowTemplateStatus;
+  version: number;
+  assignmentRules: WorkflowAssignmentRules;
+  steps: WorkflowStepConfig[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateWorkflowTemplateDto {
+  name: string;
+  description?: string;
+  internshipType?: string;
+  assignmentRules?: WorkflowAssignmentRules;
+  steps: WorkflowStepConfig[];
+}
+
+export interface UpdateWorkflowTemplateDto {
+  name?: string;
+  description?: string;
+  internshipType?: string;
+  status?: WorkflowTemplateStatus;
+  assignmentRules?: WorkflowAssignmentRules;
+  steps?: WorkflowStepConfig[];
+}
+
+export interface TaskExtensionDto {
+  id: string;
+  originalDeadline: string;
+  newDeadline: string;
+  reason: string;
+  authorizedUserId: string;
+  authorizedUserEmail?: string;
+  authorizedUserName?: string;
+  authorizedAt: string;
+}
+
+export interface WorkflowTaskDto {
+  id: string;
+  instanceId: string;
+  organizationId: string;
+  stepId: string;
+  title: string;
+  stage: string;
+  type: WorkflowStepType;
+  status: TaskStatus;
+  assigneeRole: UserRole;
+  required: boolean;
+  originalDueDate: string;
+  currentDueDate: string;
+  isLate: boolean;
+  completedAt?: string | null;
+  evaluationCriteria?: string;
+  maxMarks?: number;
+  latePolicy: LatePolicyType;
+  extensions: TaskExtensionDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowInstanceDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  templateId: string;
+  templateName: string;
+  templateVersion: number;
+  status: WorkflowStatus;
+  progress: number;
+  stepsSnapshot: WorkflowStepConfig[];
+  tasks: WorkflowTaskDto[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GrantExtensionDto {
+  newDeadline: string;
+  reason: string;
+}
+
 

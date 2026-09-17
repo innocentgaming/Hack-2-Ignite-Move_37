@@ -14,6 +14,8 @@ import { AdminUsersPage } from './pages/AdminUsersPage';
 import { AdminStudentImportPage } from './pages/AdminStudentImportPage';
 import { AdminAuditLogsPage } from './pages/AdminAuditLogsPage';
 import { AdminSettingsPage } from './pages/AdminSettingsPage';
+import { AdminWorkflowsPage } from './pages/AdminWorkflowsPage';
+import { TasksPage } from './pages/TasksPage';
 import { LoadingPage } from './pages/LoadingPage';
 import { ErrorPage } from './pages/ErrorPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -44,12 +46,13 @@ export const App: React.FC = () => {
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />
               
-              {/* Admin Phase 2 Dedicated Pages */}
+              {/* Admin Dedicated Pages */}
               <Route path="admin" element={<DashboardPage />} />
               <Route path="admin/departments" element={<AdminDepartmentsPage />} />
               <Route path="admin/users" element={<AdminUsersPage />} />
               <Route path="admin/students/import" element={<AdminStudentImportPage />} />
               <Route path="admin/audit" element={<AdminAuditLogsPage />} />
+              <Route path="admin/workflows" element={<AdminWorkflowsPage />} />
               <Route path="admin/settings" element={<AdminSettingsPage />} />
               <Route path="admin/*" element={<DashboardPage />} />
 
@@ -58,8 +61,8 @@ export const App: React.FC = () => {
               <Route path="student/*" element={<DashboardPage />} />
               <Route path="mentor/*" element={<DashboardPage />} />
               <Route path="internships" element={<DashboardPage />} />
-              <Route path="tasks" element={<DashboardPage />} />
-              <Route path="submissions" element={<DashboardPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+              <Route path="submissions" element={<TasksPage />} />
               <Route path="documents" element={<DashboardPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
