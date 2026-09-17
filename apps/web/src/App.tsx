@@ -59,11 +59,21 @@ export const App: React.FC = () => {
               <Route path="admin/*" element={<DashboardPage />} />
 
               <Route path="hod/approvals" element={<InternshipsPage />} />
+              <Route path="hod/mentors" element={<InternshipsPage />} />
+              <Route path="hod" element={<DashboardPage />} />
               <Route path="hod/*" element={<DashboardPage />} />
+
+              <Route path="faculty" element={<InternshipsPage />} />
               <Route path="faculty/reviews" element={<InternshipsPage />} />
+              <Route path="faculty/evaluations" element={<TasksPage />} />
               <Route path="faculty/*" element={<DashboardPage />} />
+
               <Route path="student/*" element={<DashboardPage />} />
+
+              <Route path="mentor" element={<InternshipsPage />} />
+              <Route path="mentor/reviews" element={<TasksPage />} />
               <Route path="mentor/*" element={<DashboardPage />} />
+
               <Route path="internships" element={<InternshipsPage />} />
               <Route path="internships/new" element={<InternshipRegistrationPage />} />
               <Route path="tasks" element={<TasksPage />} />
