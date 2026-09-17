@@ -32,7 +32,7 @@ services:
       - key: DEFAULT_ORGANIZATION_CODE
         value: apex-inst
       - key: FRONTEND_URL
-        value: https://internos.vercel.app
+        value: https://internos-web-tau.vercel.app
       - key: STORAGE_DRIVER
         value: local
       - key: STORAGE_LOCAL_UPLOAD_DIR
