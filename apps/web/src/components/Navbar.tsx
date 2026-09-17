@@ -4,7 +4,8 @@ import { Badge } from './Badge';
 import { Button } from './Button';
 import { UserRole } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
-import { Bell, Building2, LogOut, UserCheck } from 'lucide-react';
+import { Building2, LogOut, UserCheck } from 'lucide-react';
+import { NotificationCenter } from './NotificationCenter';
 
 export const Navbar: React.FC = () => {
   const { user, logout, switchDemoRole } = useAuth();
@@ -104,13 +105,7 @@ export const Navbar: React.FC = () => {
 
       {/* Right: Notifications & User Profile */}
       <div className="flex items-center gap-4">
-        <button
-          aria-label="Notifications"
-          className="w-8 h-8 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors relative"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-1.5" />
-        </button>
+        <NotificationCenter />
 
         <div className="h-6 w-px bg-slate-200" />
 

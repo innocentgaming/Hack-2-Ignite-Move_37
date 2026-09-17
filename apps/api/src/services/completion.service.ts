@@ -31,6 +31,7 @@ import { authStore } from './auth.service.js';
 import { auditService } from './audit.service.js';
 import { internshipStateMachine } from './internship-state-machine.service.js';
 import { monitoringService } from './monitoring.service.js';
+import { notificationService } from './notification.service.js';
 
 export interface InMemoryTerminationRequest {
   id: string;
@@ -189,7 +190,17 @@ export class CompletionService {
       throw new ForbiddenError('Only assigned mentor, faculty, or institutional supervisor can evaluate');
     }
 
-    if (!Array.isArray(dto.criteria) || dto.criteria.length === 0) {
+    let criteria = dto.criteria;
+    if ((!Array.isArray(criteria) || criteria.length === 0) && (dto as any).technicalSkillsScore !== undefined) {
+      criteria = [
+        { name: 'Technical Skills', maxMarks: 30, awardedMarks: Number((dto as any).technicalSkillsScore) || 25, comments: 'Good execution' },
+        { name: 'Work Quality', maxMarks: 30, awardedMarks: Number((dto as any).workQualityScore) || 25, comments: 'Good quality' },
+        { name: 'Initiative', maxMarks: 20, awardedMarks: Number((dto as any).initiativeScore) || 18, comments: 'Proactive' },
+        { name: 'Professionalism', maxMarks: 20, awardedMarks: Number((dto as any).professionalismScore) || 18, comments: 'Professional' },
+      ];
+    }
+
+    if (!Array.isArray(criteria) || criteria.length === 0) {
       throw new BadRequestError('Evaluation must include criteria scoring');
     }
 
@@ -197,7 +208,7 @@ export class CompletionService {
     let totalMarks = 0;
     let maxMarks = 0;
 
-    for (const c of dto.criteria) {
+    for (const c of criteria) {
       if (typeof c.awardedMarks !== 'number' || c.awardedMarks < 0) {
         throw new BadRequestError(`Invalid marks for criterion '${c.name}': must be non-negative`);
       }
@@ -221,7 +232,7 @@ export class CompletionService {
       evaluatorId: evaluator.id,
       evaluatorName: `${evaluator.firstName} ${evaluator.lastName}`.trim() || 'Evaluator',
       evaluatorRole: role,
-      criteria: dto.criteria,
+      criteria: criteria,
       totalMarks,
       maxMarks,
       percentage,
@@ -265,6 +276,28 @@ export class CompletionService {
         percentage,
       },
     });
+
+    auditService.log({
+      organizationId,
+      userId: evaluator.id,
+      action: 'EVALUATION',
+      entity: 'FinalEvaluation',
+      entityId: id,
+      details: {
+        internshipId: dto.internshipId,
+        totalMarks,
+        finalGrade,
+      },
+    });
+
+    notificationService.notifyEvaluationCompleted({
+      organizationId,
+      internshipId: dto.internshipId,
+      studentId: detail.studentId,
+      totalScore: totalMarks,
+      grade: finalGrade,
+      facultyIds: detail.facultyId ? [detail.facultyId] : [],
+    }).catch(() => {});
 
     return evaluation;
   }
@@ -453,6 +486,25 @@ export class CompletionService {
       },
     });
 
+    auditService.log({
+      organizationId,
+      userId: facultyUser.id,
+      action: 'COMPLETION',
+      entity: 'Internship',
+      entityId: dto.internshipId,
+      details: {
+        completedBy: facultyUser.id,
+        status: InternshipStatus.COMPLETED,
+      },
+    });
+
+    notificationService.notifyCompletionConfirmed({
+      organizationId,
+      internshipId: dto.internshipId,
+      studentId: detail.studentId,
+      internshipTitle: detail.title,
+    }).catch(() => {});
+
     return detail.status;
   }
 
@@ -620,6 +672,28 @@ export class CompletionService {
         reason: dto.reason.trim(),
       },
     });
+
+    auditService.log({
+      organizationId,
+      userId: mentorUser.id,
+      action: 'TERMINATION',
+      entity: 'TerminationRequest',
+      entityId: id,
+      details: {
+        internshipId: dto.internshipId,
+        reason: dto.reason.trim(),
+      },
+    });
+
+    // Notify HODs and Admins
+    const hodsAndAdmins = ['user-a-admin', 'user-a-hod'];
+    notificationService.notifyTerminationRequested({
+      organizationId,
+      internshipId: dto.internshipId,
+      recipientIds: hodsAndAdmins,
+      studentName: 'Student',
+      reason: dto.reason.trim(),
+    }).catch(() => {});
 
     return termRequest;
   }

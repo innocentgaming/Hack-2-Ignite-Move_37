@@ -65,6 +65,18 @@ export enum NotificationType {
   REVIEW_SUBMITTED = 'REVIEW_SUBMITTED',
   EVALUATION_POSTED = 'EVALUATION_POSTED',
   DEADLINE_WARNING = 'DEADLINE_WARNING',
+  // Phase 10 In-App Notification Events
+  INTERNSHIP_SUBMITTED = 'INTERNSHIP_SUBMITTED',
+  INTERNSHIP_APPROVED = 'INTERNSHIP_APPROVED',
+  INTERNSHIP_REJECTED = 'INTERNSHIP_REJECTED',
+  MENTOR_ASSIGNED = 'MENTOR_ASSIGNED',
+  TASK_DUE = 'TASK_DUE',
+  TASK_OVERDUE = 'TASK_OVERDUE',
+  REVISION_REQUESTED = 'REVISION_REQUESTED',
+  REVIEW_COMPLETED = 'REVIEW_COMPLETED',
+  EVALUATION_COMPLETED = 'EVALUATION_COMPLETED',
+  COMPLETION_CONFIRMED = 'COMPLETION_CONFIRMED',
+  TERMINATION_REQUESTED = 'TERMINATION_REQUESTED',
 }
 
 export enum AuditAction {
@@ -121,6 +133,15 @@ export enum AuditAction {
   TERMINATION_DECIDE = 'TERMINATION_DECIDE',
   INTERNSHIP_TERMINATE = 'INTERNSHIP_TERMINATE',
   INTERNSHIP_CANCEL = 'INTERNSHIP_CANCEL',
+  // Phase 10 standard actions
+  ROLE_CHANGE = 'ROLE_CHANGE',
+  WORKFLOW_CHANGE = 'WORKFLOW_CHANGE',
+  INTERNSHIP_APPROVAL = 'INTERNSHIP_APPROVAL',
+  MENTOR_ASSIGNMENT = 'MENTOR_ASSIGNMENT',
+  OUTCOME_MODIFICATION = 'OUTCOME_MODIFICATION',
+  EVALUATION = 'EVALUATION',
+  TERMINATION = 'TERMINATION',
+  COMPLETION = 'COMPLETION',
 }
 
 // ==========================================
@@ -254,16 +275,27 @@ export interface InternshipDto {
   updatedAt?: string;
 }
 
+export interface DocumentEntityRelation {
+  entityType: 'INTERNSHIP' | 'SUBMISSION' | 'EVALUATION' | 'INSTITUTION' | string;
+  entityId: string;
+}
+
 export interface DocumentDto {
   id: string;
   organizationId: string;
+  ownerId?: string;
+  uploaderId?: string;
   name: string;
+  filename?: string;
   mimeType: string;
   size: number;
   storageKey: string;
   url: string;
-  uploaderId?: string;
+  isPrivate?: boolean;
+  entityRelation?: DocumentEntityRelation;
+  uploadedAt?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 // ==========================================
@@ -490,8 +522,10 @@ export interface AuditLogDto {
   entity: string;
   entityId?: string | null;
   details?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
   ipAddress?: string | null;
   createdAt: string;
+  timestamp?: string;
 }
 
 export interface AuditLogQuery {
@@ -1393,5 +1427,72 @@ export interface AIInternshipInsightsDto {
   }[];
   analyses: AIAnalysisRecordDto[];
   isAdvisory: true;
+}
+
+// ==========================================
+// Phase 10: In-App Notifications & Document DTOs
+// ==========================================
+
+export interface NotificationDto {
+  id: string;
+  organizationId: string;
+  recipientId: string;
+  userId?: string;
+  type: NotificationType | string;
+  title: string;
+  message: string;
+  relatedEntity?: {
+    entityType: string;
+    entityId: string;
+  };
+  entityType?: string;
+  entityId?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface CreateNotificationDto {
+  recipientId: string;
+  type: NotificationType | string;
+  title: string;
+  message: string;
+  relatedEntity?: {
+    entityType: string;
+    entityId: string;
+  };
+  entityType?: string;
+  entityId?: string;
+}
+
+export interface NotificationQuery {
+  isRead?: boolean;
+  type?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface UnreadCountDto {
+  unreadCount: number;
+}
+
+export interface UploadDocumentDto {
+  filename: string;
+  mimeType: string;
+  size: number;
+  isPrivate?: boolean;
+  entityType?: string;
+  entityId?: string;
+  internshipId?: string;
+  submissionId?: string;
+}
+
+export interface DocumentQuery {
+  entityType?: string;
+  entityId?: string;
+  internshipId?: string;
+  submissionId?: string;
+  ownerId?: string;
+  page?: number;
+  limit?: number;
 }
 

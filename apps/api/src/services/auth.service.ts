@@ -15,6 +15,7 @@ import {
 } from '@internos/types';
 import { env } from '../config/env.js';
 import { revokeToken } from '../middleware/auth.js';
+import { auditService } from './audit.service.js';
 
 export interface InMemoryUser {
   id: string;
@@ -369,6 +370,18 @@ export class AuthService {
             { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
           );
 
+          await auditService.log({
+            organizationId: dbUser.organizationId,
+            userId: dbUser.id,
+            actorId: dbUser.id,
+            actorEmail: dbUser.email,
+            actorRole: normalizedRole,
+            action: 'LOGIN',
+            entity: 'User',
+            entityId: dbUser.id,
+            details: { email: dbUser.email, role: normalizedRole },
+          });
+
           return {
             token,
             user: {
@@ -438,6 +451,18 @@ export class AuthService {
       env.JWT_SECRET,
       { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
     );
+
+    await auditService.log({
+      organizationId: userOrg.id,
+      userId: memUser.id,
+      actorId: memUser.id,
+      actorEmail: memUser.email,
+      actorRole: normalizedRole,
+      action: 'LOGIN',
+      entity: 'User',
+      entityId: memUser.id,
+      details: { email: memUser.email, role: normalizedRole },
+    });
 
     return {
       token,

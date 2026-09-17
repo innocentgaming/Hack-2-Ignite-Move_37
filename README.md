@@ -10,7 +10,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-124%20Passed-brightgreen)](https://nodejs.org/api/test.html)
+[![Tests](https://img.shields.io/badge/Tests-147%20Passed-brightgreen)](https://nodejs.org/api/test.html)
 
 ---
 
@@ -130,6 +130,26 @@ InternOS solves these systemic inefficiencies through a modular, deterministic, 
 * **Faculty Academic Confirmation**: Final institutional sign-off capturing credits awarded, supervisor recommendations, and academic notes.
 * **Comprehensive Student Dossier**: Consolidated permanent record containing company details, supervisor notes, evidence documents, rubric scores, letter grades, and audit history.
 * **Governed Termination & Cancellation**: Structured termination requests by mentors with HOD approval, and documented student cancellations.
+
+### 9. Evidence-Based AI Intelligence Layer (Advisory)
+* **Advisory AI Philosophy**: AI acts strictly as an advisory intelligence layer. AI never autonomously approves, rejects, marks competencies, determines health, or blocks academic workflows.
+* **Selective Deliverable Ingestion**: Analyzes major milestone submissions and monthly reports; purposefully ignores micro-diary entries to prevent noise.
+* **Structured Extraction**: Extracts activities, technologies, verified skills, and concrete evidence snippets mapped against expected educational Program Outcomes.
+* **Objective Evidence Language Rules**: Strict institutional policy enforcement—uses *"No evidence found in submitted work."* and expressly prohibits biased assumptions like *"Student does not know"*.
+* **Fault-Tolerant Resilience**: Upstream timeouts or JSON format errors gracefully mark analysis as `FAILED` without failing the underlying student submission or workflow.
+
+### 10. In-App Notifications, Institutional Audit Logging & Secure Document Management
+* **Interactive In-App Notification Center**: Real-time notification center in the navigation header featuring unread count badge, time-ago formatting, category icons, and single/bulk mark-as-read.
+* **Lifecycle Event Triggers**: Dispatches structured in-app notifications on key institutional events:
+  * Internship submitted, approved, and rejected
+  * Industry mentor and faculty coordinator assignments
+  * Milestone tasks due and overdue
+  * Mentor revision requested and review completed
+  * Final rubric evaluation completed and academic completion confirmed
+  * Termination requested and approved
+* **Institutional Action Audit Trail**: Append-only tamper-evident audit log recording actor, organization, action, entity, entity ID, timestamp, and metadata for institutional compliance.
+* **Sensitive Information Redaction**: Automated sanitization pipeline that redacts passwords, tokens, API keys, credentials, and authorization headers from audit logs.
+* **Private-by-Default Secure Document Management**: Document metadata stored in PostgreSQL/in-memory store with binary assets stored in isolated object storage. Files are private by default, requiring backend RBAC authorization and tenant checks for streaming access.
 
 ---
 

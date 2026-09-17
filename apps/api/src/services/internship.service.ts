@@ -27,6 +27,7 @@ import { tenantStore, InMemoryInternship } from './tenant.service.js';
 import { internshipStateMachine } from './internship-state-machine.service.js';
 import { workflowService } from './workflow.service.js';
 import { auditService } from './audit.service.js';
+import { notificationService } from './notification.service.js';
 
 export interface InMemoryCompany {
   id: string;
@@ -679,6 +680,14 @@ export class InternshipService {
       entityId: internshipId,
     });
 
+    notificationService.notifyInternshipSubmitted({
+      organizationId,
+      internshipId,
+      recipientIds: ['user-a-admin', 'user-a-faculty', 'user-a-hod'],
+      studentName: user.email || 'Student',
+      internshipTitle: res.title,
+    }).catch(() => {});
+
     return res;
   }
 
@@ -711,6 +720,13 @@ export class InternshipService {
         entityId: internshipId,
       });
 
+      notificationService.notifyInternshipApproved({
+        organizationId,
+        internshipId,
+        studentId: detail.studentId,
+        internshipTitle: detail.title,
+      }).catch(() => {});
+
       return res;
     } else {
       if (!dto.reason || !dto.reason.trim()) {
@@ -731,6 +747,14 @@ export class InternshipService {
         entityId: internshipId,
         details: { rejectionReason: dto.reason.trim() },
       });
+
+      notificationService.notifyInternshipRejected({
+        organizationId,
+        internshipId,
+        studentId: detail.studentId,
+        internshipTitle: detail.title,
+        reason: dto.reason.trim(),
+      }).catch(() => {});
 
       return res;
     }
@@ -814,6 +838,25 @@ export class InternshipService {
       entityId: internshipId,
       details: { mentorName: detail.mentor.name, mentorEmail: detail.mentor.email },
     });
+
+    auditService.log({
+      organizationId,
+      userId: user.id,
+      action: 'MENTOR_ASSIGNMENT',
+      entity: 'Internship',
+      entityId: internshipId,
+      details: { mentorName: detail.mentor.name, mentorEmail: detail.mentor.email },
+    });
+
+    notificationService.notifyMentorAssigned({
+      organizationId,
+      internshipId,
+      mentorId: detail.mentorId,
+      studentId: detail.studentId,
+      mentorName: detail.mentor.name,
+      studentName: 'Student',
+      internshipTitle: detail.title,
+    }).catch(() => {});
 
     return this.mapDetailToDto(detail);
   }

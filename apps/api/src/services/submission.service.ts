@@ -29,6 +29,7 @@ import { auditService } from './audit.service.js';
 import { storageService } from './storage.service.js';
 import { aiService } from './ai.service.js';
 import { aiAnalysisService } from './ai/ai-analysis.service.js';
+import { notificationService } from './notification.service.js';
 import { workspaceStore, InMemorySubmission, InMemoryReview } from './workspace.service.js';
 
 export interface InMemorySubmissionFile {
@@ -448,12 +449,13 @@ export class SubmissionService {
       throw new ForbiddenError('Only supervisors and industry mentors can submit reviews');
     }
 
-    if (!dto.feedback || !dto.feedback.trim()) {
+    const feedback = (dto.feedback || (dto as any).overallFeedback || '').trim();
+    if (!feedback) {
       throw new ValidationError('Review feedback / comments are required');
     }
 
-    const isRevision = !!dto.requestRevision;
-    const revisionReason = (dto.revisionReason || dto.feedback).trim();
+    const isRevision = !!(dto.requestRevision || (dto as any).isRevisionRequested);
+    const revisionReason = (dto.revisionReason || feedback).trim();
 
     if (isRevision && !revisionReason) {
       throw new ValidationError('A clear revision reason is required when requesting changes');
@@ -470,7 +472,7 @@ export class SubmissionService {
       reviewerId: reviewerUser.id,
       reviewerName: `${reviewerUser.firstName} ${reviewerUser.lastName}`.trim() || 'Supervisor',
       reviewerRole,
-      feedback: dto.feedback.trim(),
+      feedback,
       score: dto.score,
       status: isRevision ? 'CHANGES_REQUESTED' : 'ACCEPTED',
       createdAt: now,
@@ -522,6 +524,24 @@ export class SubmissionService {
         revisionReason: isRevision ? revisionReason : undefined,
       },
     });
+
+    if (isRevision) {
+      notificationService.notifyRevisionRequested({
+        organizationId,
+        submissionId: dto.submissionId,
+        studentId: sub.studentId,
+        taskTitle: sub.title,
+        notes: revisionReason,
+      }).catch(() => {});
+    } else {
+      notificationService.notifyReviewCompleted({
+        organizationId,
+        submissionId: dto.submissionId,
+        studentId: sub.studentId,
+        taskTitle: sub.title,
+        status: review.status,
+      }).catch(() => {});
+    }
 
     return this.mapReviewToDto(review);
   }
