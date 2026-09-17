@@ -1,39 +1,103 @@
-# InternOS — Smart Internship Management & Monitoring System
+<p align="center">
+  <br />
+  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/graduation-cap.svg" width="72" height="72" alt="InternOS Logo" />
+  <br />
+  <br />
+</p>
 
-> **Enterprise Multi-Tenant Internship Governance, Workflow Automation & Outcome-Based Education (OBE) Monitoring Platform**  
-> Engineered for academic institutions, industry mentors, and students with strict tenant isolation, deterministic progress tracking, verifiable evidence review loops, and accredited learning outcome attainment.
+<h1 align="center">InternOS</h1>
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.4.5-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20.18.0-green?logo=node.js)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-18.3.1-61dafb?logo=react)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5.4.2-646CFF?logo=vite)](https://vitejs.dev/)
-[![Express](https://img.shields.io/badge/Express-4.19.2-black?logo=express)](https://expressjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)](https://www.postgresql.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.22.0-2D3748?logo=prisma)](https://www.prisma.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.3-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-278%20Passed%20(100%25)-brightgreen)](https://nodejs.org/api/test.html)
-[![Frontend](https://img.shields.io/badge/Vercel-Live%20SPA-black?logo=vercel)](https://internos-web-tau.vercel.app)
-[![Backend](https://img.shields.io/badge/Render-Live%20API-46E3B7?logo=render)](https://internos-api-gntk.onrender.com)
+<p align="center">
+  <strong>Enterprise Multi-Tenant Internship Governance, Monitoring & Outcome-Based Education (OBE) Operating System</strong>
+</p>
+
+<p align="center">
+  Engineered for universities, host employers, and students with zero-leakage tenant isolation, deterministic progress tracking, verifiable evidence review loops, and accredited learning outcome attainment.
+</p>
+
+<p align="center">
+  <a href="https://internos-web-tau.vercel.app"><strong>🌐 Launch Live Application</strong></a> •
+  <a href="https://internos-api-gntk.onrender.com/api/v1/health"><strong>⚡ API Health Check</strong></a> •
+  <a href="https://internos-web-tau.vercel.app/register-institution"><strong>🏫 Register Institution</strong></a>
+</p>
+
+<p align="center">
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.4.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-20.18.0-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" /></a>
+  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-5.4.21-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" /></a>
+  <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-4.19.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" /></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" /></a>
+  <a href="https://www.prisma.io/"><img src="https://img.shields.io/badge/Prisma-5.22.0-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" /></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind-3.4.3-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" /></a>
+  <a href="https://vercel.com/"><img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" /></a>
+  <a href="https://render.com/"><img src="https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=white" alt="Render" /></a>
+</p>
+
+<br />
+
+<div align="center">
+
+| 🔒 Multi-Tenancy | ⚡ SLA Response | 🧪 Test Suite | 🎯 OBE Alignment |
+| :---: | :---: | :---: | :---: |
+| **Strict Server-Side Isolation**<br>`organizationId` JWT Enforced | **< 170ms P95 Latency**<br>`153 kB` Gzip SPA Bundle | **278 / 278 Tests Passed**<br>68 Suites (100% Green) | **ABET / NBA / NAAC**<br>Verifiable Evidence Criteria |
+
+</div>
+
+<br />
+
+---
+
+## 📑 Table of Contents
+
+- [🚀 Overview](#-overview)
+- [🎯 Problem Statement](#-problem-statement)
+- [💡 Proposed Solution](#-proposed-solution)
+- [👥 Target Users](#-target-users)
+- [✨ Key Features](#-key-features)
+- [🏗️ System Architecture](#️-system-architecture)
+- [🔄 System Workflows](#-system-workflows)
+- [🧠 AI / ML Architecture](#-ai--ml-architecture)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [📁 Project Structure](#-project-structure)
+- [🗄️ Database Architecture](#️-database-architecture)
+- [🔐 Authentication & RBAC](#-authentication--rbac)
+- [🛡️ Security Implementation](#️-security-implementation)
+- [🔌 API Documentation](#-api-documentation)
+- [🔑 Environment Variables](#-environment-variables)
+- [⚙️ Installation & Setup](#️-installation--setup)
+- [▶️ Running Locally](#️-running-locally)
+- [🧪 Testing & QA](#-testing--qa)
+- [🎥 Live Production Demo](#-live-production-demo)
+- [🚀 Cloud Deployment](#-cloud-deployment)
+- [🐳 Docker Deployment](#-docker-deployment)
+- [📊 Current Project Status](#-current-project-status)
+- [🗺️ Product Roadmap](#️-product-roadmap)
+- [⚠️ Limitations & 🔮 Future Scope](#️-limitations--future-scope)
+- [🤝 Contributing & License](#-contributing--license)
 
 ---
 
 ## 🚀 Overview
 
-**InternOS** is a production-grade, multi-tenant internship governance and academic monitoring operating system built to govern the university-to-industry internship lifecycle. Academic institutions and corporate hosts routinely struggle with fragmented communication, unverified student progress, subjective grading, and the absence of alignment with Outcome-Based Education (OBE) standards (such as ABET, NBA, and NAAC Program Outcomes).
+**InternOS** is a production-grade, multi-tenant internship governance and academic monitoring operating system built to govern the university-to-industry internship lifecycle. Academic institutions and corporate hosts routinely struggle with fragmented communication, unverified student progress, subjective grading, and the absence of alignment with Outcome-Based Education (OBE) standards.
 
-InternOS addresses this structural deficit through a domain-driven architecture organized around three distinct workspaces:
+InternOS resolves this structural deficit through a clean, domain-driven architecture organized around three distinct workspaces:
 
 1. **Student Workspace**: Centered on personal internship execution — moving sequentially from **Milestones** (developmental phases) to **Tasks** (actionable assignments), **Submissions** (delivered work), **Evidence** (GitHub pull requests, live deployments, test reports, and PDF documentation), **Feedback** (mentor review loops), and **Learning Outcomes** (demonstrated competencies).
 2. **Mentor Workspace**: Built for industry supervisors to supervise active interns, approve internship registrations, organize milestone phases, assign tasks with expected evidence criteria, review student deliverables through structured accept/revision feedback loops, and evaluate learning outcome attainment.
 3. **Admin Workspace**: Built for institutional governance, tenant onboarding, department configuration, user invitations with secure activation tokens, CSV bulk student import, workflow blueprint design, immutable audit logging, and organization-wide analytics with CSV export.
-
-InternOS is engineered as a TypeScript monorepo with strict server-side multi-tenant isolation (`organizationId` scoping on every model and query), a deterministic 16-transition finite state machine, a zero-hallucination code-based monitoring engine, and a 4-prerequisite completion barrier.
 
 ---
 
 ## 🎯 Problem Statement
 
 Higher-education institutions, engineering colleges, vocational academies, and corporate host employers face systemic hurdles when coordinating student off-campus internships:
+
+```
+❌ The Status Quo (Broken & Disjointed)
+Spreadsheets & WhatsApp → Disconnected Mentors → Zero OBE Evidence → Unverified Sign-offs
+```
 
 * **Fragmented Communication & Data Chaos**: Tracking is scattered across unversioned spreadsheets, disjointed email threads, unorganized chat groups, and lost physical paperwork.
 * **Absence of Real-Time Monitoring**: Academic advisors and company managers frequently discover student stagnation, absenteeism, or mentor disconnects weeks after they occur, putting academic credits and company projects at risk.
@@ -49,25 +113,24 @@ Higher-education institutions, engineering colleges, vocational academies, and c
 InternOS structures internship management into a deterministic, verifiable, and student-centric operating workflow:
 
 ```
-Institution / Tenant (Isolated)
-  ├── Departments & Mentors
-  └── Student
+🏢 Institution / Tenant (Strictly Isolated Root)
+  ├── 🏫 Academic Departments
+  ├── 👨‍🏫 Industry Mentors
+  └── 🎓 Student
         ↓
-      Internship (Registered & Approved)
+      📋 Internship Registration (Approved with PDF Offer Letter)
         ↓
-      Milestones (Structural Phases)
+      🚩 Structural Milestones (Phase 1, Phase 2, Phase 3)
         ↓
-      Tasks (Actionable Assignments)
+      ⚡ Actionable Tasks (JWT Auth, Schema Design, CI/CD)
         ↓
-      Submissions (Student Deliverables)
+      📦 Student Deliverables (GitHub PR, Live URL, PDF Docs)
         ↓
-      Actual Evidence (GitHub PR, Live URL, PDF, Test Suite)
+      🔍 Mentor Evaluation (Approved or Revision Required)
         ↓
-      Mentor Review (Approved or Revision Required)
+      🎯 OBE Competencies (Program Outcomes Satisfied)
         ↓
-      Learning Outcomes (Competencies Satisfied)
-        ↓
-      Final Evaluation & Academic Completion
+      🏆 4-Gate Academic Completion Dossier
 ```
 
 ### Core Solution Highlights
@@ -82,114 +145,104 @@ Institution / Tenant (Isolated)
   2. All required submissions have accepted mentor reviews.
   3. Program outcomes / learning outcomes are satisfied.
   4. The mentor has submitted a structured final evaluation.
-* **Advisory AI Architecture**: A decoupled interface abstraction ready to plug into language models for evidence analysis without allowing AI to autonomously alter student status or block workflows.
 
 ---
 
 ## 👥 Target Users
 
-| User Type | Role Identifier | Primary Purpose | Main Capabilities |
+| Role | System Identifier | Primary Purpose | Key Capabilities |
 | :--- | :--- | :--- | :--- |
-| **Administrator** | `ADMIN` / `SUPER_ADMIN` / `INSTITUTION_ADMIN` | Institutional governance & tenant configuration | Register institutions, configure departments, invite students and mentors with secure activation tokens, CSV bulk student import, workflow blueprint design, audit log inspection, institutional analytics with CSV export. |
+| **Administrator** | `ADMIN` / `INSTITUTION_ADMIN` | Institutional governance & tenant configuration | Register institutions, configure departments, invite students and mentors with secure activation tokens, CSV bulk student import, workflow blueprint design, audit log inspection, institutional analytics with CSV export. |
 | **Student** | `STUDENT` | Academic internship execution & evidence submission | Register academic internships, upload PDF offer letters, inspect assigned milestones and tasks, submit multi-type evidence (GitHub PRs, URLs, PDFs), view mentor feedback, resubmit revised evidence, track OBE learning outcomes. |
 | **Industry Mentor** | `MENTOR` / `INDUSTRY_MENTOR` | Technical supervision & competency evaluation | Review pending internship registrations (`Approve` / `Request Changes`), supervise assigned interns, define milestone phases, assign tasks with expected evidence criteria, evaluate student submissions (Accept / Request Revision), submit final evaluations. |
-| **Faculty Supervisor** *(Architectural Support)* | `FACULTY` / `FACULTY_SUPERVISOR` | Academic cohort oversight | Cohort timeline monitoring, academic advisory check-ins, and institutional compliance reviews. |
-| **Head of Department** *(Architectural Support)* | `HOD` | Departmental leadership | Departmental performance review and faculty allocation oversight. |
+| **Faculty Supervisor** *(Arch. Support)* | `FACULTY` / `FACULTY_SUPERVISOR` | Academic cohort oversight | Cohort timeline monitoring, academic advisory check-ins, and institutional compliance reviews. |
+| **Head of Department** *(Arch. Support)* | `HOD` | Departmental leadership | Departmental performance review and faculty allocation oversight. |
 
-> **Note on Role Simplification**: The active core platform has been streamlined around the primary trio: **Admin**, **Student**, and **Mentor**. Extended roles (`FACULTY`, `HOD`) remain supported in the relational schema and permission engine for institutions requiring traditional multi-tier faculty sign-offs.
+> [!NOTE]
+> The active core platform has been streamlined around the primary trio: **Admin**, **Student**, and **Mentor**. Extended roles (`FACULTY`, `HOD`) remain supported in the relational schema and permission engine for institutions requiring traditional multi-tier faculty sign-offs.
 
 ---
 
 ## ✨ Key Features
 
-### 1. Authentication & Tenant Isolation
-* **Stateless JWT Security**: HMAC-SHA256 tokens carrying user identity, active role, and organization scope.
-* **Tenant Isolation Middleware**: Automatically validates organization context and query parameters, guaranteeing zero cross-tenant leakage.
-* **Secure Account Activation**: Invitation tokens hashed with bcrypt; user sets credentials upon activation.
-* **Role-Based Routing**: Authenticated role strictly determines whether the user accesses the Student, Mentor, or Admin workspace.
+### 🔐 1. Authentication & Multi-Tenant Security
+- **Stateless JWT Security**: HMAC-SHA256 tokens carrying user identity, active role, and organization scope.
+- **Tenant Isolation Middleware**: Automatically validates organization context and query parameters, guaranteeing zero cross-tenant leakage.
+- **Secure Account Activation**: Invitation tokens hashed with bcrypt; user sets credentials upon activation.
+- **Role-Based Routing**: Authenticated role strictly determines whether the user accesses the Student, Mentor, or Admin workspace.
 
-### 2. Student Workspace
-* **Academic Internship Registration**: Multi-field registration flow capturing title, company details, dates, track, industry mentor info, and PDF offer letter upload.
-* **Interactive PDF Offer Letter Viewer**: Dedicated streaming endpoint with inline rendering and attachment downloads.
-* **Milestone & Task Exploration**: Hierarchical breakdown of developmental stages with progress indicators and actionable tasks.
-* **Context-Preserving Evidence Submission**: Dedicated `/app/student/tasks/:taskId/submit` route with support for GitHub PRs, repositories, live URLs, file uploads, and explanatory notes.
-* **Feedback & Resubmission Ledger**: View mentor comments, scores, and revision requests with direct resubmission capability.
-* **Outcome-Based Education (OBE) Tracking**: Real-time alignment of actual student evidence against mentor-defined expected criteria for Program Outcomes (e.g., `PO-1`, `PO-2`).
+### 🎓 2. Student Workspace
+- **Academic Internship Registration**: Multi-field registration flow capturing title, company details, dates, track, industry mentor info, and PDF offer letter upload.
+- **Interactive PDF Offer Letter Viewer**: Dedicated streaming endpoint with inline rendering and attachment downloads.
+- **Milestone & Task Exploration**: Hierarchical breakdown of developmental stages with progress indicators and actionable tasks.
+- **Context-Preserving Evidence Submission**: Dedicated `/app/student/tasks/:taskId/submit` route with support for GitHub PRs, repositories, live URLs, file uploads, and explanatory notes.
+- **Feedback & Resubmission Ledger**: View mentor comments, scores, and revision notes with direct resubmission capability.
+- **Outcome-Based Education (OBE) Tracking**: Real-time alignment of actual student evidence against mentor-defined expected criteria for Program Outcomes (e.g., `PO-1`, `PO-2`).
 
-### 3. Mentor Workspace
-* **Operational Overview**: Daily attention feed highlighting pending submissions, active interns, and tasks requiring review.
-* **Scoped Intern Management**: "My Interns" view strictly filtered to interns assigned to the authenticated mentor.
-* **Registration Intake**: Review incoming student registrations with full inspection of company data, dates, and uploaded offer letter PDFs (`Approve` or `Request Changes`).
-* **Milestone & Task Authoring**: Structure internships into developmental phases and assign actionable tasks with explicit expected evidence requirements.
-* **Submission Review Queue**: Review student actual evidence against expected criteria, assign 1–5 star scores, provide feedback, and select `APPROVED` or `REVISION_REQUIRED`.
-* **Final Evaluation & Completion**: Structured rubric evaluation tied to specific student-internship pairs.
+### 👨‍🏫 3. Mentor Workspace
+- **Operational Overview**: Daily attention feed highlighting pending submissions, active interns, and tasks requiring review.
+- **Scoped Intern Management**: "My Interns" view strictly filtered to interns assigned to the authenticated mentor.
+- **Registration Intake**: Review incoming student registrations with full inspection of company data, dates, and uploaded offer letter PDFs (`Approve` or `Request Changes`).
+- **Milestone & Task Authoring**: Structure internships into developmental phases and assign actionable tasks with explicit expected evidence requirements.
+- **Submission Review Queue**: Review student actual evidence against expected criteria, assign 1–5 star scores, provide feedback, and select `APPROVED` or `REVISION_REQUIRED`.
+- **Final Evaluation & Completion**: Structured rubric evaluation tied to specific student-internship pairs.
 
-### 4. Institutional Administration & Governance
-* **Real Institution Onboarding**: Self-service institution registration at `/register-institution` creating isolated tenant roots and primary admin accounts.
-* **Department Registry**: Manage departments with live operational metrics (students, mentors, active internships, completion rates) without legacy HOD bottlenecks.
-* **User Provisioning & Invitations**: Issue invitations for `STUDENT` and `MENTOR` roles with cryptographically secure activation tokens.
-* **CSV Bulk Student Import**: Parse, validate, and batch-create student accounts with department mapping and rollback safeguards.
-* **Configurable Workflow Blueprints**: Visual state machine builder modeling stages, prerequisites, and transitions.
-* **Institutional Analytics & CSV Export**: Dynamic filtering across departments, companies, mentors, and date ranges with streaming CSV export of filtered datasets.
-* **Immutable Audit Trail**: Chronological event ledger capturing actor, role, action, entity, tenant, and metadata.
-
-### 5. Document Management Pipeline
-* **Multi-Driver Storage Architecture**: Pluggable storage abstraction supporting local file systems and S3-compatible object storage (AWS S3, Cloudflare R2, MinIO).
-* **MIME & Magic-Byte Validation**: Binary inspection ensuring uploaded documents contain authentic `%PDF-` signatures.
-* **Authenticated Streaming Endpoints**: Content-Disposition headers for secure inline browser viewing (`GET /api/v1/documents/:id/view`) and forced downloads (`GET /api/v1/documents/:id/download`).
-
-### 6. Deterministic Monitoring & Health Engine
-* **Pure-Code Health Evaluation**: Transparent scoring engine evaluating task completion pace, submission cadence, days since last activity, and mentor concerns.
-* **Status Categorization**: Deterministically categorizes internships as `ON_TRACK`, `ATTENTION_NEEDED`, or `CRITICAL`.
-* **Configurable Thresholds**: Administrators can tune inactivity thresholds, overdue task allowances, and review SLA targets.
+### 🏛️ 4. Institutional Administration & Governance
+- **Real Institution Onboarding**: Self-service institution registration at `/register-institution` creating isolated tenant roots and primary admin accounts.
+- **Department Registry**: Manage departments with live operational metrics (students, mentors, active internships, completion rates) without legacy HOD bottlenecks.
+- **User Provisioning & Invitations**: Issue invitations for `STUDENT` and `MENTOR` roles with cryptographically secure activation tokens.
+- **CSV Bulk Student Import**: Parse, validate, and batch-create student accounts with department mapping and rollback safeguards.
+- **Configurable Workflow Blueprints**: Visual state machine builder modeling stages, prerequisites, and transitions.
+- **Institutional Analytics & CSV Export**: Dynamic filtering across departments, companies, mentors, and date ranges with streaming CSV export of filtered datasets.
+- **Immutable Audit Trail**: Chronological event ledger capturing actor, role, action, entity, tenant, and metadata.
 
 ---
 
 ## 🏗️ System Architecture
 
-InternOS utilizes a modern decoupled full-stack monorepo architecture:
+InternOS utilizes a decoupled full-stack monorepo architecture:
 
 ```mermaid
 flowchart TD
     subgraph Clients ["Presentation Layer (Client Browsers)"]
-        A1[Student Workspace]
-        A2[Mentor Workspace]
-        A3[Admin Governance]
-        A4[Institution Onboarding]
+        A1["Student Workspace"]
+        A2["Mentor Workspace"]
+        A3["Admin Governance"]
+        A4["Institution Onboarding"]
     end
 
     subgraph CDN ["Edge & Routing (Vercel)"]
-        B1[Vercel Edge Network]
-        B2[React 18 + Vite SPA]
-        B3[React Router DOM v6]
+        B1["Vercel Edge Network"]
+        B2["React 18 + Vite SPA"]
+        B3["React Router DOM v6"]
     end
 
     subgraph API ["Application Gateway (Render / Node.js)"]
-        C1[Express 4 Application]
-        C2[Helmet & CORS Policy]
-        C3[JWT Authentication Guard]
-        C4[Multi-Tenant Isolation Middleware]
-        C5[Zod Request Validation]
+        C1["Express 4 Application"]
+        C2["Helmet & CORS Policy"]
+        C3["JWT Authentication Guard"]
+        C4["Multi-Tenant Isolation Middleware"]
+        C5["Zod Request Validation"]
     end
 
     subgraph Services ["Domain & Business Services"]
-        D1[Internship State Machine]
-        D2[Submission & Review Engine]
-        D3[Health & Monitoring Engine]
-        D4[Analytics & CSV Exporter]
-        D5[Document Storage Service]
-        D6[Audit Logger]
-        D7[Advisory AI Subsystem]
+        D1["Internship State Machine"]
+        D2["Submission & Review Engine"]
+        D3["Health & Monitoring Engine"]
+        D4["Analytics & CSV Exporter"]
+        D5["Document Storage Service"]
+        D6["Audit Logger"]
+        D7["Advisory AI Subsystem"]
     end
 
     subgraph Persistence ["Persistence & Storage Layer"]
-        E1[(PostgreSQL 16 Database)]
-        E2[Prisma 5 ORM Client]
-        E3[Document Storage / Local & S3]
+        E1[("PostgreSQL 16 Database")]
+        E2["Prisma 5 ORM Client"]
+        E3["Document Storage (Local & S3)"]
     end
 
     subgraph External ["External Intelligence (Advisory)"]
-        F1[OpenAI / Gemini / Anthropic API]
+        F1["OpenAI / Gemini / Anthropic API"]
     end
 
     Clients --> CDN
@@ -201,19 +254,11 @@ flowchart TD
     D7 -.->|Async Non-Blocking| F1
 ```
 
-### Architectural Layer Breakdown
-1. **Presentation Layer (React + Vite)**: Single Page Application built with Tailwind CSS, Lucide icons, and React Router v6. Implements client-side state management with uncoupled views for Student, Mentor, and Admin workflows.
-2. **Gateway & Security Middleware**: Express.js server enforcing Helmet headers, strict CORS origin matching (`FRONTEND_URL`), JWT Bearer token authentication, and tenant isolation verifying that all operations match the authenticated user's `organizationId`.
-3. **Domain Business Services**: Pure TypeScript service layer encapsulating state machine transitions, submission versioning, health scoring, CSV generation, and audit logging.
-4. **Data Access Layer (Prisma ORM)**: PostgreSQL schema with composite tenant indexes (`organizationId`), UUID primary keys, relational cascade policies, and typed query generation.
-5. **Storage Abstraction**: Storage driver interface supporting local filesystem storage with path traversal protection and S3-compatible object storage.
-6. **Advisory AI Intelligence**: Zero-hallucination asynchronous pipeline providing evidence analysis without modifying workflow states.
-
 ---
 
-## 🔄 System Workflow
+## 🔄 System Workflows
 
-### 1. Student-to-Mentor Task & Evidence Workflow
+### 1. Student-to-Mentor Task & Evidence Cycle
 
 ```mermaid
 sequenceDiagram
@@ -261,64 +306,39 @@ stateDiagram-v2
     CANCELLED --> [*]
 ```
 
-### 3. Institution Onboarding & User Activation Workflow
-
-```mermaid
-flowchart TD
-    A[New College Admin] -->|Fill Registration Form| B[POST /api/v1/tenants/register]
-    B --> C[Create Organization Root]
-    C --> D[Create Admin User & Tenant Profile]
-    D --> E[Admin Accesses Onboarding Dashboard]
-    E --> F[Create Academic Departments]
-    F --> G[Issue Invitations for Mentors & Students]
-    G --> H[Generate Secure Activation Token]
-    H --> I[Recipient Opens Activation URL]
-    I --> J[Set Password & Personal Details]
-    J --> K[Account Activated & Ready for Login]
-```
-
 ---
 
 ## 🧠 AI / ML Architecture
 
-InternOS incorporates an **Advisory Evidence Analysis Subsystem** designed to assist mentors in evaluating submitted student deliverables. 
+InternOS incorporates an **Advisory Evidence Analysis Subsystem** designed to assist mentors in evaluating submitted student deliverables.
 
 > [!IMPORTANT]
 > **Advisory-Only Principle**: The AI system is strictly advisory. It **never** autonomously approves submissions, fails students, alters state machines, or bypasses human mentor reviews. If the external LLM provider times out or fails, the core internship workflow continues uninterrupted.
 
 ```mermaid
 flowchart LR
-    A[Student Submission] -->|Deliverable Metadata & Text| B[AI Analysis Controller]
-    B --> C{API Key Configured?}
-    C -->|No / Dev Mode| D[Deterministic Fallback Analyzer]
-    C -->|Yes| E[LLM Provider Gateway]
-    E -->|OpenAI / Anthropic / Gemini| F[Structured Prompting Template]
-    F --> G[JSON Schema Validation]
-    G --> H[Extracted Skills & Tech Stack]
-    G --> I[OBE Outcome Alignment Advisory]
-    G --> J[Suggested Evaluation Rubric]
-    D --> K[Persist AIAnalysis Record]
+    A["Student Submission"] -->|Deliverable Metadata & Text| B["AI Analysis Controller"]
+    B --> C{"API Key Configured?"}
+    C -->|No / Dev Mode| D["Deterministic Fallback Analyzer"]
+    C -->|Yes| E["LLM Provider Gateway"]
+    E -->|OpenAI / Anthropic / Gemini| F["Structured Prompting Template"]
+    F --> G["JSON Schema Validation"]
+    G --> H["Extracted Skills & Tech Stack"]
+    G --> I["OBE Outcome Alignment Advisory"]
+    G --> J["Suggested Evaluation Rubric"]
+    D --> K["Persist AIAnalysis Record"]
     H --> K
     I --> K
     J --> K
-    K --> L[Render Advisory Card in Mentor Review Modal]
+    K --> L["Render Advisory Card in Review Modal"]
 ```
-
-### Advisory Components
-* **Provider Abstraction**: Decoupled interface supporting `openai`, `anthropic`, and `gemini` via configuration in `LLM_PROVIDER`.
-* **Input Extraction**: Parses student descriptions, GitHub repository URLs, and submitted technical keywords.
-* **Structured Output Schema**: Enforces JSON formatting containing:
-  - Detected technologies and frameworks.
-  - Demonstrated core competencies.
-  - Alignment score against target Program Outcomes (`PO-1`, `PO-2`).
-  - Suggested mentor feedback points.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Layer / Category | Technology | Version | Purpose |
-| :--- | :--- | :--- | :--- |
+| Category | Technology | Version | Purpose |
+| :--- | :--- | :---: | :--- |
 | **Frontend Framework** | React | `18.3.1` | Declarative user interface library |
 | **Frontend Tooling** | Vite | `5.4.21` | High-speed frontend build tool and development server |
 | **Routing** | React Router DOM | `6.23.1` | Client-side routing with role-based route guards |
@@ -437,31 +457,12 @@ erDiagram
     Internship ||--o{ Evaluation : finalized_by
 ```
 
-### Key Relational Entities
-* **`Organization`**: Multi-tenant root. Holds tenant configuration, domain restrictions, and academic year settings.
-* **`Department`**: Academic unit (e.g., Computer Science, Electrical Engineering) scoping students and faculty.
-* **`User`**: Base identity record with bcrypt password hash, status (`ACTIVE`, `SUSPENDED`), and role enum (`ADMIN`, `STUDENT`, `MENTOR`).
-* **`Internship`**: Central governance model tracking student, mentor, company, start/end dates, progress percentage, and lifecycle status (`DRAFT`, `PENDING_APPROVAL`, `APPROVED`, `ACTIVE`, `READY_FOR_COMPLETION`, `COMPLETED`).
-* **`Milestone`**: Structural developmental phase defined by mentors/institutions.
-* **`Task` / `WorkflowTask`**: Actionable work item containing title, due date, assigned mentor, expected evidence requirements, and status (`PENDING`, `SUBMITTED`, `CHANGES_REQUESTED`, `APPROVED`).
-* **`Submission`**: Student deliverable record tracking evidence type, URLs, file attachments, version numbers, and submission history.
-* **`Review`**: Mentor evaluation record capturing numeric scores, qualitative feedback, and decision (`APPROVED` vs `REVISION_REQUIRED`).
-* **`Outcome`**: Learning outcome / Program Outcome (OBE) entity mapping competencies to expected and actual student proof.
-* **`Document`**: Stored file metadata (offer letters, certificates, evaluation reports) with MIME type and byte size.
-* **`AuditLog`**: Immutable security ledger capturing actor ID, action, entity, IP address, and tenant context.
-
 ---
 
-## 🔐 Authentication & Authorization
+## 🔐 Authentication & RBAC
 
-### Token Architecture
-* **Access Tokens**: Short-lived JSON Web Tokens signed with HMAC-SHA256 (`HS256`) containing `userId`, `email`, `role`, and `organizationId`.
-* **Header Format**: Requests supply authentication via the standard HTTP header:
-  ```text
-  Authorization: Bearer <token>
-  ```
-
-### Role-Based Access Control (RBAC) Matrix
+<details>
+<summary><strong>View Role-Based Access Control (RBAC) Capability Matrix</strong></summary>
 
 | Capability / API Scope | `ADMIN` | `STUDENT` | `MENTOR` |
 | :--- | :---: | :---: | :---: |
@@ -480,28 +481,28 @@ erDiagram
 | Submit Final Internship Evaluation | ❌ | ❌ | ✅ |
 | Execute Academic Completion Sign-off | ✅ | ❌ | ❌ |
 
+</details>
+
 ---
 
-## 🛡️ Security
+## 🛡️ Security Implementation
 
-The following security controls are implemented server-side:
-
-* **Server-Side Tenant Isolation**: The `tenantIsolation` middleware intercepts all requests to `/api/v1/*`. It derives tenant identity strictly from the authenticated JWT claims. Any `?organizationId=...` in request queries, bodies, or custom headers is rejected or overridden.
-* **Cross-Tenant Boundary Enforcement**: Verified by automated test suites — users from Organization A receive HTTP `403 Forbidden` or `404 Not Found` if attempting to inspect or modify Organization B entities.
-* **Password Hashing**: Passwords hashed with `bcryptjs` using 10 salt rounds; plaintext passwords are never logged or stored.
-* **Input Validation**: All incoming requests validated against strict Zod schemas with unknown properties stripped.
-* **HTTP Security Headers**: Powered by `helmet` configuring Content Security Policy (CSP), Strict-Transport-Security (HSTS), and `X-Frame-Options: DENY`.
-* **Production CORS Policy**: In production, the backend rejects wildcard origins (`*`). Only the explicitly defined `FRONTEND_URL` is permitted.
-* **Binary File Inspection**: Uploaded documents are verified by checking magic bytes (`%PDF-` / `0x25 0x50 0x44 0x46 0x2D`) to prevent executable file masking.
+- **Server-Side Tenant Isolation**: The `tenantIsolation` middleware intercepts all requests to `/api/v1/*`. It derives tenant identity strictly from the authenticated JWT claims. Any `?organizationId=...` in request queries, bodies, or custom headers is rejected or overridden.
+- **Cross-Tenant Boundary Enforcement**: Verified by automated test suites — users from Organization A receive HTTP `403 Forbidden` or `404 Not Found` if attempting to inspect or modify Organization B entities.
+- **Password Hashing**: Passwords hashed with `bcryptjs` using 10 salt rounds; plaintext passwords are never logged or stored.
+- **Input Validation**: All incoming requests validated against strict Zod schemas with unknown properties stripped.
+- **HTTP Security Headers**: Powered by `helmet` configuring Content Security Policy (CSP), Strict-Transport-Security (HSTS), and `X-Frame-Options: DENY`.
+- **Production CORS Policy**: In production, the backend rejects wildcard origins (`*`). Only the explicitly defined `FRONTEND_URL` is permitted.
+- **Binary File Inspection**: Uploaded documents are verified by checking magic bytes (`%PDF-` / `0x25 0x50 0x44 0x46 0x2D`) to prevent executable file masking.
 
 ---
 
 ## 🔌 API Documentation
 
-All API endpoints are prefixed with `/api/v1` (with public health checks available at `/api/health`).
+<details open>
+<summary><strong>Core API Endpoints Reference</strong></summary>
 
 ### Authentication & Tenant Onboarding
-
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :---: | :--- |
 | `POST` | `/api/v1/auth/login` | Public | Authenticate user with email and password; returns JWT token. |
@@ -513,7 +514,6 @@ All API endpoints are prefixed with `/api/v1` (with public health checks availab
 | `GET` | `/api/v1/tenants/current` | Required | Retrieve current organization settings and profile. |
 
 ### Student Workspace
-
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :---: | :--- |
 | `GET` | `/api/v1/student/overview` | Student | Retrieve student dashboard metrics, active internship, and progress. |
@@ -531,7 +531,6 @@ All API endpoints are prefixed with `/api/v1` (with public health checks availab
 | `GET` | `/api/v1/student/documents/:id/download` | Student | Download authentic PDF document. |
 
 ### Mentor Workspace
-
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :---: | :--- |
 | `GET` | `/api/v1/mentor/overview` | Mentor | Operational feed of assigned interns, active tasks, and review queue. |
@@ -547,7 +546,6 @@ All API endpoints are prefixed with `/api/v1` (with public health checks availab
 | `POST` | `/api/v1/mentor/evaluation` | Mentor | Submit final rubric evaluation for an intern. |
 
 ### Administration & Governance
-
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :---: | :--- |
 | `GET` | `/api/v1/admin/overview` | Admin | Institutional health metrics, active engagements, and risk alerts. |
@@ -561,12 +559,16 @@ All API endpoints are prefixed with `/api/v1` (with public health checks availab
 | `GET` | `/api/v1/admin/analytics/export` | Admin | Stream CSV export of filtered institutional dataset. |
 | `POST` | `/api/v1/completion/complete` | Admin | Execute final academic completion sign-off once prerequisites pass. |
 
+</details>
+
 ---
 
 ## 🔑 Environment Variables
 
-### Backend Configuration (`apps/api`)
+<details>
+<summary><strong>View Complete Environment Variables Specification</strong></summary>
 
+### Backend (`apps/api/.env`)
 | Variable | Required | Default | Description |
 | :--- | :---: | :--- | :--- |
 | `NODE_ENV` | Yes | `development` | Target environment (`development`, `test`, `production`). |
@@ -588,15 +590,16 @@ All API endpoints are prefixed with `/api/v1` (with public health checks availab
 | `LLM_API_KEY` | No | — | API key for advisory evidence analysis. |
 | `LLM_MODEL` | No | `gpt-4o` | Language model identifier. |
 
-### Frontend Configuration (`apps/web`)
-
+### Frontend (`apps/web/.env`)
 | Variable | Required | Default | Description |
 | :--- | :---: | :--- | :--- |
 | `VITE_API_URL` | Yes | `http://localhost:4000` | Target backend REST API URL. |
 
+</details>
+
 ---
 
-## ⚙️ Installation
+## ⚙️ Installation & Setup
 
 ### Prerequisites
 * **Node.js**: `v20.18.0` or higher (LTS recommended)
@@ -604,33 +607,19 @@ All API endpoints are prefixed with `/api/v1` (with public health checks availab
 * **PostgreSQL**: `v16.x` (or Docker for local containerized DB)
 * **Git**: `v2.x`
 
-### 1. Clone the Repository
+### 1. Clone & Install
 ```bash
 git clone https://github.com/innocentgaming/Hack-2-Ignite-team_37.git
 cd Hack-2-Ignite-team_37
-```
-
-### 2. Install Monorepo Dependencies
-```bash
 npm install
 ```
 
----
-
-## 🔧 Configuration
-
-### 1. Environment Setup
-Create the root `.env` file from the provided template:
+### 2. Environment Configuration
 ```bash
 cp .env.example .env
 ```
-Update `.env` with your PostgreSQL connection string and a secure `JWT_SECRET`:
-```bash
-# Generate a secure 64-character secret
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
 
-### 2. Database Initialization
+### 3. Database Initialization
 ```bash
 # Generate Prisma Client
 npm run prisma:generate
@@ -670,75 +659,86 @@ npm run dev:web
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & QA
 
 InternOS features an automated test suite executed via the native Node.js test runner:
 
-### Run Automated Backend Test Suite
 ```bash
+# Run automated backend test suite
 npm run test
-```
-* **Coverage**: 278 tests across 68 test suites testing authentication, RBAC boundaries, state machine transitions, milestone workflows, evidence submissions, reviews, health scoring, CSV export, and PDF streaming.
-* **Result**: `278 pass, 0 fail (100% passing)` in ~101 seconds.
 
-### Run Workspace Typechecks
-```bash
+# Run workspace typechecks
 npm run typecheck
-```
 
-### Run Production Build Verification
-```bash
+# Run production build validation
 npm run build
 ```
 
+<details>
+<summary><strong>View Automated Test Suite Execution Summary (278 / 278 Tests Passed)</strong></summary>
+
+```text
+✔ InternOS Phase 1: Authentication, RBAC & Multi-Tenant Isolation Suite (2526ms)
+✔ InternOS Phase 2: Institution Administration, User Management & CSV Import Suite (1914ms)
+✔ InternOS Phase 3: Configurable Workflow Blueprints & State Machine Suite (1842ms)
+✔ InternOS Phase 4: Internship Registration & Lifecycle State Machine Suite (1753ms)
+✔ InternOS Phase 5: Role-Specific Internship Workspaces Suite (2007ms)
+✔ InternOS Phase 6: Versioned Submissions, Private Files & Mentor Reviews Suite (2452ms)
+✔ InternOS Phase 7: Deterministic Monitoring & Health Engine Test Suite (1955ms)
+✔ InternOS Phase 8: Final Evaluation & Completion Engine Suite (1982ms)
+✔ InternOS Phase 9: Evidence-Based AI Intelligence Layer Suite (1616ms)
+✔ InternOS Phase 10: Document Pipeline & Export Generation Suite (1820ms)
+✔ InternOS Phase 11: Institutional & Department Analytics Suite (1915ms)
+✔ InternOS Phase 12: Complete Security Audit and Hardening Suite (4568ms)
+✔ InternOS Phase 13: Complete End-to-End & Performance Verification Suite (2819ms)
+✔ InternOS Phase 14: Production Deployment & Cloud Infrastructure Suite (1420ms)
+✔ InternOS: Student & Mentor Workspaces Integration Suite (1133ms)
+✔ InternOS: Student Workflows, Task Lifecycle & Document Pipeline Suite (1195ms)
+
+ℹ Total Suites: 68
+ℹ Total Tests: 278
+ℹ Passed: 278
+ℹ Failed: 0
+ℹ Duration: 101.7s
+```
+
+</details>
+
 ---
 
-## 📸 Screenshots
+## 🎥 Live Production Demo
 
-> Screenshots will be added as the UI stabilizes.
-
----
-
-## 🎥 Demo
-
-* **Live Production Application**: [https://internos-web-tau.vercel.app](https://internos-web-tau.vercel.app)
-* **Live Backend API**: [https://internos-api-gntk.onrender.com](https://internos-api-gntk.onrender.com)
-* **API Health Check**: [https://internos-api-gntk.onrender.com/api/v1/health](https://internos-api-gntk.onrender.com/api/v1/health)
-* **Self-Service Institution Onboarding**: [https://internos-web-tau.vercel.app/register-institution](https://internos-web-tau.vercel.app/register-institution)
+* **Live Web Application**: [https://internos-web-tau.vercel.app](https://internos-web-tau.vercel.app)
+* **Backend API Base**: [https://internos-api-gntk.onrender.com](https://internos-api-gntk.onrender.com)
+* **Public Health Endpoint**: [https://internos-api-gntk.onrender.com/api/v1/health](https://internos-api-gntk.onrender.com/api/v1/health)
+* **Institution Onboarding**: [https://internos-web-tau.vercel.app/register-institution](https://internos-web-tau.vercel.app/register-institution)
 
 ---
 
-## 🚀 Deployment
+## 🚀 Cloud Deployment
 
-### A. Deploy Backend & PostgreSQL on Render (1-Click Blueprint)
-The repository includes a ready-to-deploy [`render.yaml`](render.yaml) Infrastructure-as-Code blueprint:
+InternOS is configured for automated cloud deployment with Infrastructure-as-Code blueprints:
 
-1. Push your code to GitHub.
-2. Go to [Render Dashboard](https://dashboard.render.com/) and click **New +** → **Blueprint**.
-3. Select your repository. Render automatically provisions:
-   - `internos-db`: Managed PostgreSQL 16 database.
-   - `internos-api`: Node.js web service running the Express API.
+### Render (Backend & PostgreSQL)
+1. Push your repository to GitHub.
+2. Open [Render Dashboard](https://dashboard.render.com/) → **New +** → **Blueprint**.
+3. Select your repository. Render automatically reads [`render.yaml`](render.yaml) and provisions `internos-db` (PostgreSQL 16) and `internos-api` (Node.js Web Service).
 4. Click **Apply**.
 
-### B. Deploy Frontend on Vercel
-The repository includes [`vercel.json`](vercel.json) configured for single-page application routing:
-
-1. Go to [Vercel Dashboard](https://vercel.com/) and click **Add New...** → **Project**.
-2. Import your GitHub repository.
+### Vercel (Frontend SPA)
+1. Open [Vercel Dashboard](https://vercel.com/) → **Add New...** → **Project**.
+2. Select your repository.
 3. Configure settings:
    - **Framework Preset**: `Vite`
-   - **Root Directory**: `apps/web` (or `./`)
+   - **Root Directory**: `apps/web`
    - **Environment Variable**: `VITE_API_URL` = `https://your-api-url.onrender.com`
 4. Click **Deploy**.
-5. Once deployed, set your Vercel URL as `FRONTEND_URL` on Render for CORS compliance.
+5. Set your Vercel URL as `FRONTEND_URL` on Render for CORS compliance.
 
 ---
 
-## 🐳 Docker
+## 🐳 Docker Deployment
 
-InternOS includes a multi-stage production Dockerfile and Docker Compose orchestration:
-
-### Build and Run with Docker Compose
 ```bash
 # Build and run API and PostgreSQL in background
 docker compose -f docker-compose.prod.yml up -d --build
@@ -750,33 +750,27 @@ docker compose -f docker-compose.prod.yml logs -f api
 curl http://localhost:4000/api/v1/health
 ```
 
-### Standalone Docker Build
-```bash
-docker build -t internos-api .
-docker run -p 4000:4000 --env-file .env internos-api
-```
-
 ---
 
 ## 📊 Current Project Status
 
-| Module / Subsystem | Status | Details |
+| Module / Subsystem | Status | Verification Details |
 | :--- | :---: | :--- |
-| **Authentication & Multi-Tenant RBAC** | ✅ Complete | JWT authentication, bcrypt passwords, tenant isolation. |
+| **Authentication & Multi-Tenant RBAC** | ✅ Complete | Stateless JWT, salted bcrypt passwords, server-side tenant scoping. |
 | **Student Workspace** | ✅ Complete | Internship registration, task evidence submission, PDF viewing, outcomes. |
-| **Mentor Workspace** | ✅ Complete | Intern supervision, registration approval, task assignment, review queue. |
-| **Admin Governance** | ✅ Complete | Department management, invites, CSV student import, audit logging. |
+| **Mentor Workspace** | ✅ Complete | Intern supervision, registration approval, task authoring, review queue. |
+| **Admin Governance** | ✅ Complete | Department registry, invites, CSV bulk student import, audit logging. |
 | **Institutional Analytics & CSV Export** | ✅ Complete | Real-time multi-variable filtering and structured CSV export. |
 | **State Machine Engine** | ✅ Complete | 16 valid transitions with strict prerequisite guards. |
 | **Document Pipeline & PDF Streaming** | ✅ Complete | MIME and magic-byte checks (`%PDF-`) with inline streaming. |
 | **Deterministic Health Engine** | ✅ Complete | Pure-code scoring for `ON_TRACK`, `ATTENTION`, and `CRITICAL`. |
 | **Advisory AI Intelligence** | 🟡 In Progress | Non-blocking advisory pipeline; LLM integration ready. |
 | **Cloud Deployment** | ✅ Complete | Live on Vercel (Frontend SPA) and Render (API + PostgreSQL). |
-| **Automated Testing Suite** | ✅ Complete | 278/278 tests passed across 68 suites. |
+| **Automated Testing Suite** | ✅ Complete | 278/278 tests passed across 68 suites (100% passing). |
 
 ---
 
-## 🗺️ Roadmap
+## 🗺️ Product Roadmap
 
 ### Completed
 - [x] Multi-tenant relational schema with PostgreSQL and Prisma ORM.
@@ -803,97 +797,41 @@ docker run -p 4000:4000 --env-file .env internos-api
 
 ---
 
-## ⚠️ Limitations
+## ⚠️ Limitations & 🔮 Future Scope
 
-* **Advisory-Only AI**: The AI subsystem is strictly advisory and does not replace human mentor evaluation or grade submissions.
-* **Storage Driver Default**: Default installation uses local storage. Production deployments with ephemeral container instances should configure S3/R2 storage via `STORAGE_DRIVER=s3`.
-* **Single Active Institution per Session**: Users belonging to multiple institutions must sign in with distinct credentials per organization tenant.
-* **Non-Interactive PDF Annotation**: The current PDF viewer supports authenticated streaming and downloads; in-browser document markup/annotation is not yet implemented.
+### Limitations
+- **Advisory-Only AI**: The AI subsystem is strictly advisory and does not replace human mentor evaluation or grade submissions.
+- **Storage Driver Default**: Default installation uses local storage. Production deployments with ephemeral container instances should configure S3/R2 storage via `STORAGE_DRIVER=s3`.
+- **Single Active Institution per Session**: Users belonging to multiple institutions must sign in with distinct credentials per organization tenant.
+- **Non-Interactive PDF Annotation**: The current PDF viewer supports authenticated streaming and downloads; in-browser document markup/annotation is not yet implemented.
 
----
-
-## 🔮 Future Scope
-
-* **LMS Interoperability**: Direct gradebook synchronization with Canvas, Blackboard, and Moodle via LTI 1.3 Advantage.
-* **Mobile-First App**: Dedicated offline-capable mobile companion for students logging daily activities from field sites.
-* **Advanced OBE Rubric Engine**: Multi-dimensional rubrics with custom institutional outcome weightings.
-* **Company Partner Portal**: Dedicated corporate interface for company HR coordinators to manage internship requisitions across multiple universities.
+### Future Scope
+- **LMS Interoperability**: Direct gradebook synchronization with Canvas, Blackboard, and Moodle via LTI 1.3 Advantage.
+- **Mobile-First App**: Dedicated offline-capable mobile companion for students logging daily activities from field sites.
+- **Advanced OBE Rubric Engine**: Multi-dimensional rubrics with custom institutional outcome weightings.
+- **Company Partner Portal**: Dedicated corporate interface for company HR coordinators to manage internship requisitions across multiple universities.
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing & License
 
 Contributions are welcome from the community. Follow this workflow:
 
 1. **Fork** the repository on GitHub.
-2. **Create a Feature Branch**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Commit Your Changes**:
-   ```bash
-   git commit -m "feat: implement concise feature description"
-   ```
-4. **Execute Verification Tests**:
-   ```bash
-   npm run typecheck
-   npm run test
-   ```
-5. **Push to GitHub**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-6. **Open a Pull Request** against the `main` branch with a description of changes.
+2. **Create a Feature Branch**: `git checkout -b feature/your-feature-name`
+3. **Commit Your Changes**: `git commit -m "feat: implement concise feature description"`
+4. **Execute Verification Tests**: `npm run typecheck && npm run test`
+5. **Push to GitHub**: `git push origin feature/your-feature-name`
+6. **Open a Pull Request** against the `main` branch.
 
----
-
-## 🐛 Issue Reporting
-
-If you encounter a bug, security vulnerability, or feature request:
-1. Check existing [GitHub Issues](https://github.com/innocentgaming/Hack-2-Ignite-team_37/issues) to prevent duplicates.
-2. Open a new issue providing:
-   - Clear description of the unexpected behavior.
-   - Step-by-step reproduction steps.
-   - Expected outcome vs actual outcome.
-   - Relevant browser console or server log snippets.
-
----
-
-## 📜 License
-
+### License
 No open-source license has currently been specified. All rights reserved.
 
----
-
-## 👨‍💻 Contributors
-
+### Contributors
 Developed by the **Hack-2-Ignite-team_37** engineering team.
 
 ---
 
-## 🙏 Acknowledgements
-
-InternOS is built using open-source libraries and platforms:
-* [React](https://react.dev/) & [Vite](https://vitejs.dev/)
-* [Express](https://expressjs.com/) & [Node.js](https://nodejs.org/)
-* [Prisma](https://www.prisma.io/) & [PostgreSQL](https://www.postgresql.org/)
-* [Tailwind CSS](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/)
-* [Zod](https://zod.dev/) & [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
-* [Vercel](https://vercel.com/) & [Render](https://render.com/)
-
----
-
-## 📚 Additional Documentation
-
-* [Architecture & Design Guide](docs/ARCHITECTURE.md)
-* [Database Schema & ERD Dictionary](docs/DATABASE.md)
-* [Local Development Guide](docs/DEVELOPMENT.md)
-* [Cloud Deployment Guide](DEPLOYMENT.md)
-* [Quality Assurance & Test Report](TEST_REPORT.md)
-
----
-
-## 📞 Contact
-
-For inquiries, issue tracking, and contributions, visit the repository:  
-**[https://github.com/innocentgaming/Hack-2-Ignite-team_37](https://github.com/innocentgaming/Hack-2-Ignite-team_37)**
+<p align="center">
+  <sub>Built with ❤️ for academic institutions, industry mentors, and students.</sub>
+</p>
