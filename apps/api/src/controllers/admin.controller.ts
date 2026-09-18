@@ -333,7 +333,7 @@ export class AdminController {
   async getHODDashboard(req: Request, res: Response, next: NextFunction) {
     try {
       const orgId = req.organizationId!;
-      const metrics = await tenantService.getAdminDashboardMetrics(orgId);
+      const metrics = await tenantService.getHODDashboardMetrics(orgId, req.user!.id);
       return res.json(formatSuccessResponse(metrics));
     } catch (err) {
       next(err);
@@ -343,7 +343,7 @@ export class AdminController {
   async getFacultyDashboard(req: Request, res: Response, next: NextFunction) {
     try {
       const orgId = req.organizationId!;
-      const metrics = await tenantService.getAdminDashboardMetrics(orgId);
+      const metrics = await tenantService.getFacultyDashboardMetrics(orgId, req.user!.id);
       return res.json(formatSuccessResponse(metrics));
     } catch (err) {
       next(err);

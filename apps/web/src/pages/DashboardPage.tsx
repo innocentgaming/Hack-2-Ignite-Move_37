@@ -124,23 +124,23 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 md:p-8 text-white border border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-4 sm:p-6 md:p-8 text-white border border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Workspace Active • {user?.organizationName} ({user?.organizationCode})</span>
+            <span className="truncate">Workspace Active • {user?.organizationName} ({user?.organizationCode})</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">
             Hello, {user?.firstName} {user?.lastName} ({role})
           </h1>
-          <p className="text-sm text-slate-300 max-w-2xl">
+          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
             Institutional Administrator: Manage institution profile, department registry, student CSV bulk imports, and user roles.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <Badge variant="indigo" size="md">
             Role: {role}
           </Badge>
@@ -150,12 +150,12 @@ export const DashboardPage: React.FC = () => {
       {/* Real Dynamic Metrics: ADMIN DASHBOARD */}
       {adminMetrics && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-600" />
-              Institutional Telemetry (Real Backend Data)
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-indigo-600 shrink-0" />
+              <span>Institutional Telemetry</span>
             </h2>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Link to="/app/admin/students/import">
                 <Button size="sm" variant="outline" className="text-xs flex items-center gap-1.5">
                   <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600" />
@@ -171,7 +171,7 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
             <Card hoverable>
               <CardBody className="p-5 flex items-center justify-between">
                 <div>

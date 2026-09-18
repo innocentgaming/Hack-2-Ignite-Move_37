@@ -56,22 +56,22 @@ export const MentorOverviewPage: React.FC = () => {
   return (
     <div className="space-y-8 pb-16">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               Welcome back, {d?.mentorName || 'Mark Mentor'}
             </h1>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
               Mentor Workspace
             </span>
           </div>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             What requires my attention today? Overseeing interns, reviewing submissions, and tracking accredited learning outcomes.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <Link to="/app/mentor/submissions">
             <Button variant="primary" size="sm" className="gap-1.5 shadow-sm font-semibold">
               <FileCheck className="w-4 h-4" /> Review Queue
@@ -95,7 +95,7 @@ export const MentorOverviewPage: React.FC = () => {
       )}
 
       {/* TOP METRICS (5 KPIs) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Card className="p-5 flex flex-col justify-between border border-slate-200/80">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Assigned Interns</span>

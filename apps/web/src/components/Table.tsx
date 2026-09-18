@@ -36,7 +36,7 @@ export function Table<T>({
   };
 
   return (
-    <div className={`overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}>
+    <div className={`overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs max-w-full ${className}`}>
       <table className="min-w-full divide-y divide-slate-200">
         <thead className="bg-slate-50">
           <tr>
@@ -44,7 +44,7 @@ export function Table<T>({
               <th
                 key={col.key}
                 scope="col"
-                className={`px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 ${getAlignClass(
+                className={`px-3.5 sm:px-6 py-3 sm:py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500 ${getAlignClass(
                   col.align
                 )} ${col.className || ''}`}
               >
@@ -56,7 +56,7 @@ export function Table<T>({
         <tbody className="divide-y divide-slate-200 bg-white">
           {isLoading ? (
             <tr>
-              <td colSpan={columns.length} className="px-6 py-12 text-center text-sm text-slate-500">
+              <td colSpan={columns.length} className="px-4 sm:px-6 py-12 text-center text-sm text-slate-500">
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
                   <span>Loading table records...</span>
@@ -65,7 +65,7 @@ export function Table<T>({
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-6 py-12 text-center text-sm text-slate-500">
+              <td colSpan={columns.length} className="px-4 sm:px-6 py-12 text-center text-sm text-slate-500">
                 {emptyComponent || emptyText}
               </td>
             </tr>
@@ -81,7 +81,7 @@ export function Table<T>({
                 {columns.map((col) => (
                   <td
                     key={col.key}
-                    className={`whitespace-nowrap px-6 py-4 text-sm text-slate-700 ${getAlignClass(
+                    className={`whitespace-nowrap px-3.5 sm:px-6 py-3 sm:py-4 text-sm text-slate-700 ${getAlignClass(
                       col.align
                     )} ${col.className || ''}`}
                   >

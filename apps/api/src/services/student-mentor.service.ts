@@ -654,44 +654,74 @@ export class StudentMentorStore {
     this.submissions.set(sub3_3.id, sub3_3);
     this.submissions.set(sub3_4.id, sub3_4);
 
-    // 7. Seed for MIT_PUNE Demo (demo-mit-pune)
-    const mitOrgId = 'demo-mit-pune';
+    // 7. Seed for GHRISTU_PUNE Demo (demo-ghristu-pune)
+    const ghristuOrgId = 'demo-ghristu-pune';
 
-    const outMit1: InMemoryOutcomeDef = {
-      id: 'out-mit-fullstack',
-      organizationId: mitOrgId,
+    // 4 Accredited Learning Outcomes (PO-1 through PO-4)
+    const outPo1: InMemoryOutcomeDef = {
+      id: 'out-ghristu-po1',
+      organizationId: ghristuOrgId,
       code: 'PO-1',
-      name: 'Full-Stack Cloud Architecture & Microservices',
-      description: 'Design and build resilient, multi-tenant cloud-native services with strict role-based access control and persistent schemas.',
-      expectedEvidence: ['GitHub Pull Request with comprehensive unit & integration tests', 'Swagger / OpenAPI 3.0 specification', 'Live deployment verification'],
+      name: 'Software Engineering & API Development',
+      description: 'Design, implement, and document scalable RESTful APIs with secure authentication, database schemas, and automated tests.',
+      expectedEvidence: [
+        'REST API implementation',
+        'API documentation',
+        'Automated tests',
+        'GitHub pull request',
+      ],
     };
-    const outMit2: InMemoryOutcomeDef = {
-      id: 'out-mit-ai',
-      organizationId: mitOrgId,
+    const outPo2: InMemoryOutcomeDef = {
+      id: 'out-ghristu-po2',
+      organizationId: ghristuOrgId,
       code: 'PO-2',
-      name: 'Applied Machine Learning & Distributed Pipelines',
-      description: 'Implement distributed data processing pipelines with automated inference, model evaluation, and caching mechanisms.',
-      expectedEvidence: ['Jupyter analysis benchmark / load tests', 'GitHub repository with model pipeline code', 'Verification telemetry report'],
+      name: 'Cloud & DevOps',
+      description: 'Implement continuous integration and continuous deployment workflows, containerize software, and automate cloud hosting.',
+      expectedEvidence: [
+        'CI/CD workflow',
+        'Docker configuration',
+        'Deployment evidence',
+      ],
     };
-    const outMit3: InMemoryOutcomeDef = {
-      id: 'out-mit-devops',
-      organizationId: mitOrgId,
+    const outPo3: InMemoryOutcomeDef = {
+      id: 'out-ghristu-po3',
+      organizationId: ghristuOrgId,
       code: 'PO-3',
-      name: 'Cloud Automation, Containerization & CI/CD',
-      description: 'Deploy automated continuous integration and delivery pipelines with Docker containerization, security vulnerability scanning, and cloud hosting.',
-      expectedEvidence: ['GitHub Actions pipeline execution badge', 'Docker container configurations and health probes', 'SSL-secured live endpoint'],
+      name: 'Problem Solving & System Design',
+      description: 'Architect scalable solutions, formulate architectural blueprints, and benchmark system throughput.',
+      expectedEvidence: [
+        'Architecture document',
+        'Technical design',
+        'Performance analysis',
+      ],
     };
-    this.outcomes.set(outMit1.id, outMit1);
-    this.outcomes.set(outMit2.id, outMit2);
-    this.outcomes.set(outMit3.id, outMit3);
+    const outPo4: InMemoryOutcomeDef = {
+      id: 'out-ghristu-po4',
+      organizationId: ghristuOrgId,
+      code: 'PO-4',
+      name: 'Professional Practice',
+      description: 'Demonstrate workplace collaboration, iterative delivery, timely milestone reviews, and comprehensive completion documentation.',
+      expectedEvidence: [
+        'Weekly progress reports',
+        'Mentor feedback',
+        'Final internship report',
+      ],
+    };
+    this.outcomes.set(outPo1.id, outPo1);
+    this.outcomes.set(outPo2.id, outPo2);
+    this.outcomes.set(outPo3.id, outPo3);
+    this.outcomes.set(outPo4.id, outPo4);
 
-    // Milestones for internship-mit-1 (Aarav Sharma @ TCS, Mentor: Rahul Mehta)
-    const mitM1: InMemoryMilestone = {
-      id: 'ms-mit-1',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      title: 'Phase 1: Architecture, Monorepo & Environment',
-      description: 'Bootstrap monorepo with strict TypeScript typing, Docker dev containers, and PostgreSQL relational schemas.',
+    // ==========================================
+    // Aarav Sharma @ TCS (internship-ghristu-1, Mentor: Rahul Mehta)
+    // 5 Structured Milestones
+    // ==========================================
+    const aaravM1: InMemoryMilestone = {
+      id: 'ms-ghristu-1',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      title: 'Milestone 1: Project Onboarding & Architecture',
+      description: 'Development environment setup, understand application architecture, repository setup, and architecture documentation.',
       order: 1,
       startDate: new Date('2026-06-01'),
       dueDate: new Date('2026-06-30'),
@@ -700,163 +730,445 @@ export class StudentMentorStore {
       createdAt: now,
       updatedAt: now,
     };
-    const mitM2: InMemoryMilestone = {
-      id: 'ms-mit-2',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      title: 'Phase 2: Core Microservices & Multi-Tenant Engine',
-      description: 'Implement tenant isolation middleware, JWT security credentials, and department management endpoints.',
+    const aaravM2: InMemoryMilestone = {
+      id: 'ms-ghristu-2',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      title: 'Milestone 2: Backend API Development',
+      description: 'REST API implementation, JWT authentication, database schema, and CRUD APIs.',
       order: 2,
       startDate: new Date('2026-07-01'),
+      dueDate: new Date('2026-08-15'),
+      progress: 100,
+      status: 'COMPLETED',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const aaravM3: InMemoryMilestone = {
+      id: 'ms-ghristu-3',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      title: 'Milestone 3: Frontend Integration',
+      description: 'API integration, authentication UI, error handling, and responsive interface.',
+      order: 3,
+      startDate: new Date('2026-08-16'),
       dueDate: new Date('2026-09-30'),
-      progress: 75,
+      progress: 50,
       status: 'IN_PROGRESS',
       createdAt: now,
       updatedAt: now,
     };
-    const mitM3: InMemoryMilestone = {
-      id: 'ms-mit-3',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      title: 'Phase 3: CI/CD Automation & Production Hardening',
-      description: 'Configure automated testing pipelines, SonarQube quality gates, and staging cloud deployment.',
-      order: 3,
+    const aaravM4: InMemoryMilestone = {
+      id: 'ms-ghristu-4',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      title: 'Milestone 4: Testing & Deployment',
+      description: 'Unit testing, integration testing, CI/CD configuration, and cloud deployment.',
+      order: 4,
       startDate: new Date('2026-10-01'),
-      dueDate: new Date('2026-11-25'),
+      dueDate: new Date('2026-10-31'),
       progress: 0,
       status: 'NOT_STARTED',
       createdAt: now,
       updatedAt: now,
     };
-    this.milestones.set(mitM1.id, mitM1);
-    this.milestones.set(mitM2.id, mitM2);
-    this.milestones.set(mitM3.id, mitM3);
+    const aaravM5: InMemoryMilestone = {
+      id: 'ms-ghristu-5',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      title: 'Milestone 5: Final Delivery',
+      description: 'Technical documentation, final demo, final repository submission, and internship completion report.',
+      order: 5,
+      startDate: new Date('2026-11-01'),
+      dueDate: new Date('2026-11-30'),
+      progress: 0,
+      status: 'NOT_STARTED',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.milestones.set(aaravM1.id, aaravM1);
+    this.milestones.set(aaravM2.id, aaravM2);
+    this.milestones.set(aaravM3.id, aaravM3);
+    this.milestones.set(aaravM4.id, aaravM4);
+    this.milestones.set(aaravM5.id, aaravM5);
 
-    // Tasks for internship-mit-1
-    const mitT1: InMemoryTask = {
-      id: 'task-mit-101',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      milestoneId: 'ms-mit-1',
-      title: 'Monorepo & Docker Container Setup',
-      description: 'Initialize pnpm workspace, Docker compose with PostgreSQL, and ESLint strict configurations.',
-      instructions: 'Ensure docker-compose up initializes database with healthy status checks.',
+    // Aarav's Tasks: Exactly 6 tasks (4 Completed/Approved, 2 Submitted/Pending Review => ~60% progress, 2 pending reviews)
+    const aaravT1: InMemoryTask = {
+      id: 'task-ghr-101',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      milestoneId: 'ms-ghristu-1',
+      title: 'Development Environment & Architecture Setup',
+      description: 'Configure monorepo, Docker dev environment, and document system architecture.',
+      instructions: 'Submit GitHub Repository with architectural documentation and container config.',
       status: TaskStatus.APPROVED,
       priority: 'HIGH',
       dueDate: new Date('2026-06-15'),
-      learningOutcomeId: 'out-mit-devops',
-      expectedEvidence: 'GitHub repository URL with Dockerfile and setup documentation',
+      learningOutcomeId: 'out-ghristu-po3',
+      expectedEvidence: 'Architecture document & GitHub Repository',
       createdAt: now,
       updatedAt: now,
     };
-    const mitT2: InMemoryTask = {
-      id: 'task-mit-102',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      milestoneId: 'ms-mit-2',
-      title: 'Multi-Tenant Authentication & RBAC Engine',
-      description: 'Implement JWT authentication with organization isolation and role verification.',
-      instructions: 'Deliver endpoints for login, activation, and token refresh with complete test coverage.',
+    const aaravT2: InMemoryTask = {
+      id: 'task-ghr-102',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      milestoneId: 'ms-ghristu-2',
+      title: 'Database Schema & Relational Models',
+      description: 'Design and migrate relational schemas with tenant isolation constraints.',
+      instructions: 'Provide GitHub schema migration scripts and entity diagrams.',
       status: TaskStatus.APPROVED,
       priority: 'HIGH',
-      dueDate: new Date('2026-07-20'),
-      learningOutcomeId: 'out-mit-fullstack',
-      expectedEvidence: 'GitHub PR link with automated test report verifying multi-tenant isolation',
+      dueDate: new Date('2026-07-15'),
+      learningOutcomeId: 'out-ghristu-po1',
+      expectedEvidence: 'GitHub Repository with schema migrations',
       createdAt: now,
       updatedAt: now,
     };
-    const mitT3: InMemoryTask = {
-      id: 'task-mit-103',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      milestoneId: 'ms-mit-2',
-      title: 'High-Throughput Data Pipeline & Caching',
-      description: 'Implement Redis caching layer and asynchronous task queue with retry logic.',
-      instructions: 'Demonstrate sub-50ms p99 latency under 500 req/s load.',
+    const aaravT3: InMemoryTask = {
+      id: 'task-ghr-103',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      milestoneId: 'ms-ghristu-2',
+      title: 'REST API Implementation & JWT Auth',
+      description: 'Implement secure RESTful CRUD APIs with JWT authentication tokens.',
+      instructions: 'Submit GitHub PR with automated integration tests verifying endpoints.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-08-10'),
+      learningOutcomeId: 'out-ghristu-po1',
+      expectedEvidence: 'GitHub Pull Request and API documentation',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const aaravT4: InMemoryTask = {
+      id: 'task-ghr-104',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      milestoneId: 'ms-ghristu-3',
+      title: 'Authentication UI & Responsive Interface',
+      description: 'Build responsive web interface for user authentication and dashboard navigation.',
+      instructions: 'Deliver production-ready responsive layout with input validation.',
+      status: TaskStatus.APPROVED,
+      priority: 'MEDIUM',
+      dueDate: new Date('2026-08-30'),
+      learningOutcomeId: 'out-ghristu-po1',
+      expectedEvidence: 'GitHub PR with responsive UI screenshots',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const aaravT5: InMemoryTask = {
+      id: 'task-ghr-105',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      milestoneId: 'ms-ghristu-3',
+      title: 'API Integration & Error Handling',
+      description: 'Connect frontend client to backend endpoints with structured toast notifications.',
+      instructions: 'Submit PR link with end-to-end network test coverage.',
       status: TaskStatus.SUBMITTED,
       priority: 'HIGH',
       dueDate: new Date('2026-09-25'),
-      learningOutcomeId: 'out-mit-fullstack',
-      expectedEvidence: 'PR link with benchmark telemetry report and Redis cache hit-ratio analysis',
+      learningOutcomeId: 'out-ghristu-po1',
+      expectedEvidence: 'GitHub Pull Request with error boundary tests',
       createdAt: now,
       updatedAt: now,
     };
-    const mitT4: InMemoryTask = {
-      id: 'task-mit-104',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      milestoneId: 'ms-mit-3',
-      title: 'Automated CI/CD Pipeline with GitHub Actions',
-      description: 'Set up GitHub Actions to run linter, typecheck, unit tests, and build Docker containers.',
-      instructions: 'Pipeline must fail if any test or type check fails.',
-      status: TaskStatus.PENDING,
-      priority: 'MEDIUM',
+    const aaravT6: InMemoryTask = {
+      id: 'task-ghr-106',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      milestoneId: 'ms-ghristu-4',
+      title: 'CI/CD Pipeline & Automated Cloud Deployment',
+      description: 'Configure automated build & test pipeline in GitHub Actions and deploy to staging cloud.',
+      instructions: 'Submit GitHub Actions workflow run logs and verified live deployment URL.',
+      status: TaskStatus.SUBMITTED,
+      priority: 'URGENT',
       dueDate: new Date('2026-10-15'),
-      learningOutcomeId: 'out-mit-devops',
-      expectedEvidence: 'GitHub Actions workflow YAML and successful run execution link',
+      learningOutcomeId: 'out-ghristu-po2',
+      expectedEvidence: 'GitHub Actions workflow badge and Deployment URL',
       createdAt: now,
       updatedAt: now,
     };
-    this.tasks.set(mitT1.id, mitT1);
-    this.tasks.set(mitT2.id, mitT2);
-    this.tasks.set(mitT3.id, mitT3);
-    this.tasks.set(mitT4.id, mitT4);
+    this.tasks.set(aaravT1.id, aaravT1);
+    this.tasks.set(aaravT2.id, aaravT2);
+    this.tasks.set(aaravT3.id, aaravT3);
+    this.tasks.set(aaravT4.id, aaravT4);
+    this.tasks.set(aaravT5.id, aaravT5);
+    this.tasks.set(aaravT6.id, aaravT6);
 
-    // Submissions for internship-mit-1
-    const mitSub1: InMemorySubmissionRecord = {
-      id: 'sub-mit-101',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      taskId: 'task-mit-101',
-      studentId: 'user-mit-student-1',
-      title: 'Monorepo & Docker Container Setup Evidence',
-      description: 'Configured Dockerized monorepo with automated migration scripts and pre-commit hooks.',
+    // Aarav's Submissions (2 Pending Reviews, 4 Approved)
+    const aaravSub1: InMemorySubmissionRecord = {
+      id: 'sub-ghr-101',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      taskId: 'task-ghr-101',
+      studentId: 'user-ghristu-student-1',
+      title: 'Architecture Blueprint & Container Setup',
+      description: 'Initialized monorepo with PostgreSQL container, strict TypeScript, and system architecture blueprint.',
       evidenceType: EvidenceType.GITHUB_REPO,
-      evidenceUrl: 'https://github.com/mit-students/internos-platform',
+      evidenceUrl: 'https://github.com/ghristu-demo/enterprise-portal',
+      attachmentName: 'GHRISTU_System_Architecture_v1.pdf',
       status: SubmissionStatus.ACCEPTED,
       submittedAt: new Date('2026-06-14'),
       updatedAt: new Date('2026-06-15'),
-      mentorFeedback: 'Clean monorepo structure and fast Docker bootstrap. Excellent work Aarav.',
+      mentorFeedback: 'Thorough architecture diagrams and reproducible container configuration. Approved.',
       mentorRating: 5,
-      mentorStrengths: 'Attention to detail in container optimization.',
-      mentorNextAction: 'Proceed to Authentication & RBAC implementation.',
+      mentorStrengths: 'Deep understanding of multi-tier system scalability.',
+      mentorNextAction: 'Proceed to Database Schema modeling.',
       reviewedAt: new Date('2026-06-15'),
     };
-    const mitSub2: InMemorySubmissionRecord = {
-      id: 'sub-mit-102',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      taskId: 'task-mit-102',
-      studentId: 'user-mit-student-1',
-      title: 'Multi-Tenant Authentication & RBAC Engine Evidence',
-      description: 'Implemented JWT token verification with organization scoping and comprehensive Jest tests.',
+    const aaravSub2: InMemorySubmissionRecord = {
+      id: 'sub-ghr-102',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      taskId: 'task-ghr-102',
+      studentId: 'user-ghristu-student-1',
+      title: 'Database Schema & Multi-Tenant Data Models',
+      description: 'Implemented relational models with foreign key constraints, organizationId filters, and seed migrations.',
+      evidenceType: EvidenceType.GITHUB_REPO,
+      evidenceUrl: 'https://github.com/ghristu-demo/enterprise-portal/tree/main/prisma',
+      attachmentName: 'schema-verification-report.pdf',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-07-14'),
+      updatedAt: new Date('2026-07-15'),
+      mentorFeedback: 'Clean schema design with comprehensive indexes. Excellent attention to tenant isolation.',
+      mentorRating: 5,
+      mentorStrengths: 'High attention to data normalization and security.',
+      mentorNextAction: 'Implement REST endpoints with JWT validation.',
+      reviewedAt: new Date('2026-07-15'),
+    };
+    const aaravSub3: InMemorySubmissionRecord = {
+      id: 'sub-ghr-103',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      taskId: 'task-ghr-103',
+      studentId: 'user-ghristu-student-1',
+      title: 'REST API Implementation & JWT Authentication',
+      description: 'Built RESTful endpoints with HMAC token verification, role permissions, and Swagger documentation.',
       evidenceType: EvidenceType.GITHUB_PR,
-      evidenceUrl: 'https://github.com/mit-students/internos-platform/pull/4',
+      evidenceUrl: 'https://github.com/ghristu-demo/enterprise-portal/pull/3',
+      attachmentName: 'api-documentation-openapi.pdf',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-08-08'),
+      updatedAt: new Date('2026-08-10'),
+      mentorFeedback: 'Well-structured middleware and complete test coverage for positive and negative auth paths.',
+      mentorRating: 5,
+      mentorStrengths: 'Production-grade code formatting and comprehensive error handling.',
+      mentorNextAction: 'Connect frontend user interface.',
+      reviewedAt: new Date('2026-08-10'),
+    };
+    const aaravSub4: InMemorySubmissionRecord = {
+      id: 'sub-ghr-104',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      taskId: 'task-ghr-104',
+      studentId: 'user-ghristu-student-1',
+      title: 'Authentication UI & Responsive Interface Evidence',
+      description: 'Developed modern responsive dashboard with dark mode support and accessible form controls.',
+      evidenceType: EvidenceType.GITHUB_PR,
+      evidenceUrl: 'https://github.com/ghristu-demo/enterprise-portal/pull/7',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-08-28'),
+      updatedAt: new Date('2026-08-30'),
+      mentorFeedback: 'Smooth interactions and responsive layout works well on desktop and mobile viewports.',
+      mentorRating: 4,
+      mentorStrengths: 'Clean CSS utility structure.',
+      mentorNextAction: 'Wire up real API endpoints.',
+      reviewedAt: new Date('2026-08-30'),
+    };
+    // Pending Review 1
+    const aaravSub5: InMemorySubmissionRecord = {
+      id: 'sub-ghr-105',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      taskId: 'task-ghr-105',
+      studentId: 'user-ghristu-student-1',
+      title: 'REST API Integration Deliverable',
+      description: 'Connected frontend components to backend REST endpoints with optimistic updates and retry logic.',
+      evidenceType: EvidenceType.GITHUB_PR,
+      evidenceUrl: 'https://github.com/ghristu-demo/enterprise-portal/pull/14',
+      status: SubmissionStatus.SUBMITTED,
+      submittedAt: new Date('2026-09-17T10:00:00Z'),
+      updatedAt: new Date('2026-09-17T10:00:00Z'),
+    };
+    // Pending Review 2
+    const aaravSub6: InMemorySubmissionRecord = {
+      id: 'sub-ghr-106',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-1',
+      taskId: 'task-ghr-106',
+      studentId: 'user-ghristu-student-1',
+      title: 'CI/CD Pipeline & Staging Deployment Evidence',
+      description: 'Automated GitHub Actions workflow building multi-stage Docker images and deployed to staging cloud.',
+      evidenceType: EvidenceType.LIVE_URL,
+      evidenceUrl: 'https://staging.ghristu-internos.app',
+      attachmentName: 'github-actions-pipeline-log.pdf',
+      status: SubmissionStatus.SUBMITTED,
+      submittedAt: new Date('2026-09-18T09:30:00Z'),
+      updatedAt: new Date('2026-09-18T09:30:00Z'),
+    };
+    this.submissions.set(aaravSub1.id, aaravSub1);
+    this.submissions.set(aaravSub2.id, aaravSub2);
+    this.submissions.set(aaravSub3.id, aaravSub3);
+    this.submissions.set(aaravSub4.id, aaravSub4);
+    this.submissions.set(aaravSub5.id, aaravSub5);
+    this.submissions.set(aaravSub6.id, aaravSub6);
+
+    // ==========================================
+    // Ananya Patil @ Infosys (internship-ghristu-2, Mentor: Priya Nair)
+    // ==========================================
+    const ananyaM1: InMemoryMilestone = {
+      id: 'ms-ananya-1',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-2',
+      title: 'Milestone 1: Cloud Architecture & Terraform Setup',
+      description: 'Infrastructure as Code initialization for Infosys cloud client environment.',
+      order: 1,
+      startDate: new Date('2026-06-15'),
+      dueDate: new Date('2026-07-31'),
+      progress: 100,
+      status: 'COMPLETED',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const ananyaM2: InMemoryMilestone = {
+      id: 'ms-ananya-2',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-2',
+      title: 'Milestone 2: Kubernetes Container Orchestration',
+      description: 'Deploy microservices into managed Kubernetes clusters with ingress routing.',
+      order: 2,
+      startDate: new Date('2026-08-01'),
+      dueDate: new Date('2026-10-15'),
+      progress: 60,
+      status: 'IN_PROGRESS',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.milestones.set(ananyaM1.id, ananyaM1);
+    this.milestones.set(ananyaM2.id, ananyaM2);
+
+    const ananyaT1: InMemoryTask = {
+      id: 'task-ananya-201',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-2',
+      milestoneId: 'ms-ananya-1',
+      title: 'Terraform Modules for Cloud VPC & Subnets',
+      description: 'Write reproducible IaC modules for private VPC networks and firewall policies.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-07-20'),
+      learningOutcomeId: 'out-ghristu-po2',
+      expectedEvidence: 'GitHub Repository with Terraform configs',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const ananyaT2: InMemoryTask = {
+      id: 'task-ananya-202',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-2',
+      milestoneId: 'ms-ananya-2',
+      title: 'Kubernetes Helm Charts & Ingress Configuration',
+      description: 'Package microservices into Helm charts with automated rollback triggers.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-09-10'),
+      learningOutcomeId: 'out-ghristu-po2',
+      expectedEvidence: 'GitHub PR with verified Helm lint outputs',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.tasks.set(ananyaT1.id, ananyaT1);
+    this.tasks.set(ananyaT2.id, ananyaT2);
+
+    const ananyaSub1: InMemorySubmissionRecord = {
+      id: 'sub-ananya-201',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-2',
+      taskId: 'task-ananya-201',
+      studentId: 'user-ghristu-student-2',
+      title: 'Terraform VPC & Cloud Network Automation',
+      description: 'Delivered Terraform scripts provisioned on AWS/GCP with security groups and private routing.',
+      evidenceType: EvidenceType.GITHUB_REPO,
+      evidenceUrl: 'https://github.com/ghristu-demo/cloud-infra-terraform',
       status: SubmissionStatus.ACCEPTED,
       submittedAt: new Date('2026-07-19'),
       updatedAt: new Date('2026-07-20'),
-      mentorFeedback: 'Solid multi-tenant middleware implementation with strict security checks. Approved.',
+      mentorFeedback: 'Modular Terraform code following enterprise cloud standards. Well done Ananya.',
       mentorRating: 5,
-      mentorStrengths: 'High test coverage including negative authorization test cases.',
       reviewedAt: new Date('2026-07-20'),
     };
-    const mitSub3: InMemorySubmissionRecord = {
-      id: 'sub-mit-103',
-      organizationId: mitOrgId,
-      internshipId: 'internship-mit-1',
-      taskId: 'task-mit-103',
-      studentId: 'user-mit-student-1',
-      title: 'High-Throughput Data Pipeline & Caching Deliverable',
-      description: 'Integrated Redis cache with BullMQ job queues and benchmarked throughput under simulated load.',
-      evidenceType: EvidenceType.GITHUB_PR,
-      evidenceUrl: 'https://github.com/mit-students/internos-platform/pull/11',
-      status: SubmissionStatus.SUBMITTED,
-      submittedAt: new Date('2026-09-17T11:00:00Z'),
-      updatedAt: new Date('2026-09-17T11:00:00Z'),
+    this.submissions.set(ananyaSub1.id, ananyaSub1);
+
+    // ==========================================
+    // Rohan Joshi @ Persistent Systems (internship-ghristu-3, Mentor: Amit Kulkarni)
+    // ==========================================
+    const rohanM1: InMemoryMilestone = {
+      id: 'ms-rohan-1',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-3',
+      title: 'Milestone 1: Data Ingestion & ETL Pipelines',
+      description: 'Setup Apache Airflow workflows and Python data ingestion scripts.',
+      order: 1,
+      startDate: new Date('2026-07-01'),
+      dueDate: new Date('2026-08-31'),
+      progress: 100,
+      status: 'COMPLETED',
+      createdAt: now,
+      updatedAt: now,
     };
-    this.submissions.set(mitSub1.id, mitSub1);
-    this.submissions.set(mitSub2.id, mitSub2);
-    this.submissions.set(mitSub3.id, mitSub3);
+    const rohanM2: InMemoryMilestone = {
+      id: 'ms-rohan-2',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-3',
+      title: 'Milestone 2: Analytics Warehousing & Reporting Dashboards',
+      description: 'Build BigQuery analytical tables and real-time dashboard visualizations.',
+      order: 2,
+      startDate: new Date('2026-09-01'),
+      dueDate: new Date('2026-11-15'),
+      progress: 40,
+      status: 'IN_PROGRESS',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.milestones.set(rohanM1.id, rohanM1);
+    this.milestones.set(rohanM2.id, rohanM2);
+
+    const rohanT1: InMemoryTask = {
+      id: 'task-rohan-301',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-3',
+      milestoneId: 'ms-rohan-1',
+      title: 'Airflow Ingestion Pipeline Implementation',
+      description: 'Build robust ETL data pipelines with retry mechanisms and data quality checks.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-08-15'),
+      learningOutcomeId: 'out-ghristu-po1',
+      expectedEvidence: 'GitHub Repository with DAG definitions and test runs',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.tasks.set(rohanT1.id, rohanT1);
+
+    const rohanSub1: InMemorySubmissionRecord = {
+      id: 'sub-rohan-301',
+      organizationId: ghristuOrgId,
+      internshipId: 'internship-ghristu-3',
+      taskId: 'task-rohan-301',
+      studentId: 'user-ghristu-student-3',
+      title: 'Airflow ETL DAGs Deliverable',
+      description: 'Created production DAGs handling 50k events daily with automated data quality checks.',
+      evidenceType: EvidenceType.GITHUB_REPO,
+      evidenceUrl: 'https://github.com/ghristu-demo/data-pipeline-airflow',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-08-14'),
+      updatedAt: new Date('2026-08-15'),
+      mentorFeedback: 'Impressive ETL architecture with error-handling alert webhooks. Great work Rohan.',
+      mentorRating: 5,
+      reviewedAt: new Date('2026-08-15'),
+    };
+    this.submissions.set(rohanSub1.id, rohanSub1);
   }
 }
 
@@ -1908,6 +2220,24 @@ export class StudentMentorService {
    */
   async getStudentProfile(organizationId: string, studentUser: AuthenticatedUser) {
     const dept = tenantStore.departments.get(studentUser.departmentId || '');
+    let rollNumber = 'GHR-CSE-2026-041';
+    let program = 'B.Tech Computer Engineering';
+    let year = 'Third Year';
+
+    if (studentUser.email.includes('ananya')) {
+      rollNumber = 'GHR-IT-2026-057';
+      program = 'B.Tech Information Technology';
+      year = 'Third Year';
+    } else if (studentUser.email.includes('rohan')) {
+      rollNumber = 'GHR-BCA-2026-023';
+      program = 'BCA';
+      year = 'Second Year';
+    } else if (studentUser.email.includes('sneha')) {
+      rollNumber = 'GHR-CSE-2026-089';
+      program = 'B.Tech CSE';
+      year = 'Final Year';
+    }
+
     return {
       id: studentUser.id,
       firstName: studentUser.firstName,
@@ -1915,10 +2245,12 @@ export class StudentMentorService {
       email: studentUser.email,
       role: studentUser.role,
       department: dept?.name || 'Computer Engineering',
-      departmentCode: dept?.code || 'CS',
-      rollNumber: '2023-CS-101',
+      departmentCode: dept?.code || 'CE',
+      program,
+      year,
+      rollNumber,
       batchYear: 2026,
-      cgpa: 3.85,
+      cgpa: 3.88,
     };
   }
 
@@ -2000,15 +2332,26 @@ export class StudentMentorService {
       };
     });
 
+    // Calculate verified outcomes count for mentor's interns
+    const verifiedOutcomesCount = allOutcomes.filter((o) => {
+      const outTasks = allTasks.filter((t) => t.learningOutcomeId === o.id);
+      return outTasks.length > 0 && outTasks.every((t) => t.status === TaskStatus.APPROVED);
+    }).length;
+
+    // Resolve primary mentor company name
+    const primaryInternship = internships[0];
+    const mentorCompany = primaryInternship ? internshipStore.companies.get(primaryInternship.companyId) : null;
+    const companyName = mentorCompany?.name || (mentorUser.email.includes('tcs') ? 'Tata Consultancy Services' : mentorUser.email.includes('infosys') ? 'Infosys' : mentorUser.email.includes('persistent') ? 'Persistent Systems' : 'Industry Partner');
+
     return {
       mentorName: `${mentorUser.firstName} ${mentorUser.lastName}`,
-      companyName: 'Google Cloud Solutions',
+      companyName,
       stats: {
         assignedInterns: interns.length,
         activeInternships: activeInternships.length,
         pendingReviews: pendingReviews.length,
         tasksAwaitingReview,
-        outcomesRequiringEvidence: Math.max(0, allOutcomes.length - 2),
+        outcomesRequiringEvidence: Math.max(0, allOutcomes.length - verifiedOutcomesCount),
       },
       recentSubmissions,
       interns,

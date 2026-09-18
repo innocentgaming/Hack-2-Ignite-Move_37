@@ -126,12 +126,12 @@ export class InternshipStore {
       updatedAt: seedDate,
     });
 
-    // Seed Companies for MIT_PUNE
+    // Seed Companies for GHRISTU_PUNE (demo-ghristu-pune)
     this.companies.set('company-tcs', {
       id: 'company-tcs',
-      organizationId: 'demo-mit-pune',
+      organizationId: 'demo-ghristu-pune',
       name: 'Tata Consultancy Services',
-      industry: 'Enterprise Cloud Solutions',
+      industry: 'Enterprise Cloud & Digital Solutions',
       website: 'https://www.tcs.com',
       address: 'Sahyadri Park, Hinjawadi Phase 3, Pune, Maharashtra',
       isVerified: true,
@@ -140,11 +140,33 @@ export class InternshipStore {
     });
     this.companies.set('company-infosys', {
       id: 'company-infosys',
-      organizationId: 'demo-mit-pune',
-      name: 'Infosys Limited',
-      industry: 'Applied AI & Cloud Platforms',
+      organizationId: 'demo-ghristu-pune',
+      name: 'Infosys',
+      industry: 'Cloud Infrastructure & DevOps Platforms',
       website: 'https://www.infosys.com',
       address: 'Plot No. 1, Pune Infotech Park, Hinjawadi, Pune, Maharashtra',
+      isVerified: true,
+      createdAt: seedDate,
+      updatedAt: seedDate,
+    });
+    this.companies.set('company-persistent', {
+      id: 'company-persistent',
+      organizationId: 'demo-ghristu-pune',
+      name: 'Persistent Systems',
+      industry: 'Enterprise Software & Data Analytics',
+      website: 'https://www.persistent.com',
+      address: 'Bhageerath, 402, Senapati Bapat Road, Pune, Maharashtra',
+      isVerified: true,
+      createdAt: seedDate,
+      updatedAt: seedDate,
+    });
+    this.companies.set('company-techmahindra', {
+      id: 'company-techmahindra',
+      organizationId: 'demo-ghristu-pune',
+      name: 'Tech Mahindra',
+      industry: 'AI, Autonomous Systems & ML Engineering',
+      website: 'https://www.techmahindra.com',
+      address: 'Rajiv Gandhi Infotech Park, Phase 3, Hinjawadi, Pune, Maharashtra',
       isVerified: true,
       createdAt: seedDate,
       updatedAt: seedDate,
@@ -258,42 +280,84 @@ export class InternshipStore {
       }
     );
 
-    // Seed Internships for MIT_PUNE
+    // Seed Internships for GHRISTU_PUNE (demo-ghristu-pune)
+    // Internship 1: Aarav Sharma @ TCS (Full Stack Software Engineering Intern, Mentor: Rahul Mehta)
     this.syncSeedInternship(
-      'internship-mit-1',
-      'demo-mit-pune',
-      'user-mit-student-1',
+      'internship-ghristu-1',
+      'demo-ghristu-pune',
+      'user-ghristu-student-1',
       'company-tcs',
-      'Full Stack Cloud Engineering Internship',
+      'Full Stack Software Engineering Intern',
       'FULL_TIME',
       InternshipStatus.ACTIVE,
       new Date('2026-06-01'),
       new Date('2026-11-30'),
-      'user-mit-mentor-1',
+      'user-ghristu-mentor-1',
       {
         name: 'Rahul Mehta',
-        email: 'rahul.mehta@tcs.com',
+        email: 'rahul.mehta@ghristu-demo.in',
         designation: 'Tech Lead & Industry Mentor',
         phone: '+91 9822012345',
       }
     );
 
+    // Internship 2: Ananya Patil @ Infosys (Cloud & DevOps Engineering Intern, Mentor: Priya Nair)
     this.syncSeedInternship(
-      'internship-mit-2',
-      'demo-mit-pune',
-      'user-mit-student-2',
+      'internship-ghristu-2',
+      'demo-ghristu-pune',
+      'user-ghristu-student-2',
       'company-infosys',
-      'AI & Enterprise Automation Internship',
+      'Cloud & DevOps Engineering Intern',
+      'FULL_TIME',
+      InternshipStatus.ACTIVE,
+      new Date('2026-06-15'),
+      new Date('2026-12-15'),
+      'user-ghristu-mentor-2',
+      {
+        name: 'Priya Nair',
+        email: 'priya.nair@ghristu-demo.in',
+        designation: 'Corporate Project Mentor',
+        phone: '+91 9822055667',
+      }
+    );
+
+    // Internship 3: Rohan Joshi @ Persistent Systems (Data Analytics Intern, Mentor: Amit Kulkarni)
+    this.syncSeedInternship(
+      'internship-ghristu-3',
+      'demo-ghristu-pune',
+      'user-ghristu-student-3',
+      'company-persistent',
+      'Data Analytics Intern',
       'FULL_TIME',
       InternshipStatus.ACTIVE,
       new Date('2026-07-01'),
       new Date('2026-12-31'),
-      'user-mit-mentor-2',
+      'user-ghristu-mentor-3',
       {
-        name: 'Priya Nair',
-        email: 'priya.nair@infosys.com',
-        designation: 'Corporate Project Mentor',
-        phone: '+91 9822055667',
+        name: 'Amit Kulkarni',
+        email: 'amit.kulkarni@ghristu-demo.in',
+        designation: 'Principal Data Engineer',
+        phone: '+91 9822077889',
+      }
+    );
+
+    // Internship 4: Sneha Kulkarni @ Tech Mahindra (AI & Machine Learning Intern, Mentor: Vikram Deshmukh)
+    this.syncSeedInternship(
+      'internship-ghristu-4',
+      'demo-ghristu-pune',
+      'user-ghristu-student-4',
+      'company-techmahindra',
+      'AI & Machine Learning Intern',
+      'FULL_TIME',
+      InternshipStatus.PENDING_APPROVAL,
+      new Date('2026-08-01'),
+      new Date('2027-01-31'),
+      'user-ghristu-mentor-4',
+      {
+        name: 'Vikram Deshmukh',
+        email: 'vikram.deshmukh@ghristu-demo.in',
+        designation: 'AI Research Director',
+        phone: '+91 9822099001',
       }
     );
   }
@@ -923,8 +987,8 @@ export class InternshipService {
     }
 
     const role = normalizeRole(user.role);
-    if (role !== UserRole.ADMIN) {
-      throw new TenantViolationError('Only Administrators can assign coordinators');
+    if (![UserRole.HOD, UserRole.ADMIN].includes(role)) {
+      throw new TenantViolationError('Only HOD or Admin can assign faculty coordinators');
     }
 
     if (!dto.facultyId) {
@@ -1022,6 +1086,11 @@ export class InternshipService {
     // Role-based visibility
     if (role === UserRole.STUDENT) {
       list = list.filter((d) => d.studentId === user.id);
+    } else if (role === UserRole.FACULTY) {
+      const assigned = list.filter((d) => d.facultyId === user.id);
+      if (assigned.length > 0) {
+        list = assigned;
+      }
     } else if (role === UserRole.MENTOR) {
       list = list.filter((d) => (d as any).industryMentorId === user.id || (d as any).mentorId === user.id || d.mentor?.email === user.email);
     }

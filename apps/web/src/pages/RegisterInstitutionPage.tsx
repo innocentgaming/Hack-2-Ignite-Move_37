@@ -129,7 +129,7 @@ export const RegisterInstitutionPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 space-y-6 max-w-2xl w-full mx-auto my-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 max-w-2xl w-full mx-auto my-3 sm:my-6">
       {/* Back Button */}
       <div className="flex items-center justify-between">
         <Link

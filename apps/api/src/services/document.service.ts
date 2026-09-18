@@ -93,32 +93,32 @@ class DocumentStore {
       uploadedAt: now,
     };
 
-    const docMit1: InMemoryDocumentRecord = {
-      id: 'doc-mit-1',
-      organizationId: 'demo-mit-pune',
-      ownerId: 'user-mit-admin',
+    const docGhristu1: InMemoryDocumentRecord = {
+      id: 'doc-ghristu-1',
+      organizationId: 'demo-ghristu-pune',
+      ownerId: 'user-ghristu-admin',
       entityRelation: {
         entityType: 'INSTITUTION',
-        entityId: 'demo-mit-pune',
+        entityId: 'demo-ghristu-pune',
       },
-      storageKey: 'demo-mit-pune/docs/MIT_Pune_Internship_Guidelines_2026.pdf',
-      filename: 'MIT_Pune_Internship_Guidelines_2026.pdf',
+      storageKey: 'demo-ghristu-pune/docs/GHRISTU_Internship_Policy_2026.pdf',
+      filename: 'GHRISTU_Internship_Policy_2026.pdf',
       mimeType: 'application/pdf',
       size: 1048576,
       isPrivate: false,
       uploadedAt: now,
     };
 
-    const docMit2: InMemoryDocumentRecord = {
-      id: 'doc-mit-2',
-      organizationId: 'demo-mit-pune',
-      ownerId: 'user-mit-student-1',
+    const docGhristu2: InMemoryDocumentRecord = {
+      id: 'doc-ghristu-2',
+      organizationId: 'demo-ghristu-pune',
+      ownerId: 'user-ghristu-student-1',
       entityRelation: {
         entityType: 'INTERNSHIP',
-        entityId: 'internship-mit-1',
+        entityId: 'internship-ghristu-1',
       },
-      storageKey: 'demo-mit-pune/docs/Infosys_Aarav_Sharma_Offer_Letter.pdf',
-      filename: 'Infosys_Aarav_Sharma_Offer_Letter.pdf',
+      storageKey: 'demo-ghristu-pune/docs/TCS_Aarav_Sharma_Internship_Offer.pdf',
+      filename: 'TCS_Aarav_Sharma_Internship_Offer.pdf',
       mimeType: 'application/pdf',
       size: 524288,
       isPrivate: true,
@@ -128,8 +128,8 @@ class DocumentStore {
     this.documents.set(doc1.id, doc1);
     this.documents.set(doc2.id, doc2);
     this.documents.set(docB1.id, docB1);
-    this.documents.set(docMit1.id, docMit1);
-    this.documents.set(docMit2.id, docMit2);
+    this.documents.set(docGhristu1.id, docGhristu1);
+    this.documents.set(docGhristu2.id, docGhristu2);
   }
 }
 
@@ -264,6 +264,8 @@ export class DocumentService {
           if (internship.studentId === callerId) return true;
           // Mentor assigned to internship
           if (internship.mentorId === callerId) return true;
+          // Faculty coordinator assigned to internship
+          if (internship.facultyId === callerId) return true;
         }
       }
 
@@ -274,6 +276,7 @@ export class DocumentService {
           const internship = internshipStore.details.get(sub.internshipId);
           if (internship) {
             if (internship.mentorId === callerId) return true;
+            if (internship.facultyId === callerId) return true;
           }
         }
       }

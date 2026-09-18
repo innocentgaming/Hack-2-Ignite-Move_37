@@ -199,8 +199,8 @@ export class CompletionService {
     }
 
     const role = normalizeRole(evaluator.role);
-    if (![UserRole.MENTOR, UserRole.ADMIN].includes(role)) {
-      throw new ForbiddenError('Only assigned mentor or institutional administrator can evaluate');
+    if (![UserRole.MENTOR, UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN].includes(role)) {
+      throw new ForbiddenError('Only assigned mentor, faculty, or institutional supervisor can evaluate');
     }
 
     let criteria = dto.criteria;
@@ -333,7 +333,7 @@ export class CompletionService {
     }
 
     const role = normalizeRole(evaluator.role);
-    if (evaluation.evaluatorId !== evaluator.id && role !== UserRole.ADMIN) {
+    if (evaluation.evaluatorId !== evaluator.id && ![UserRole.ADMIN, UserRole.HOD].includes(role)) {
       throw new ForbiddenError('Only original evaluator or administrators can update this evaluation');
     }
 
@@ -416,8 +416,8 @@ export class CompletionService {
     }
 
     const role = normalizeRole(approverUser.role);
-    if (![UserRole.MENTOR, UserRole.ADMIN].includes(role)) {
-      throw new ForbiddenError('Only assigned mentor or institutional Administrator can confirm completion');
+    if (![UserRole.MENTOR, UserRole.ADMIN, UserRole.FACULTY, UserRole.HOD].includes(role)) {
+      throw new ForbiddenError('Only assigned mentor, faculty coordinator, or institutional Administrator can confirm completion');
     }
 
     const notes = (dto.notes || dto.facultyNotes || '').trim();
@@ -592,6 +592,8 @@ export class CompletionService {
     // Collect timeline
     const timeline = await monitoringService.getLifecycleTimeline(organizationId, user, internshipId);
 
+    const facultyConf = completionStore.confirmations.get(internshipId);
+
     return {
       internship: workspaceService.mapInternshipDetailToDto(detail),
       company: {
@@ -613,6 +615,7 @@ export class CompletionService {
         completedAt: detail.updatedAt.toISOString(),
       },
       finalEvaluation: finalEval,
+      facultyConfirmation: facultyConf,
       outcomes: detail.expectedOutcomes,
       evidenceFiles,
       milestoneFeedback,
@@ -723,8 +726,8 @@ export class CompletionService {
     }
 
     const role = normalizeRole(approverUser.role);
-    if (role !== UserRole.ADMIN) {
-      throw new ForbiddenError('Only Admin can approve internship termination');
+    if (![UserRole.HOD, UserRole.ADMIN].includes(role)) {
+      throw new ForbiddenError('Only HOD or Admin can approve internship termination');
     }
 
     if (!dto.reason || !dto.reason.trim()) {

@@ -16,6 +16,8 @@ import {
   UserFilterQuery,
   UserListItemDto,
   AdminDashboardMetrics,
+  HODDashboardMetrics,
+  FacultyDashboardMetrics,
   MentorDashboardMetrics,
   InstitutionProfileDto,
   UpdateInstitutionDto,
@@ -77,55 +79,115 @@ class TenantStore {
   public seedDefaults() {
     const now = new Date('2026-09-01T00:00:00Z');
 
-    // 1. Departments for MIT_PUNE (demo-mit-pune)
-    this.departments.set('dept-mit-cse', {
-      id: 'dept-mit-cse',
-      organizationId: 'demo-mit-pune',
-      code: 'CSE',
-      name: 'Computer Science & Engineering',
-      description: 'Department of Computer Science & Engineering - Autonomous B.Tech & M.Tech Programs',
+    // 1. 10 Academic Departments for GHRISTU_PUNE (demo-ghristu-pune)
+    this.departments.set('dept-ghristu-ce', {
+      id: 'dept-ghristu-ce',
+      organizationId: 'demo-ghristu-pune',
+      code: 'CE',
+      name: 'Computer Engineering',
+      description: 'Department of Computer Engineering - B.Tech & M.Tech Programs in Software Systems & Architecture',
       isActive: true,
       createdAt: now,
       updatedAt: now,
     });
-    this.departments.set('dept-mit-entc', {
-      id: 'dept-mit-entc',
-      organizationId: 'demo-mit-pune',
-      code: 'ENTC',
-      name: 'Electronics & Telecommunication',
-      description: 'Department of E&TC - Embedded Systems, IoT, and Signal Processing',
+    this.departments.set('dept-ghristu-it', {
+      id: 'dept-ghristu-it',
+      organizationId: 'demo-ghristu-pune',
+      code: 'IT',
+      name: 'Information Technology',
+      description: 'Department of Information Technology - Cloud Engineering, DevOps & Cybersecurity',
       isActive: true,
       createdAt: now,
       updatedAt: now,
     });
-    this.departments.set('dept-mit-mech', {
-      id: 'dept-mit-mech',
-      organizationId: 'demo-mit-pune',
+    this.departments.set('dept-ghristu-csa', {
+      id: 'dept-ghristu-csa',
+      organizationId: 'demo-ghristu-pune',
+      code: 'CSA',
+      name: 'Computer Science & Applications',
+      description: 'School of Computer Science & Applications - BCA, MCA & Applied Software Systems',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-aids', {
+      id: 'dept-ghristu-aids',
+      organizationId: 'demo-ghristu-pune',
+      code: 'AIDS',
+      name: 'Artificial Intelligence & Data Science',
+      description: 'Department of AI & Data Science - Machine Learning, Big Data & Generative AI Systems',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-etc', {
+      id: 'dept-ghristu-etc',
+      organizationId: 'demo-ghristu-pune',
+      code: 'ETC',
+      name: 'Electronics & Telecommunication Engineering',
+      description: 'Department of E&TC - Embedded Systems, IoT, Edge Computing & Signal Processing',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-mech', {
+      id: 'dept-ghristu-mech',
+      organizationId: 'demo-ghristu-pune',
       code: 'MECH',
       name: 'Mechanical Engineering',
-      description: 'Department of Mechanical Engineering - Mechatronics, Robotics, and Manufacturing',
+      description: 'Department of Mechanical Engineering - Mechatronics, Robotics & Automation',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-civil', {
+      id: 'dept-ghristu-civil',
+      organizationId: 'demo-ghristu-pune',
+      code: 'CIVIL',
+      name: 'Civil Engineering',
+      description: 'Department of Civil Engineering - Sustainable Infrastructure & Smart Cities',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-mgmt', {
+      id: 'dept-ghristu-mgmt',
+      organizationId: 'demo-ghristu-pune',
+      code: 'MGMT',
+      name: 'Commerce & Management',
+      description: 'School of Commerce & Management - Business Analytics & Technology Management',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-sci', {
+      id: 'dept-ghristu-sci',
+      organizationId: 'demo-ghristu-pune',
+      code: 'SCI',
+      name: 'Science',
+      description: 'School of Science - Applied Computing & Computational Sciences',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-ghristu-des', {
+      id: 'dept-ghristu-des',
+      organizationId: 'demo-ghristu-pune',
+      code: 'DES',
+      name: 'Design',
+      description: 'School of Design - UI/UX Design, Industrial Design & Product Innovation',
       isActive: true,
       createdAt: now,
       updatedAt: now,
     });
 
-    // 2. Departments for ORG_A
+    // 2. Departments for ORG_A (Test fixture)
     this.departments.set('dept-a-cs', {
       id: 'dept-a-cs',
       organizationId: 'org-a-id',
       code: 'CS',
-      name: 'Computer Science Department',
-      description: 'Department of Computer Science & Engineering',
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    });
-    this.departments.set('dept-a-it', {
-      id: 'dept-a-it',
-      organizationId: 'org-a-id',
-      code: 'ITECH',
-      name: 'Information Technology',
-      description: 'Department of Information Technology & Software Systems',
+      name: 'Computer Science',
+      description: 'Department of Computer Science',
       isActive: true,
       createdAt: now,
       updatedAt: now,
@@ -134,85 +196,83 @@ class TenantStore {
       id: 'dept-a-ee',
       organizationId: 'org-a-id',
       code: 'EE',
-      name: 'Electrical Engineering Department',
+      name: 'Electrical Engineering',
       description: 'Department of Electrical Engineering',
       isActive: true,
       createdAt: now,
       updatedAt: now,
     });
 
-    // 3. Departments for ORG_B
+    // 3. Departments for ORG_B (Test fixture)
     this.departments.set('dept-b-me', {
       id: 'dept-b-me',
       organizationId: 'org-b-id',
       code: 'ME',
-      name: 'Mechanical Engineering Department',
+      name: 'Mechanical Engineering',
       description: 'Department of Mechanical Engineering',
       isActive: true,
       createdAt: now,
       updatedAt: now,
     });
-    this.departments.set('dept-b-biotech', {
-      id: 'dept-b-biotech',
-      organizationId: 'org-b-id',
-      code: 'BIO',
-      name: 'Biotechnology Department',
-      description: 'Department of Biotechnology',
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    });
 
-    // 4. Legacy Apex Depts
-    this.departments.set('dept-cse-uuid', {
-      id: 'dept-cse-uuid',
-      organizationId: 'apex-org-demo-uuid',
-      code: 'CSE',
-      name: 'Department of Computer Science & Engineering',
-      description: 'Department of CSE',
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    // Internships for MIT_PUNE
-    this.internships.set('internship-mit-1', {
-      id: 'internship-mit-1',
-      organizationId: 'demo-mit-pune',
-      studentId: 'user-mit-student-1',
+    // Internships for GHRISTU_PUNE
+    // Internship 1: Aarav Sharma @ TCS (Full Stack Software Engineering Intern)
+    this.internships.set('internship-ghristu-1', {
+      id: 'internship-ghristu-1',
+      organizationId: 'demo-ghristu-pune',
+      studentId: 'user-ghristu-student-1',
       companyId: 'company-tcs',
-      title: 'Full Stack Cloud Engineering Internship',
+      title: 'Full Stack Software Engineering Intern',
       type: 'FULL_TIME',
       status: InternshipStatus.ACTIVE,
       startDate: new Date('2026-06-01'),
       endDate: new Date('2026-11-30'),
-      createdAt: new Date(),
+      createdAt: new Date('2026-06-01'),
       updatedAt: new Date(),
     });
-    this.internships.set('internship-mit-2', {
-      id: 'internship-mit-2',
-      organizationId: 'demo-mit-pune',
-      studentId: 'user-mit-student-2',
+
+    // Internship 2: Ananya Patil @ Infosys (Cloud & DevOps Engineering Intern)
+    this.internships.set('internship-ghristu-2', {
+      id: 'internship-ghristu-2',
+      organizationId: 'demo-ghristu-pune',
+      studentId: 'user-ghristu-student-2',
       companyId: 'company-infosys',
-      title: 'AI & Enterprise Automation Internship',
+      title: 'Cloud & DevOps Engineering Intern',
+      type: 'FULL_TIME',
+      status: InternshipStatus.ACTIVE,
+      startDate: new Date('2026-06-15'),
+      endDate: new Date('2026-12-15'),
+      createdAt: new Date('2026-06-15'),
+      updatedAt: new Date(),
+    });
+
+    // Internship 3: Rohan Joshi @ Persistent Systems (Data Analytics Intern)
+    this.internships.set('internship-ghristu-3', {
+      id: 'internship-ghristu-3',
+      organizationId: 'demo-ghristu-pune',
+      studentId: 'user-ghristu-student-3',
+      companyId: 'company-persistent',
+      title: 'Data Analytics Intern',
       type: 'FULL_TIME',
       status: InternshipStatus.ACTIVE,
       startDate: new Date('2026-07-01'),
-      endDate: new Date('2026-12-15'),
-      createdAt: new Date(),
+      endDate: new Date('2026-12-31'),
+      createdAt: new Date('2026-07-01'),
       updatedAt: new Date(),
     });
-    this.internships.set('internship-mit-3', {
-      id: 'internship-mit-3',
-      organizationId: 'demo-mit-pune',
-      studentId: 'user-mit-student-3',
-      companyId: 'company-bharatforge',
-      title: 'Autonomous Systems Software Intern',
-      type: 'PART_TIME',
+
+    // Internship 4: Sneha Kulkarni @ Tech Mahindra (AI & Machine Learning Intern - PENDING APPROVAL)
+    this.internships.set('internship-ghristu-4', {
+      id: 'internship-ghristu-4',
+      organizationId: 'demo-ghristu-pune',
+      studentId: 'user-ghristu-student-4',
+      companyId: 'company-techmahindra',
+      title: 'AI & Machine Learning Intern',
+      type: 'FULL_TIME',
       status: InternshipStatus.PENDING_APPROVAL,
       startDate: new Date('2026-08-01'),
-      endDate: new Date('2026-12-31'),
-      createdAt: new Date(),
+      endDate: new Date('2027-01-31'),
+      createdAt: new Date('2026-08-01'),
       updatedAt: new Date(),
     });
 
@@ -1164,11 +1224,78 @@ export class TenantService {
 
     return {
       totalStudents,
+      totalFaculty: orgUsers.filter((u) => u.role === UserRole.FACULTY).length,
       totalMentors,
+      totalHods: orgUsers.filter((u) => u.role === UserRole.HOD).length,
       totalDepartments,
       activeInternships,
       pendingApprovals,
       departmentBreakdown,
+    };
+  }
+
+  async getHODDashboardMetrics(organizationId: string, userId: string): Promise<HODDashboardMetrics> {
+    const user = authStore.users.get(userId);
+    if (!user || user.organizationId !== organizationId) {
+      throw new UnauthorizedError('HOD user not found in organization context');
+    }
+
+    const dept = Array.from(tenantStore.departments.values()).find(
+      (d) => d.organizationId === organizationId && (d.hodId === userId || d.id === user.departmentId)
+    );
+
+    const deptId = dept ? dept.id : user.departmentId || 'unknown';
+    const deptName = dept ? dept.name : 'Unassigned Department';
+    const deptCode = dept ? dept.code : 'N/A';
+
+    const orgUsers = Array.from(authStore.users.values()).filter((u) => u.organizationId === organizationId);
+    const deptStudents = orgUsers.filter((u) => u.role === UserRole.STUDENT && u.departmentId === deptId);
+    const deptFaculty = orgUsers.filter((u) => u.role === UserRole.FACULTY && u.departmentId === deptId);
+
+    const studentIds = new Set(deptStudents.map((u) => u.id));
+    const deptInternships = Array.from(tenantStore.internships.values()).filter(
+      (i) => i.organizationId === organizationId && studentIds.has(i.studentId)
+    );
+
+    const activeInternships = deptInternships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
+    const pendingApprovals = deptInternships.filter((i) => i.status === InternshipStatus.PENDING_APPROVAL).length;
+    const unassignedInternsCount = deptStudents.filter((s) => !deptInternships.some((i) => i.studentId === s.id)).length;
+
+    return {
+      departmentId: deptId,
+      departmentName: deptName,
+      departmentCode: deptCode,
+      totalStudents: deptStudents.length,
+      totalFaculty: deptFaculty.length,
+      activeInternships,
+      pendingApprovals,
+      unassignedInternsCount,
+    };
+  }
+
+  async getFacultyDashboardMetrics(organizationId: string, facultyId: string): Promise<FacultyDashboardMetrics> {
+    const faculty = authStore.users.get(facultyId);
+    if (!faculty || faculty.organizationId !== organizationId) {
+      throw new UnauthorizedError('Faculty not found in organization context');
+    }
+
+    const orgStudents = Array.from(authStore.users.values()).filter(
+      (u) => u.organizationId === organizationId && u.role === UserRole.STUDENT && u.departmentId === faculty.departmentId
+    );
+    const studentIds = new Set(orgStudents.map((u) => u.id));
+    const internships = Array.from(tenantStore.internships.values()).filter(
+      (i) => i.organizationId === organizationId && studentIds.has(i.studentId)
+    );
+
+    const activeInternshipsCount = internships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
+    const pendingReviewsCount = internships.filter((i) => i.status === InternshipStatus.PENDING_APPROVAL).length;
+
+    return {
+      facultyId,
+      supervisedStudentsCount: orgStudents.length,
+      activeInternshipsCount,
+      pendingReviewsCount,
+      completedEvaluationsCount: 0,
     };
   }
 

@@ -114,7 +114,7 @@ export class CSVImportService {
       const rowErrors: string[] = [];
 
       // Flexible header names
-      const studentId = row['studentid'] || row['student_id'] || row['rollnumber'] || row['roll_no'] || row['id'] || '';
+      const studentId = row['studentid'] || row['student_id'] || row['rollnumber'] || row['roll_number'] || row['roll_no'] || row['id'] || '';
       const fullName = row['name'] || row['fullname'] || row['full_name'] || '';
       const firstNameCol = row['firstname'] || row['first_name'] || '';
       const lastNameCol = row['lastname'] || row['last_name'] || '';

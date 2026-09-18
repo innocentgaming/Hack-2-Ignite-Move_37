@@ -46,6 +46,24 @@ export class MonitoringService {
       return allTenantInternships;
     }
 
+    if (role === UserRole.HOD) {
+      const hodUser = authStore.users.get(user.id);
+      const deptId = hodUser?.departmentId;
+      if (!deptId) return allTenantInternships;
+      return allTenantInternships.filter((d) => {
+        const student = authStore.users.get(d.studentId);
+        return student?.departmentId === deptId;
+      });
+    }
+
+    if (role === UserRole.FACULTY) {
+      const facUser = authStore.users.get(user.id);
+      const assigned = allTenantInternships.filter(
+        (d) => d.facultyId === user.id || (facUser?.departmentId && authStore.users.get(d.studentId)?.departmentId === facUser.departmentId)
+      );
+      return assigned.length > 0 ? assigned : allTenantInternships;
+    }
+
     if (role === UserRole.MENTOR) {
       const mentorUser = authStore.users.get(user.id);
       return allTenantInternships.filter(

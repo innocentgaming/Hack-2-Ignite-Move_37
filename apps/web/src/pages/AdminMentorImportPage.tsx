@@ -30,10 +30,10 @@ export const AdminMentorImportPage: React.FC = () => {
   const [confirming, setConfirming] = useState(false);
   const [importResult, setImportResult] = useState<MentorCsvImportResult | null>(null);
 
-  const sampleCSV = `First Name,Last Name,Email Address,Company,Designation,Phone,Department
-Anand,Deshpande,anand.deshpande@persistent.com,Persistent Systems,Founder & Chairman,9822011223,CSE
-Meera,Kulkarni,meera.kulkarni@tcs.com,Tata Consultancy Services,Principal Architect,9822044556,CSE
-Sanjay,Joshi,sanjay.joshi@tataelxsi.com,Tata Elxsi,Technical Director,9822077889,ENTC`;
+  const sampleCSV = `first_name,last_name,email,company,designation,specialization,department
+Anand,Deshpande,anand.deshpande@ghristu-demo.in,Persistent Systems,Founder & Chairman,Enterprise Architecture,CE
+Meera,Kulkarni,meera.kulkarni@ghristu-demo.in,Tata Consultancy Services,Principal Architect,Cloud Systems,CE
+Sanjay,Joshi,sanjay.joshi@ghristu-demo.in,Infosys,Technical Director,DevOps & Automation,IT`;
 
   const handleLoadSample = () => {
     setCsvText(sampleCSV);

@@ -5,11 +5,14 @@
 
 export enum UserRole {
   ADMIN = 'ADMIN',
+  FACULTY = 'FACULTY',
+  HOD = 'HOD',
   MENTOR = 'MENTOR',
   STUDENT = 'STUDENT',
   // Backwards compatibility legacy aliases
   SUPER_ADMIN = 'SUPER_ADMIN',
   INSTITUTION_ADMIN = 'INSTITUTION_ADMIN',
+  FACULTY_SUPERVISOR = 'FACULTY_SUPERVISOR',
   INDUSTRY_MENTOR = 'INDUSTRY_MENTOR',
 }
 
@@ -561,7 +564,9 @@ export interface CSVImportResult {
 
 export interface AdminDashboardMetrics {
   totalStudents: number;
+  totalFaculty?: number;
   totalMentors: number;
+  totalHods?: number;
   totalDepartments: number;
   activeInternships: number;
   pendingApprovals: number;
@@ -570,9 +575,29 @@ export interface AdminDashboardMetrics {
     departmentName: string;
     departmentCode: string;
     studentCount: number;
+    facultyCount?: number;
     mentorCount?: number;
     internshipCount: number;
   }[];
+}
+
+export interface HODDashboardMetrics {
+  departmentId: string;
+  departmentName: string;
+  departmentCode: string;
+  totalStudents: number;
+  totalFaculty: number;
+  activeInternships: number;
+  pendingApprovals: number;
+  unassignedInternsCount: number;
+}
+
+export interface FacultyDashboardMetrics {
+  facultyId: string;
+  supervisedStudentsCount: number;
+  activeInternshipsCount: number;
+  pendingReviewsCount: number;
+  completedEvaluationsCount: number;
 }
 
 export interface MentorDashboardMetrics {

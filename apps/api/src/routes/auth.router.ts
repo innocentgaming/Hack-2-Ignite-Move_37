@@ -35,7 +35,7 @@ const registerInstitutionSchema = z.object({
 
 const inviteSchema = z.object({
   email: z.string().email('Valid email address is required'),
-  role: z.enum([UserRole.ADMIN, UserRole.MENTOR, UserRole.STUDENT]),
+  role: z.nativeEnum(UserRole),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   departmentId: z.string().optional(),

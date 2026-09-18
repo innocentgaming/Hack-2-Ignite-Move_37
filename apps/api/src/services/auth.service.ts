@@ -59,28 +59,28 @@ class AuthStore {
     const defaultPasswordHash = bcrypt.hashSync('Password123!', 10);
     const seedDate = new Date('2026-09-01T00:00:00Z');
 
-    // 1. Isolated Demo Tenant: MIT Pune (Maharashtra Institute of Technology, Pune)
+    // 1. Isolated Demo Tenant: G H Raisoni International Skill Tech University, Pune
     const orgDemo: InMemoryOrg = {
-      id: 'demo-mit-pune',
-      code: 'MIT_PUNE',
-      name: 'Maharashtra Institute of Technology, Pune',
-      domain: 'mitpune.edu.in',
+      id: 'demo-ghristu-pune',
+      code: 'GHRISTU_PUNE',
+      name: 'G H Raisoni International Skill Tech University, Pune',
+      domain: 'ghristu-demo.in',
       settings: {
         academicYear: '2026-2027',
         semester: 'Semester VII',
-        institutionType: 'AUTONOMOUS_INSTITUTE',
-        officialEmailDomain: 'mitpune.edu.in',
-        phoneNumber: '+91 20 2543 1795',
-        pincode: '411038',
-        accreditationDetails: 'NAAC A+ Autonomous (Grade: 3.65) / NBA Tier-1 Accredited',
-        address: 'Paud Road, Kothrud',
+        institutionType: 'UNIVERSITY',
+        officialEmailDomain: 'ghristu-demo.in',
+        phoneNumber: '+91 20 6678 1234',
+        pincode: '412207',
+        accreditationDetails: 'State Private University / Skill Tech Center of Excellence',
+        address: 'Wagholi, Pune-Ahmednagar Road',
         city: 'Pune',
         state: 'Maharashtra',
         country: 'India',
-        defaultInternshipDurationWeeks: 16,
+        defaultInternshipDurationWeeks: 24,
         requireMentorEvaluation: true,
         allowStudentSelfRegistration: true,
-        contactEmail: 'admin@mitpune.edu.in',
+        contactEmail: 'admin@ghristu-demo.in',
         isDemoAccount: true,
       },
       createdAt: seedDate,
@@ -145,70 +145,112 @@ class AuthStore {
     };
     this.organizations.set(orgApex.id, orgApex);
 
-    // Seed MIT_PUNE Demo Users (ADMIN, MENTOR, STUDENT)
-    const mitPuneUsers: Omit<InMemoryUser, 'createdAt' | 'updatedAt'>[] = [
+    // Seed GHRISTU_PUNE Demo Users (ADMIN, MENTORS, STUDENTS - No Faculty/HOD)
+    const ghristuUsers: Omit<InMemoryUser, 'createdAt' | 'updatedAt'>[] = [
+      // Admin
       {
-        id: 'user-mit-admin',
-        organizationId: 'demo-mit-pune',
-        departmentId: 'dept-mit-cse',
-        email: 'admin@mitpune.edu.in',
+        id: 'user-ghristu-admin',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-ce',
+        email: 'admin@ghristu-demo.in',
         passwordHash: defaultPasswordHash,
-        firstName: 'Rajesh',
-        lastName: 'Kulkarni',
+        firstName: 'Dr. Anil',
+        lastName: 'Deshmukh',
         role: UserRole.ADMIN,
         status: UserStatus.ACTIVE,
       },
+      // Mentor 1 (TCS)
       {
-        id: 'user-mit-mentor-1',
-        organizationId: 'demo-mit-pune',
-        departmentId: 'dept-mit-cse',
-        email: 'rahul.mehta@tcs.com',
+        id: 'user-ghristu-mentor-1',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-ce',
+        email: 'rahul.mehta@ghristu-demo.in',
         passwordHash: defaultPasswordHash,
         firstName: 'Rahul',
         lastName: 'Mehta',
         role: UserRole.MENTOR,
         status: UserStatus.ACTIVE,
       },
+      // Mentor 2 (Infosys)
       {
-        id: 'user-mit-mentor-2',
-        organizationId: 'demo-mit-pune',
-        departmentId: 'dept-mit-cse',
-        email: 'priya.nair@infosys.com',
+        id: 'user-ghristu-mentor-2',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-it',
+        email: 'priya.nair@ghristu-demo.in',
         passwordHash: defaultPasswordHash,
         firstName: 'Priya',
         lastName: 'Nair',
         role: UserRole.MENTOR,
         status: UserStatus.ACTIVE,
       },
+      // Mentor 3 (Persistent Systems)
       {
-        id: 'user-mit-student-1',
-        organizationId: 'demo-mit-pune',
-        departmentId: 'dept-mit-cse',
-        email: 'aarav.sharma@mitpune.edu.in',
+        id: 'user-ghristu-mentor-3',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-csa',
+        email: 'amit.kulkarni@ghristu-demo.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Amit',
+        lastName: 'Kulkarni',
+        role: UserRole.MENTOR,
+        status: UserStatus.ACTIVE,
+      },
+      // Mentor 4 (Tech Mahindra)
+      {
+        id: 'user-ghristu-mentor-4',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-ce',
+        email: 'vikram.deshmukh@ghristu-demo.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Vikram',
+        lastName: 'Deshmukh',
+        role: UserRole.MENTOR,
+        status: UserStatus.ACTIVE,
+      },
+      // Student 1 (Aarav Sharma - B.Tech CE)
+      {
+        id: 'user-ghristu-student-1',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-ce',
+        email: 'aarav.sharma@ghristu-demo.in',
         passwordHash: defaultPasswordHash,
         firstName: 'Aarav',
         lastName: 'Sharma',
         role: UserRole.STUDENT,
         status: UserStatus.ACTIVE,
       },
+      // Student 2 (Ananya Patil - B.Tech IT)
       {
-        id: 'user-mit-student-2',
-        organizationId: 'demo-mit-pune',
-        departmentId: 'dept-mit-cse',
-        email: 'ananya.patil@mitpune.edu.in',
+        id: 'user-ghristu-student-2',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-it',
+        email: 'ananya.patil@ghristu-demo.in',
         passwordHash: defaultPasswordHash,
         firstName: 'Ananya',
         lastName: 'Patil',
         role: UserRole.STUDENT,
         status: UserStatus.ACTIVE,
       },
+      // Student 3 (Rohan Joshi - BCA)
       {
-        id: 'user-mit-student-3',
-        organizationId: 'demo-mit-pune',
-        departmentId: 'dept-mit-entc',
-        email: 'rohan.k@mitpune.edu.in',
+        id: 'user-ghristu-student-3',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-csa',
+        email: 'rohan.joshi@ghristu-demo.in',
         passwordHash: defaultPasswordHash,
         firstName: 'Rohan',
+        lastName: 'Joshi',
+        role: UserRole.STUDENT,
+        status: UserStatus.ACTIVE,
+      },
+      // Student 4 (Sneha Kulkarni - B.Tech CSE)
+      {
+        id: 'user-ghristu-student-4',
+        organizationId: 'demo-ghristu-pune',
+        departmentId: 'dept-ghristu-ce',
+        email: 'sneha.kulkarni@ghristu-demo.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Sneha',
         lastName: 'Kulkarni',
         role: UserRole.STUDENT,
         status: UserStatus.ACTIVE,
@@ -226,6 +268,28 @@ class AuthStore {
         firstName: 'Alice',
         lastName: 'Admin',
         role: UserRole.ADMIN,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-a-hod',
+        organizationId: 'org-a-id',
+        departmentId: 'dept-a-cs',
+        email: 'hod@org-a.com',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Helen',
+        lastName: 'HOD',
+        role: UserRole.HOD,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-a-faculty',
+        organizationId: 'org-a-id',
+        departmentId: 'dept-a-cs',
+        email: 'faculty@org-a.com',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Fiona',
+        lastName: 'Faculty',
+        role: UserRole.FACULTY,
         status: UserStatus.ACTIVE,
       },
       {
@@ -359,7 +423,7 @@ class AuthStore {
       },
     ];
 
-    const allSeed = [...mitPuneUsers, ...orgAUsers, ...orgBUsers, ...legacyUsers];
+    const allSeed = [...ghristuUsers, ...orgAUsers, ...orgBUsers, ...legacyUsers];
     for (const u of allSeed) {
       this.users.set(u.id, {
         ...u,
@@ -573,9 +637,9 @@ export class AuthService {
     const normalizedEmail = email.toLowerCase().trim();
     const normalizedRole = normalizeRole(role);
 
-    // Restrict invited roles to valid platform roles (ADMIN, MENTOR, STUDENT)
-    if (![UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN].includes(normalizedRole)) {
-      throw new ValidationError('Invalid role for organization invite. Only STUDENT, MENTOR, and ADMIN are permitted');
+    // Validate invited role against platform roles
+    if (![UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.FACULTY, UserRole.HOD].includes(normalizedRole)) {
+      throw new ValidationError('Invalid role for organization invite');
     }
 
     // Check if user already exists in this organization

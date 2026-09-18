@@ -85,7 +85,10 @@ export const AnalyticsPage: React.FC = () => {
 
   const fetchDepartments = useCallback(async () => {
     try {
-      const res = await apiClient.get<DepartmentDto[]>('/api/v1/tenants/departments');
+      let res = await apiClient.get<DepartmentDto[]>('/api/v1/admin/departments');
+      if (!res.success || !res.data) {
+        res = await apiClient.get<DepartmentDto[]>('/api/v1/tenants/departments');
+      }
       if (res.success && res.data) {
         setDepartments(res.data);
       }
@@ -231,19 +234,19 @@ ${selectedAssessment.academicCreditReadiness}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <BarChart3 className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
-              Institutional & Department Analytics
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span>Institutional & Department Analytics</span>
             </h1>
             <Badge variant="indigo">Real-Time Aggregates</Badge>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             Aggregated institutional performance, partner distribution, outcome coverage, and mentor workloads.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button
             variant="outline"
             size="sm"

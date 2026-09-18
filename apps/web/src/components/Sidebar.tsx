@@ -24,6 +24,7 @@ import {
   ScrollText,
   Settings,
   Compass,
+  X,
 } from 'lucide-react';
 
 interface NavItem {
@@ -34,7 +35,15 @@ interface NavItem {
   section?: string;
 }
 
-export const Sidebar: React.FC = () => {
+export interface SidebarProps {
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({
+  isMobileOpen = false,
+  onCloseMobile,
+}) => {
   const { user } = useAuth();
   const rawRole = user?.role || UserRole.STUDENT;
   const role = normalizeRole(rawRole);
@@ -256,15 +265,8 @@ export const Sidebar: React.FC = () => {
       ? 'Mentor Workspace'
       : 'Admin Console';
 
-  return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col h-[calc(100vh-4rem)] sticky top-16 border-r border-slate-800 select-none">
-      <div className="p-4 border-b border-slate-800/60">
-        <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          <Compass className="w-4 h-4 text-indigo-400" />
-          <span>{portalTitle}</span>
-        </div>
-      </div>
-
+  const renderNavContent = (onItemClick?: () => void) => (
+    <>
       <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
         {visibleItems.map((item) => (
           <React.Fragment key={item.to}>
@@ -276,6 +278,7 @@ export const Sidebar: React.FC = () => {
             <NavLink
               to={item.to}
               end={item.to === '/app/student' || item.to === '/app/mentor' || item.to === '/app/admin'}
+              onClick={onItemClick}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
@@ -303,7 +306,54 @@ export const Sidebar: React.FC = () => {
           </p>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 bg-slate-900 text-slate-300 h-[calc(100vh-4rem)] sticky top-16 border-r border-slate-800 select-none shrink-0">
+        <div className="p-4 border-b border-slate-800/60">
+          <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <Compass className="w-4 h-4 text-indigo-400" />
+            <span>{portalTitle}</span>
+          </div>
+        </div>
+        {renderNavContent()}
+      </aside>
+
+      {/* Mobile Backdrop */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 md:hidden transition-opacity duration-200"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile Off-canvas Drawer */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-slate-900 text-slate-300 flex flex-col shadow-2xl md:hidden transform transition-transform duration-300 ease-in-out ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <Compass className="w-4 h-4 text-indigo-400" />
+            <span>{portalTitle}</span>
+          </div>
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            aria-label="Close navigation"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        {renderNavContent(onCloseMobile)}
+      </aside>
+    </>
   );
 };
 

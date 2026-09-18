@@ -28,10 +28,10 @@ export const AdminStudentImportPage: React.FC = () => {
   const [confirming, setConfirming] = useState(false);
   const [importResult, setImportResult] = useState<CSVImportResult | null>(null);
 
-  const sampleCSV = `studentId,name,email,department
-CS-2026-101,Aarav Sharma,aarav.sharma@org-a.com,CS
-CS-2026-102,Priya Patel,priya.patel@org-a.com,CS
-EE-2026-201,Rohan Gupta,rohan.gupta@org-a.com,EE`;
+  const sampleCSV = `first_name,last_name,email,roll_number,department,program,year,graduation_year
+Aditya,Kadam,aditya.kadam@ghristu-demo.in,GHR-CSE-2026-102,CE,B.Tech Computer Engineering,Third Year,2027
+Pooja,Deshmukh,pooja.deshmukh@ghristu-demo.in,GHR-IT-2026-108,IT,B.Tech Information Technology,Third Year,2027
+Sameer,Patil,sameer.patil@ghristu-demo.in,GHR-BCA-2026-045,CSA,BCA,Second Year,2028`;
 
   const handleLoadSample = () => {
     setCsvText(sampleCSV);

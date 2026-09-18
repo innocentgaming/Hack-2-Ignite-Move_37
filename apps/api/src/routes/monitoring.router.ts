@@ -12,35 +12,35 @@ router.use(authenticate);
 // Metrics Overview
 router.get(
   '/overview',
-  requireRoles(UserRole.ADMIN, UserRole.MENTOR),
+  requireRoles(UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY, UserRole.MENTOR),
   (req, res, next) => monitoringController.getOverview(req, res, next)
 );
 
 // Monitored Internships with Multi-Dimensional Filtering
 router.get(
   '/internships',
-  requireRoles(UserRole.ADMIN, UserRole.MENTOR),
+  requireRoles(UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY, UserRole.MENTOR),
   (req, res, next) => monitoringController.getInternships(req, res, next)
 );
 
 // Dedicated Attention Queue
 router.get(
   '/attention-queue',
-  requireRoles(UserRole.ADMIN, UserRole.MENTOR),
+  requireRoles(UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY, UserRole.MENTOR),
   (req, res, next) => monitoringController.getAttentionQueue(req, res, next)
 );
 
 // Unified Lifecycle Timeline
 router.get(
   '/internships/:id/timeline',
-  requireRoles(UserRole.ADMIN, UserRole.MENTOR, UserRole.STUDENT),
+  requireRoles(UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY, UserRole.MENTOR, UserRole.STUDENT),
   (req, res, next) => monitoringController.getLifecycleTimeline(req, res, next)
 );
 
 // Direct Health Evaluation for a Single Internship
 router.get(
   '/internships/:id/health',
-  requireRoles(UserRole.ADMIN, UserRole.MENTOR, UserRole.STUDENT),
+  requireRoles(UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY, UserRole.MENTOR, UserRole.STUDENT),
   (req, res, next) => monitoringController.getInternshipHealth(req, res, next)
 );
 

@@ -21,17 +21,17 @@ export const STATE_TRANSITION_RULES: StateTransitionRule[] = [
     to: InternshipStatus.CANCELLED,
     allowedRoles: [UserRole.STUDENT, UserRole.ADMIN],
   },
-  // 3. PENDING_APPROVAL -> APPROVED (Mentor or Admin approves registration)
+  // 3. PENDING_APPROVAL -> APPROVED (Authorized approver approves)
   {
     from: InternshipStatus.PENDING_APPROVAL,
     to: InternshipStatus.APPROVED,
-    allowedRoles: [UserRole.ADMIN, UserRole.MENTOR],
+    allowedRoles: [UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
   },
-  // 4. PENDING_APPROVAL -> REJECTED (Mentor or Admin rejects with reason)
+  // 4. PENDING_APPROVAL -> REJECTED (Authorized approver rejects with reason)
   {
     from: InternshipStatus.PENDING_APPROVAL,
     to: InternshipStatus.REJECTED,
-    allowedRoles: [UserRole.ADMIN, UserRole.MENTOR],
+    allowedRoles: [UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
     requiresReason: true,
   },
   // 5. PENDING_APPROVAL -> CANCELLED (Student withdraws)
@@ -46,57 +46,57 @@ export const STATE_TRANSITION_RULES: StateTransitionRule[] = [
     to: InternshipStatus.DRAFT,
     allowedRoles: [UserRole.STUDENT, UserRole.ADMIN],
   },
-  // 7. APPROVED -> ACTIVE (Internship commences)
+  // 7. APPROVED -> ACTIVE (Internship starts / commencement)
   {
     from: InternshipStatus.APPROVED,
     to: InternshipStatus.ACTIVE,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.STUDENT, UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN],
   },
   // 8. APPROVED -> CANCELLED
   {
     from: InternshipStatus.APPROVED,
     to: InternshipStatus.CANCELLED,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.STUDENT, UserRole.HOD, UserRole.ADMIN],
     requiresReason: true,
   },
   // 9. APPROVED -> TERMINATED
   {
     from: InternshipStatus.APPROVED,
     to: InternshipStatus.TERMINATED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.HOD, UserRole.ADMIN],
     requiresReason: true,
   },
-  // 10. ACTIVE -> READY_FOR_COMPLETION (Tasks/milestones finished)
+  // 10. ACTIVE -> READY_FOR_COMPLETION (Tasks/reports finished)
   {
     from: InternshipStatus.ACTIVE,
     to: InternshipStatus.READY_FOR_COMPLETION,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.STUDENT, UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN],
   },
   // 11. ACTIVE -> TERMINATED (Early termination)
   {
     from: InternshipStatus.ACTIVE,
     to: InternshipStatus.TERMINATED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.HOD, UserRole.ADMIN],
     requiresReason: true,
   },
-  // 12. READY_FOR_COMPLETION -> COMPLETED (Final evaluation & completion sign-off)
+  // 12. READY_FOR_COMPLETION -> COMPLETED (Final evaluation sign-off)
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.COMPLETED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN],
   },
   // 13. READY_FOR_COMPLETION -> ACTIVE (Sent back for further milestone work)
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.ACTIVE,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN],
     requiresReason: true,
   },
   // 14. READY_FOR_COMPLETION -> TERMINATED
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.TERMINATED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
+    allowedRoles: [UserRole.HOD, UserRole.ADMIN],
     requiresReason: true,
   },
   // 15. ACTIVE -> CANCELLED (Authorized cancellation with justification)

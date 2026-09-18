@@ -116,17 +116,17 @@ export const StudentOverviewPage: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* 1. Header Greeting & Primary Status */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* 1. Header Greeting & Quick Submit Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             {getGreeting()}, {data.studentName} 👋
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
             Here is your live progress and upcoming deliverables for today.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Link
             to={
               upcomingTasks && upcomingTasks.length > 0
@@ -136,7 +136,7 @@ export const StudentOverviewPage: React.FC = () => {
           >
             <Button variant="primary" size="sm" className="gap-2 shadow-xs">
               <FileCheck className="w-4 h-4" />
-              Submit Evidence
+              <span>Submit Evidence</span>
             </Button>
           </Link>
           <Link to="/app/student/internship">
@@ -149,7 +149,7 @@ export const StudentOverviewPage: React.FC = () => {
       </div>
 
       {/* 2. Main Internship Hero Card */}
-      <Card className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border-0 relative overflow-hidden">
+      <Card className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl border-0 relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">

@@ -770,13 +770,13 @@ export class WorkspaceService {
       (d) => d.organizationId === organizationId && (!deptId || this.isStudentInDept(d.studentId, deptId))
     );
 
-    // Mentor Assignments Loading Matrix
-    const deptMentors = Array.from(authStore.users.values()).filter(
-      (u) => u.organizationId === organizationId && u.role === UserRole.MENTOR && (!deptId || u.departmentId === deptId)
+    // Faculty / Mentor Assignments Loading Matrix
+    const deptFaculty = Array.from(authStore.users.values()).filter(
+      (u) => u.organizationId === organizationId && (u.role === UserRole.FACULTY || u.role === UserRole.MENTOR) && (!deptId || u.departmentId === deptId)
     );
 
-    const facultyAssignments = deptMentors.map((f) => {
-      const assigned = departmentInternships.filter((d) => d.mentorId === f.id || (d as any).industryMentorId === f.id);
+    const facultyAssignments = deptFaculty.map((f) => {
+      const assigned = departmentInternships.filter((d) => d.facultyId === f.id || d.mentorId === f.id || (d as any).industryMentorId === f.id);
       return {
         facultyId: f.id,
         facultyName: `${f.firstName} ${f.lastName}`.trim(),

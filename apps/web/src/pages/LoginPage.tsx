@@ -12,9 +12,9 @@ export const LoginPage: React.FC = () => {
   const { login, isLoading } = useAuth();
 
   const [mode, setMode] = useState<'demo' | 'real'>('demo');
-  const [email, setEmail] = useState('admin@mitpune.edu.in');
+  const [email, setEmail] = useState('admin@ghristu-demo.in');
   const [password, setPassword] = useState('Password123!');
-  const [organizationCode, setOrganizationCode] = useState('MIT_PUNE');
+  const [organizationCode, setOrganizationCode] = useState('GHRISTU_PUNE');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const getRoleRedirect = (role: UserRole | string): string => {
@@ -56,7 +56,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 space-y-6 max-w-lg mx-auto">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 max-w-lg w-full mx-auto">
       {/* Back Button */}
       <div className="flex items-center justify-between">
         <Link
@@ -67,31 +67,42 @@ export const LoginPage: React.FC = () => {
           <span>Back to Home</span>
         </Link>
         <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-          v2.4 Production-Ready
+          v2.4 Enterprise Governance
         </span>
       </div>
 
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome to InternOS</h2>
-        <p className="text-xs text-slate-500">Sign in to your university internship governance workspace</p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 font-mono">InternOS</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-[11px] px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+            DEMO ENVIRONMENT
+          </span>
+        </div>
+        <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug">
+          G H Raisoni International Skill Tech University
+        </h2>
+        <p className="text-xs text-slate-500">
+          Pune, Maharashtra • Enterprise Internship Governance (Tenant: <code className="font-mono text-indigo-700 font-bold">GHRISTU_PUNE</code>)
+        </p>
       </div>
 
       {/* Mode Switcher */}
-      <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+      <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-[11px] sm:text-xs font-semibold">
         <button
           type="button"
           onClick={() => {
             setMode('demo');
-            handleDemoSelect('admin@mitpune.edu.in', 'MIT_PUNE');
+            handleDemoSelect('admin@ghristu-demo.in', 'GHRISTU_PUNE');
           }}
-          className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2 px-1 rounded-lg flex items-center justify-center gap-1 sm:gap-1.5 transition-all text-center ${
             mode === 'demo'
               ? 'bg-white text-indigo-700 shadow-xs font-bold'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-          <span>Explore Demo (MIT Pune)</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+          <span className="truncate">Explore Demo</span>
         </button>
         <button
           type="button"
@@ -102,14 +113,14 @@ export const LoginPage: React.FC = () => {
             setOrganizationCode('');
             setErrorMessage(null);
           }}
-          className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+          className={`py-2 px-1 rounded-lg flex items-center justify-center gap-1 sm:gap-1.5 transition-all text-center ${
             mode === 'real'
               ? 'bg-white text-indigo-700 shadow-xs font-bold'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Building2 className="w-3.5 h-3.5 text-slate-500" />
-          <span>Real Institution Sign In</span>
+          <UserCheck className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+          <span className="truncate">Live Login</span>
         </button>
       </div>
 
@@ -126,96 +137,160 @@ export const LoginPage: React.FC = () => {
           <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
             <span className="flex items-center gap-1.5 text-indigo-900 font-bold">
               <Building2 className="w-3.5 h-3.5 text-indigo-600" />
-              Maharashtra Institute of Technology, Pune (MIT_PUNE)
+              G H Raisoni International Skill Tech University, Pune
             </span>
-            <span className="text-[10px] text-slate-400 font-mono">Pass: Password123!</span>
+            <span className="text-[10px] text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded font-mono font-medium">
+              DEMO ACCOUNT ONLY
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-1.5 text-xs">
+          <div className="grid grid-cols-1 gap-1.5 text-xs max-h-72 overflow-y-auto pr-1">
+            {/* Admin Persona */}
             <button
               type="button"
-              onClick={() => handleDemoSelect('admin@mitpune.edu.in', 'MIT_PUNE')}
+              onClick={() => handleDemoSelect('admin@ghristu-demo.in', 'GHRISTU_PUNE')}
               className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
-                email === 'admin@mitpune.edu.in'
+                email === 'admin@ghristu-demo.in'
                   ? 'bg-white border-indigo-400 text-indigo-950 font-semibold shadow-xs ring-1 ring-indigo-300'
                   : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
               }`}
             >
               <div>
-                <div className="font-semibold text-slate-900">🏛️ Prof. Rajesh Kulkarni</div>
-                <div className="text-[11px] text-slate-500">Dean / Institutional Administrator</div>
+                <div className="font-semibold text-slate-900">🏛️ Dr. Anil Deshmukh</div>
+                <div className="text-[11px] text-slate-500">Institution Administrator • GHRISTU</div>
               </div>
               <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold">
                 ADMIN
               </span>
             </button>
 
+            {/* Mentor Persona 1 */}
             <button
               type="button"
-              onClick={() => handleDemoSelect('rahul.mehta@tcs.com', 'MIT_PUNE')}
+              onClick={() => handleDemoSelect('rahul.mehta@ghristu-demo.in', 'GHRISTU_PUNE')}
               className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
-                email === 'rahul.mehta@tcs.com'
+                email === 'rahul.mehta@ghristu-demo.in'
                   ? 'bg-white border-amber-400 text-amber-950 font-semibold shadow-xs ring-1 ring-amber-300'
                   : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
               }`}
             >
               <div>
                 <div className="font-semibold text-slate-900">💼 Rahul Mehta</div>
-                <div className="text-[11px] text-slate-500">Tech Lead & Industry Mentor (TCS)</div>
+                <div className="text-[11px] text-slate-500">Industry Mentor • Tata Consultancy Services</div>
               </div>
               <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
                 MENTOR
               </span>
             </button>
 
+            {/* Mentor Persona 2 */}
             <button
               type="button"
-              onClick={() => handleDemoSelect('priya.nair@infosys.com', 'MIT_PUNE')}
+              onClick={() => handleDemoSelect('priya.nair@ghristu-demo.in', 'GHRISTU_PUNE')}
               className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
-                email === 'priya.nair@infosys.com'
+                email === 'priya.nair@ghristu-demo.in'
                   ? 'bg-white border-amber-400 text-amber-950 font-semibold shadow-xs ring-1 ring-amber-300'
                   : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
               }`}
             >
               <div>
                 <div className="font-semibold text-slate-900">💼 Priya Nair</div>
-                <div className="text-[11px] text-slate-500">Corporate Project Mentor (Infosys)</div>
+                <div className="text-[11px] text-slate-500">Industry Mentor • Infosys</div>
               </div>
               <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
                 MENTOR
               </span>
             </button>
 
+            {/* Mentor Persona 3 */}
             <button
               type="button"
-              onClick={() => handleDemoSelect('aarav.sharma@mitpune.edu.in', 'MIT_PUNE')}
+              onClick={() => handleDemoSelect('amit.kulkarni@ghristu-demo.in', 'GHRISTU_PUNE')}
               className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
-                email === 'aarav.sharma@mitpune.edu.in'
+                email === 'amit.kulkarni@ghristu-demo.in'
+                  ? 'bg-white border-amber-400 text-amber-950 font-semibold shadow-xs ring-1 ring-amber-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">💼 Amit Kulkarni</div>
+                <div className="text-[11px] text-slate-500">Industry Mentor • Persistent Systems</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
+                MENTOR
+              </span>
+            </button>
+
+            {/* Student Persona 1 */}
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('aarav.sharma@ghristu-demo.in', 'GHRISTU_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'aarav.sharma@ghristu-demo.in'
                   ? 'bg-white border-sky-400 text-sky-950 font-semibold shadow-xs ring-1 ring-sky-300'
                   : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
               }`}
             >
               <div>
                 <div className="font-semibold text-slate-900">🎒 Aarav Sharma</div>
-                <div className="text-[11px] text-slate-500">B.Tech CSE • Infosys Full-Stack Intern</div>
+                <div className="text-[11px] text-slate-500">B.Tech CE (3rd Yr) • TCS Full Stack Intern</div>
               </div>
               <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
                 STUDENT
               </span>
             </button>
 
+            {/* Student Persona 2 */}
             <button
               type="button"
-              onClick={() => handleDemoSelect('ananya.patil@mitpune.edu.in', 'MIT_PUNE')}
+              onClick={() => handleDemoSelect('ananya.patil@ghristu-demo.in', 'GHRISTU_PUNE')}
               className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
-                email === 'ananya.patil@mitpune.edu.in'
+                email === 'ananya.patil@ghristu-demo.in'
                   ? 'bg-white border-sky-400 text-sky-950 font-semibold shadow-xs ring-1 ring-sky-300'
                   : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
               }`}
             >
               <div>
                 <div className="font-semibold text-slate-900">🎒 Ananya Patil</div>
-                <div className="text-[11px] text-slate-500">B.Tech ENTC • Tata Elxsi Embedded Intern</div>
+                <div className="text-[11px] text-slate-500">B.Tech IT (3rd Yr) • Infosys Cloud & DevOps Intern</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
+                STUDENT
+              </span>
+            </button>
+
+            {/* Student Persona 3 */}
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('rohan.joshi@ghristu-demo.in', 'GHRISTU_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'rohan.joshi@ghristu-demo.in'
+                  ? 'bg-white border-sky-400 text-sky-950 font-semibold shadow-xs ring-1 ring-sky-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">🎒 Rohan Joshi</div>
+                <div className="text-[11px] text-slate-500">BCA (2nd Yr) • Persistent Systems Data Intern</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
+                STUDENT
+              </span>
+            </button>
+
+            {/* Student Persona 4 */}
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('sneha.kulkarni@ghristu-demo.in', 'GHRISTU_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'sneha.kulkarni@ghristu-demo.in'
+                  ? 'bg-white border-sky-400 text-sky-950 font-semibold shadow-xs ring-1 ring-sky-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">🎒 Sneha Kulkarni</div>
+                <div className="text-[11px] text-slate-500">B.Tech CSE (Final Yr) • Tech Mahindra AI Intern</div>
               </div>
               <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
                 STUDENT
@@ -232,7 +307,7 @@ export const LoginPage: React.FC = () => {
           type="text"
           value={organizationCode}
           onChange={(e) => setOrganizationCode(e.target.value)}
-          placeholder="e.g. MIT_PUNE or your assigned code"
+          placeholder="e.g. GHRISTU_PUNE or your assigned code"
           required
         />
 
