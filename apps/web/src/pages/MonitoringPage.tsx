@@ -33,7 +33,9 @@ import {
   ChevronRight,
   Brain,
   Sparkles,
+  ArrowLeft,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const MonitoringPage: React.FC = () => {
   const { user } = useAuth();
@@ -203,12 +205,20 @@ export const MonitoringPage: React.FC = () => {
 
   const getScopeTitle = () => {
     if (role === UserRole.ADMIN) return 'Institution-Level Health Monitoring';
-    if (role === UserRole.HOD) return 'Department Health Monitoring';
     return 'Supervised Internships Health Monitoring';
   };
 
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <Link
+        to="/app/admin"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to Dashboard</span>
+      </Link>
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

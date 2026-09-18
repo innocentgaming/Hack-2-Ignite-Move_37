@@ -33,7 +33,7 @@ export const TasksPage: React.FC = () => {
   const { user } = useAuth();
   const rawRole = user?.role || UserRole.STUDENT;
   const role = normalizeRole(rawRole);
-  const canGrantExtension = [UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY].includes(role);
+  const canGrantExtension = [UserRole.ADMIN, UserRole.MENTOR].includes(role);
 
   const [tasks, setTasks] = useState<WorkflowTaskDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ export const TasksPage: React.FC = () => {
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'SUBMITTED' | 'APPROVED'>('ALL');
-  const [roleFilter, setRoleFilter] = useState<'ALL' | 'STUDENT' | 'FACULTY' | 'HOD' | 'MENTOR'>('ALL');
+  const [roleFilter, setRoleFilter] = useState<'ALL' | 'STUDENT' | 'MENTOR'>('ALL');
 
   // Submission Modal
   const [submittingTask, setSubmittingTask] = useState<WorkflowTaskDto | null>(null);
@@ -300,7 +300,7 @@ export const TasksPage: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1">Assignee Role:</span>
-            {(['ALL', 'STUDENT', 'FACULTY', 'HOD', 'MENTOR'] as const).map((r) => (
+            {(['ALL', 'STUDENT', 'MENTOR'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}

@@ -26,6 +26,7 @@ const envSchema = z.object({
   LLM_PROVIDER: z.string().default('openai'),
   LLM_API_KEY: z.string().default('placeholder_not_used_in_phase_0'),
   LLM_MODEL: z.string().default('gpt-4o'),
+  GROQ_API_KEY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

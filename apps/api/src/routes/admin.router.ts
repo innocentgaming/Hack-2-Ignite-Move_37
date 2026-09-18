@@ -95,12 +95,6 @@ adminRouter.patch(
   adminController.toggleDepartmentStatus.bind(adminController)
 );
 
-adminRouter.patch(
-  '/departments/:departmentId/hod',
-  requirePermission('department:manage'),
-  adminController.assignDepartmentHOD.bind(adminController)
-);
-
 adminRouter.get(
   '/departments/:departmentId/stats',
   requirePermission('department:read'),
@@ -165,6 +159,27 @@ adminRouter.post(
   '/students/import/confirm',
   requirePermission('students:import'),
   adminController.confirmCSVImport.bind(adminController)
+);
+
+// ==========================================
+// CSV Mentor Import Pipeline (Groq AI assisted)
+// ==========================================
+adminRouter.get(
+  '/mentors/import/template',
+  requirePermission('mentors:import'),
+  adminController.getMentorImportTemplate.bind(adminController)
+);
+
+adminRouter.post(
+  '/mentors/import/preview',
+  requirePermission('mentors:import'),
+  adminController.parseAndPreviewMentorCSV.bind(adminController)
+);
+
+adminRouter.post(
+  '/mentors/import/confirm',
+  requirePermission('mentors:import'),
+  adminController.confirmMentorCSVImport.bind(adminController)
 );
 
 // ==========================================

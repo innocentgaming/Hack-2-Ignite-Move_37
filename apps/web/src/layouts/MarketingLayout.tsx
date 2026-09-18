@@ -22,19 +22,16 @@ export const MarketingLayout: React.FC = () => {
           <a href="#features" className="hover:text-white transition-colors">Platform Capabilities</a>
           <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
           <a href="#roles" className="hover:text-white transition-colors">Role Workflows</a>
-          <a href="/api/health" target="_blank" rel="noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors">
-            API Health (GET)
-          </a>
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link to="/login">
-            <Button variant="outline" size="sm" className="border-slate-700 bg-slate-800/80 text-white hover:bg-slate-700">
+            <Button variant="white" size="sm" className="px-4 py-1.5 text-xs font-bold text-slate-900 shadow-sm">
               Sign In
             </Button>
           </Link>
           <Link to="/login">
-            <Button size="sm" className="gap-1.5 bg-indigo-500 hover:bg-indigo-600">
+            <Button size="sm" className="gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-1.5 text-xs shadow-md shadow-indigo-600/20">
               <span>Launch Console</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -52,11 +49,11 @@ export const MarketingLayout: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-slate-400">InternOS</span>
-            <span>— Phase 0 Architectural Foundation</span>
+            <span>— Enterprise University Internship Governance Platform</span>
           </div>
           <div className="flex items-center gap-6">
-            <span>Multi-Tenant Scoped</span>
-            <span>Prisma 5 + PostgreSQL</span>
+            <span>Multi-Tenant Architecture</span>
+            <span>Prisma ORM + PostgreSQL</span>
             <span>Express + React TS</span>
           </div>
         </div>

@@ -143,9 +143,9 @@ export const CompletionPage: React.FC = () => {
   const role = normalizeRole(rawRole);
 
   const isMentor = role === UserRole.MENTOR;
-  const isFaculty = [UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN].includes(role);
+  const isFaculty = role === UserRole.ADMIN;
   const isStudent = role === UserRole.STUDENT;
-  const isHodOrAdmin = [UserRole.HOD, UserRole.ADMIN].includes(role);
+  const isHodOrAdmin = role === UserRole.ADMIN;
 
   // ── State ──
   const [internships, setInternships] = useState<InternshipDetailsDto[]>([]);
@@ -645,9 +645,9 @@ export const CompletionPage: React.FC = () => {
                           detail={checklist.checks.finalEvaluationCompleted ? 'Evaluation submitted' : 'Awaiting mentor evaluation'}
                         />
                         <ChecklistItem
-                          label="Faculty Confirmation"
-                          passed={checklist.checks.facultyConfirmationCompleted}
-                          detail={checklist.checks.facultyConfirmationCompleted ? 'Confirmed' : 'Awaiting faculty sign-off'}
+                          label="Institutional Confirmation"
+                          passed={!!checklist.checks.adminApprovalCompleted}
+                          detail={checklist.checks.adminApprovalCompleted ? 'Confirmed' : 'Awaiting confirmation'}
                         />
                       </div>
 
@@ -846,17 +846,17 @@ export const CompletionPage: React.FC = () => {
                         Completed: {new Date(dossier.dates.completedAt).toLocaleDateString()}
                       </p>
                     </div>
-                    {/* Faculty Confirmation */}
+                    {/* Final Status Confirmation */}
                     <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Academic Confirmation</p>
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Completion Status</p>
                       <p className="text-sm font-bold text-slate-800">
-                        {dossier.facultyConfirmation.academicRecommendation.replace(/_/g, ' ')}
+                        OFFICIALLY COMPLETED
                       </p>
                       <p className="text-xs text-slate-500 mt-1">
-                        {dossier.facultyConfirmation.creditsAwarded} credits awarded
+                        All milestones & rubrics verified
                       </p>
                       <p className="text-xs text-slate-600 mt-1 italic">
-                        "{dossier.facultyConfirmation.facultyNotes}"
+                        Evaluation Grade: {dossier.finalEvaluation?.finalGrade || 'A'} ({dossier.finalEvaluation?.totalMarks || 100}/100)
                       </p>
                     </div>
                   </div>

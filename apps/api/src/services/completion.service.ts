@@ -3,8 +3,6 @@ import {
   CreateFinalEvaluationDto,
   UpdateFinalEvaluationDto,
   CompletionChecklistDto,
-  FacultyConfirmationDto,
-  CreateFacultyConfirmationDto,
   CompletedInternshipDossierDto,
   TerminationDecisionDto,
   SubmissionFileDto,
@@ -46,10 +44,30 @@ export interface InMemoryTerminationRequest {
   decisionReason?: string;
 }
 
+export interface CompletionConfirmationDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  confirmedById: string;
+  confirmedByName: string;
+  notes: string;
+  academicRecommendation?: string;
+  creditsAwarded?: number;
+  confirmedAt: string;
+}
+
+export interface CreateCompletionConfirmationDto {
+  internshipId: string;
+  notes?: string;
+  facultyNotes?: string;
+  academicRecommendation?: string;
+  creditsAwarded?: number;
+}
+
 export class CompletionStore {
   public finalEvaluations: Map<string, FinalEvaluationDto> = new Map(); // internshipId -> FinalEvaluationDto
   public evaluationsById: Map<string, FinalEvaluationDto> = new Map(); // id -> FinalEvaluationDto
-  public facultyConfirmations: Map<string, FacultyConfirmationDto> = new Map(); // internshipId -> FacultyConfirmationDto
+  public confirmations: Map<string, CompletionConfirmationDto> = new Map(); // internshipId -> CompletionConfirmationDto
   public terminationRequests: Map<string, InMemoryTerminationRequest> = new Map(); // id -> InMemoryTerminationRequest
 }
 
@@ -137,9 +155,8 @@ export class CompletionService {
       missingConditions.push('Final mentor evaluation is not completed');
     }
 
-    // 4. Academic Confirmation / Sign-off
-    const facultyConfirmation = completionStore.facultyConfirmations.get(internshipId);
-    const facultyConfirmationCompleted = !!facultyConfirmation || detail.status === InternshipStatus.COMPLETED;
+    // 4. Admin Sign-off / Confirmation
+    const adminApprovalCompleted = detail.status === InternshipStatus.COMPLETED;
 
     const eligible =
       requiredSubmissionsCompleted &&
@@ -153,14 +170,14 @@ export class CompletionService {
         requiredSubmissionsCompleted,
         requiredReviewsCompleted,
         finalEvaluationCompleted,
-        facultyConfirmationCompleted,
+        adminApprovalCompleted,
       },
       details: {
         requiredTasksTotal: requiredTasks.length,
         requiredTasksSubmitted: requiredTasksSubmittedCount,
         pendingReviewsTotal: pendingReviewsCount,
         hasFinalEvaluation: finalEvaluationCompleted,
-        hasFacultyConfirmation: facultyConfirmationCompleted,
+        hasAdminApproval: adminApprovalCompleted,
       },
     };
   }
@@ -182,8 +199,8 @@ export class CompletionService {
     }
 
     const role = normalizeRole(evaluator.role);
-    if (![UserRole.MENTOR, UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN].includes(role)) {
-      throw new ForbiddenError('Only assigned mentor, faculty, or institutional supervisor can evaluate');
+    if (![UserRole.MENTOR, UserRole.ADMIN].includes(role)) {
+      throw new ForbiddenError('Only assigned mentor or institutional administrator can evaluate');
     }
 
     let criteria = dto.criteria;
@@ -316,7 +333,7 @@ export class CompletionService {
     }
 
     const role = normalizeRole(evaluator.role);
-    if (evaluation.evaluatorId !== evaluator.id && ![UserRole.ADMIN, UserRole.HOD].includes(role)) {
+    if (evaluation.evaluatorId !== evaluator.id && role !== UserRole.ADMIN) {
       throw new ForbiddenError('Only original evaluator or administrators can update this evaluation');
     }
 
@@ -381,14 +398,14 @@ export class CompletionService {
   }
 
   /**
-   * Faculty confirmation sign-off and transition to COMPLETED
+   * Institutional confirmation sign-off and transition to COMPLETED
    * BACKEND STRICT INVARIANT:
-   * Required submissions + Required reviews + Final evaluation + Faculty confirmation = COMPLETED
+   * Required submissions + Required reviews + Final evaluation + Confirmation = COMPLETED
    */
   async confirmCompletionByFaculty(
     organizationId: string,
-    facultyUser: AuthenticatedUser,
-    dto: CreateFacultyConfirmationDto
+    approverUser: AuthenticatedUser,
+    dto: CreateCompletionConfirmationDto
   ): Promise<InternshipStatus> {
     const detail = internshipStore.details.get(dto.internshipId);
     if (!detail) {
@@ -398,13 +415,13 @@ export class CompletionService {
       throw new TenantViolationError('Cross-tenant completion confirmation prohibited');
     }
 
-    const role = normalizeRole(facultyUser.role);
-    if (![UserRole.MENTOR, UserRole.ADMIN, UserRole.FACULTY, UserRole.HOD].includes(role)) {
-      throw new ForbiddenError('Only assigned mentor, faculty coordinator, or institutional Administrator can confirm completion');
+    const role = normalizeRole(approverUser.role);
+    if (![UserRole.MENTOR, UserRole.ADMIN].includes(role)) {
+      throw new ForbiddenError('Only assigned mentor or institutional Administrator can confirm completion');
     }
 
-    const notes = dto.facultyNotes || (dto as any).notes;
-    if (!notes || !notes.trim()) {
+    const notes = (dto.notes || dto.facultyNotes || '').trim();
+    if (!notes) {
       throw new BadRequestError('Completion confirmation notes are required');
     }
 
@@ -430,21 +447,21 @@ export class CompletionService {
     }
 
     const now = new Date().toISOString();
-    const confId = `fconf-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+    const confId = `conf-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
 
-    const confirmation: FacultyConfirmationDto = {
+    const confirmation: CompletionConfirmationDto = {
       id: confId,
       organizationId,
       internshipId: dto.internshipId,
-      facultyId: facultyUser.id,
-      facultyName: `${facultyUser.firstName} ${facultyUser.lastName}`.trim() || 'Faculty Supervisor',
-      facultyNotes: dto.facultyNotes.trim(),
+      confirmedById: approverUser.id,
+      confirmedByName: `${approverUser.firstName} ${approverUser.lastName}`.trim() || 'Institutional Administrator',
+      notes,
       academicRecommendation: dto.academicRecommendation || 'APPROVED_FOR_CREDITS',
       creditsAwarded: dto.creditsAwarded ?? 4,
       confirmedAt: now,
     };
 
-    completionStore.facultyConfirmations.set(dto.internshipId, confirmation);
+    completionStore.confirmations.set(dto.internshipId, confirmation);
 
     // Transition state to COMPLETED
     const previousStatus = detail.status;
@@ -453,16 +470,16 @@ export class CompletionService {
     detail.stateHistory.push({
       fromStatus: previousStatus,
       toStatus: InternshipStatus.COMPLETED,
-      changedBy: facultyUser.id,
+      changedBy: approverUser.id,
       changedAt: now,
-      reason: `Faculty confirmed completion: ${dto.facultyNotes.trim()}`,
+      reason: `Institutional confirmation: ${notes}`,
     });
 
     auditService.log({
       organizationId,
-      userId: facultyUser.id,
+      userId: approverUser.id,
       action: AuditAction.COMPLETION_CONFIRM,
-      entity: 'FacultyConfirmation',
+      entity: 'Confirmation',
       entityId: confId,
       details: {
         internshipId: dto.internshipId,
@@ -473,24 +490,24 @@ export class CompletionService {
 
     auditService.log({
       organizationId,
-      userId: facultyUser.id,
+      userId: approverUser.id,
       action: AuditAction.INTERNSHIP_COMPLETE,
       entity: 'Internship',
       entityId: dto.internshipId,
       details: {
-        completedBy: facultyUser.id,
+        completedBy: approverUser.id,
         status: InternshipStatus.COMPLETED,
       },
     });
 
     auditService.log({
       organizationId,
-      userId: facultyUser.id,
+      userId: approverUser.id,
       action: 'COMPLETION',
       entity: 'Internship',
       entityId: dto.internshipId,
       details: {
-        completedBy: facultyUser.id,
+        completedBy: approverUser.id,
         status: InternshipStatus.COMPLETED,
       },
     });
@@ -531,10 +548,7 @@ export class CompletionService {
       throw new BadRequestError('Final evaluation record not found for this internship');
     }
 
-    const facultyConf = completionStore.facultyConfirmations.get(internshipId);
-    if (!facultyConf) {
-      throw new BadRequestError('Faculty completion confirmation record not found');
-    }
+
 
     const student = authStore.users.get(detail.studentId);
     const company = internshipStore.companies.get(detail.companyId);
@@ -599,7 +613,6 @@ export class CompletionService {
         completedAt: detail.updatedAt.toISOString(),
       },
       finalEvaluation: finalEval,
-      facultyConfirmation: facultyConf,
       outcomes: detail.expectedOutcomes,
       evidenceFiles,
       milestoneFeedback,
@@ -710,8 +723,8 @@ export class CompletionService {
     }
 
     const role = normalizeRole(approverUser.role);
-    if (![UserRole.HOD, UserRole.ADMIN].includes(role)) {
-      throw new ForbiddenError('Only HOD or Admin can approve internship termination');
+    if (role !== UserRole.ADMIN) {
+      throw new ForbiddenError('Only Admin can approve internship termination');
     }
 
     if (!dto.reason || !dto.reason.trim()) {

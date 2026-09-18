@@ -11,16 +11,10 @@ export const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const normalizedRole = user?.role ? normalizeRole(user.role) : UserRole.STUDENT;
 
-  const roleLabels: Record<UserRole, { label: string; variant: 'slate' | 'indigo' | 'emerald' | 'amber' | 'purple' }> = {
-    [UserRole.ADMIN]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.HOD]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.FACULTY]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.STUDENT]: { label: 'STUDENT', variant: 'slate' },
+  const roleLabels: Record<string, { label: string; variant: 'slate' | 'indigo' | 'emerald' | 'amber' | 'purple' }> = {
+    [UserRole.ADMIN]: { label: 'ADMINISTRATOR', variant: 'indigo' },
     [UserRole.MENTOR]: { label: 'MENTOR', variant: 'amber' },
-    [UserRole.SUPER_ADMIN]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.INSTITUTION_ADMIN]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.FACULTY_SUPERVISOR]: { label: 'ADMIN', variant: 'indigo' },
-    [UserRole.INDUSTRY_MENTOR]: { label: 'MENTOR', variant: 'amber' },
+    [UserRole.STUDENT]: { label: 'STUDENT', variant: 'slate' },
   };
 
   const currentRoleInfo = roleLabels[normalizedRole] || { label: normalizedRole, variant: 'slate' as const };

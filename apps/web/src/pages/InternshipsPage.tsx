@@ -39,7 +39,7 @@ export const InternshipsPage: React.FC = () => {
   const rawRole = user?.role || UserRole.STUDENT;
   const role = normalizeRole(rawRole);
   const isStudent = role === UserRole.STUDENT;
-  const isApprover = [UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY].includes(role);
+  const isApprover = [UserRole.ADMIN, UserRole.MENTOR].includes(role);
 
   const [internships, setInternships] = useState<InternshipDetailsDto[]>([]);
   const [loading, setLoading] = useState(true);

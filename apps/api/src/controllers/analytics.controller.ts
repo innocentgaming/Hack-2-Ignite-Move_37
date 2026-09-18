@@ -130,6 +130,59 @@ export class AnalyticsController {
       next(err);
     }
   }
+
+  /**
+   * GET /api/v1/analytics/students-roster
+   */
+  async getStudentsRoster(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const organizationId = req.organizationId || req.user?.organizationId;
+      if (!organizationId) {
+        throw new ValidationError('Organization ID is required');
+      }
+
+      const departmentId = req.query.departmentId as string | undefined;
+      const roster = await analyticsService.getStudentsRoster(organizationId, departmentId);
+
+      res.status(200).json({
+        success: true,
+        data: roster,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /api/v1/analytics/ai-assess
+   * Assess student internship progress using Groq AI
+   */
+  async assessStudentProgress(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const organizationId = req.organizationId || req.user?.organizationId;
+      if (!organizationId) {
+        throw new ValidationError('Organization ID is required');
+      }
+
+      const { studentId, internshipId } = req.body;
+      if (!studentId) {
+        throw new ValidationError('studentId is required in request body');
+      }
+
+      const assessment = await analyticsService.assessStudentProgressWithAI(
+        organizationId,
+        studentId,
+        internshipId
+      );
+
+      res.status(200).json({
+        success: true,
+        data: assessment,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const analyticsController = new AnalyticsController();

@@ -126,6 +126,30 @@ export class InternshipStore {
       updatedAt: seedDate,
     });
 
+    // Seed Companies for MIT_PUNE
+    this.companies.set('company-tcs', {
+      id: 'company-tcs',
+      organizationId: 'demo-mit-pune',
+      name: 'Tata Consultancy Services',
+      industry: 'Enterprise Cloud Solutions',
+      website: 'https://www.tcs.com',
+      address: 'Sahyadri Park, Hinjawadi Phase 3, Pune, Maharashtra',
+      isVerified: true,
+      createdAt: seedDate,
+      updatedAt: seedDate,
+    });
+    this.companies.set('company-infosys', {
+      id: 'company-infosys',
+      organizationId: 'demo-mit-pune',
+      name: 'Infosys Limited',
+      industry: 'Applied AI & Cloud Platforms',
+      website: 'https://www.infosys.com',
+      address: 'Plot No. 1, Pune Infotech Park, Hinjawadi, Pune, Maharashtra',
+      isVerified: true,
+      createdAt: seedDate,
+      updatedAt: seedDate,
+    });
+
     // Seed Initial Details for existing seed internships in tenantStore
     this.syncSeedInternship(
       'internship-a-1',
@@ -231,6 +255,45 @@ export class InternshipStore {
         email: 'mentor@org-a.com',
         designation: 'Staff Solutions Architect',
         phone: '+1 555-0199',
+      }
+    );
+
+    // Seed Internships for MIT_PUNE
+    this.syncSeedInternship(
+      'internship-mit-1',
+      'demo-mit-pune',
+      'user-mit-student-1',
+      'company-tcs',
+      'Full Stack Cloud Engineering Internship',
+      'FULL_TIME',
+      InternshipStatus.ACTIVE,
+      new Date('2026-06-01'),
+      new Date('2026-11-30'),
+      'user-mit-mentor-1',
+      {
+        name: 'Rahul Mehta',
+        email: 'rahul.mehta@tcs.com',
+        designation: 'Tech Lead & Industry Mentor',
+        phone: '+91 9822012345',
+      }
+    );
+
+    this.syncSeedInternship(
+      'internship-mit-2',
+      'demo-mit-pune',
+      'user-mit-student-2',
+      'company-infosys',
+      'AI & Enterprise Automation Internship',
+      'FULL_TIME',
+      InternshipStatus.ACTIVE,
+      new Date('2026-07-01'),
+      new Date('2026-12-31'),
+      'user-mit-mentor-2',
+      {
+        name: 'Priya Nair',
+        email: 'priya.nair@infosys.com',
+        designation: 'Corporate Project Mentor',
+        phone: '+91 9822055667',
       }
     );
   }
@@ -860,8 +923,8 @@ export class InternshipService {
     }
 
     const role = normalizeRole(user.role);
-    if (![UserRole.HOD, UserRole.ADMIN].includes(role)) {
-      throw new TenantViolationError('Only HOD or Admin can assign faculty coordinators');
+    if (role !== UserRole.ADMIN) {
+      throw new TenantViolationError('Only Administrators can assign coordinators');
     }
 
     if (!dto.facultyId) {
@@ -959,12 +1022,8 @@ export class InternshipService {
     // Role-based visibility
     if (role === UserRole.STUDENT) {
       list = list.filter((d) => d.studentId === user.id);
-    } else if (role === UserRole.FACULTY) {
-      // Show internships assigned to this faculty, or all if none assigned yet
-      const assigned = list.filter((d) => d.facultyId === user.id);
-      if (assigned.length > 0) {
-        list = assigned;
-      }
+    } else if (role === UserRole.MENTOR) {
+      list = list.filter((d) => (d as any).industryMentorId === user.id || (d as any).mentorId === user.id || d.mentor?.email === user.email);
     }
 
     if (filters?.status) {

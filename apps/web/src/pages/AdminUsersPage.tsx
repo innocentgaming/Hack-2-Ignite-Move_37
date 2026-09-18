@@ -44,7 +44,7 @@ export const AdminUsersPage: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteFirstName, setInviteFirstName] = useState('');
   const [inviteLastName, setInviteLastName] = useState('');
-  const [inviteRole, setInviteRole] = useState<UserRole>(UserRole.FACULTY);
+  const [inviteRole, setInviteRole] = useState<UserRole>(UserRole.MENTOR);
   const [inviteDeptId, setInviteDeptId] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteSuccess, setInviteSuccess] = useState<{ activationUrl: string; email: string } | null>(null);
@@ -279,9 +279,7 @@ export const AdminUsersPage: React.FC = () => {
               >
                 <option value="ALL">All Roles</option>
                 <option value={UserRole.STUDENT}>Students</option>
-                <option value={UserRole.FACULTY}>Faculty Supervisors</option>
-                <option value={UserRole.HOD}>Department Heads (HOD)</option>
-                <option value={UserRole.MENTOR}>Industry Mentors</option>
+                <option value={UserRole.MENTOR}>Mentors (Industry & Academic)</option>
                 <option value={UserRole.ADMIN}>Administrators</option>
               </select>
             </div>
@@ -431,8 +429,6 @@ export const AdminUsersPage: React.FC = () => {
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 bg-white"
                   >
                     <option value={UserRole.STUDENT}>Student</option>
-                    <option value={UserRole.FACULTY}>Faculty</option>
-                    <option value={UserRole.HOD}>HOD</option>
                     <option value={UserRole.MENTOR}>Mentor</option>
                     <option value={UserRole.ADMIN}>Admin</option>
                   </select>
@@ -559,9 +555,7 @@ export const AdminUsersPage: React.FC = () => {
                       className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 bg-white"
                     >
                       <option value={UserRole.STUDENT}>Student</option>
-                      <option value={UserRole.MENTOR}>Industry Mentor</option>
-                      <option value={UserRole.FACULTY}>Faculty</option>
-                      <option value={UserRole.HOD}>HOD</option>
+                      <option value={UserRole.MENTOR}>Industry & Academic Mentor</option>
                       <option value={UserRole.ADMIN}>Administrator</option>
                     </select>
                   </div>
@@ -634,8 +628,6 @@ export const AdminUsersPage: React.FC = () => {
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 bg-white"
                 >
                   <option value={UserRole.STUDENT}>Student</option>
-                  <option value={UserRole.FACULTY}>Faculty</option>
-                  <option value={UserRole.HOD}>HOD</option>
                   <option value={UserRole.MENTOR}>Mentor</option>
                   <option value={UserRole.ADMIN}>Admin</option>
                 </select>

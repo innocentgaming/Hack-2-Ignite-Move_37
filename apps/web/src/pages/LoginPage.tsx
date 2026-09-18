@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
 import { FormInput } from '../components/FormInput';
-import { ShieldCheck, AlertCircle, ArrowRight, Building2 } from 'lucide-react';
+import { ShieldCheck, AlertCircle, ArrowRight, ArrowLeft, Building2, Sparkles, UserCheck } from 'lucide-react';
 import { UserRole } from '@internos/types';
 import { normalizeRole } from '@internos/shared';
 
@@ -11,9 +11,10 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
 
-  const [email, setEmail] = useState('admin@org-a.com');
+  const [mode, setMode] = useState<'demo' | 'real'>('demo');
+  const [email, setEmail] = useState('admin@mitpune.edu.in');
   const [password, setPassword] = useState('Password123!');
-  const [organizationCode, setOrganizationCode] = useState('ORG_A');
+  const [organizationCode, setOrganizationCode] = useState('MIT_PUNE');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const getRoleRedirect = (role: UserRole | string): string => {
@@ -21,10 +22,6 @@ export const LoginPage: React.FC = () => {
     switch (norm) {
       case UserRole.ADMIN:
         return '/app/admin';
-      case UserRole.HOD:
-        return '/app/hod';
-      case UserRole.FACULTY:
-        return '/app/faculty';
       case UserRole.MENTOR:
         return '/app/mentor';
       case UserRole.STUDENT:
@@ -59,10 +56,61 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 space-y-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8 space-y-6 max-w-lg mx-auto">
+      {/* Back Button */}
+      <div className="flex items-center justify-between">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Home</span>
+        </Link>
+        <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+          v2.4 Production-Ready
+        </span>
+      </div>
+
       <div className="space-y-1">
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome to InternOS</h2>
-        <p className="text-xs text-slate-500">Sign in to your educational institution portal (Phase 1)</p>
+        <p className="text-xs text-slate-500">Sign in to your university internship governance workspace</p>
+      </div>
+
+      {/* Mode Switcher */}
+      <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+        <button
+          type="button"
+          onClick={() => {
+            setMode('demo');
+            handleDemoSelect('admin@mitpune.edu.in', 'MIT_PUNE');
+          }}
+          className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+            mode === 'demo'
+              ? 'bg-white text-indigo-700 shadow-xs font-bold'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          <span>Explore Demo (MIT Pune)</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setMode('real');
+            setEmail('');
+            setPassword('');
+            setOrganizationCode('');
+            setErrorMessage(null);
+          }}
+          className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+            mode === 'real'
+              ? 'bg-white text-indigo-700 shadow-xs font-bold'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Building2 className="w-3.5 h-3.5 text-slate-500" />
+          <span>Real Institution Sign In</span>
+        </button>
       </div>
 
       {errorMessage && (
@@ -72,110 +120,119 @@ export const LoginPage: React.FC = () => {
         </div>
       )}
 
-      {/* Multi-Tenant Quick Account Picker */}
-      <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-        <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
-          <span className="flex items-center gap-1.5">
-            <Building2 className="w-3.5 h-3.5 text-indigo-600" />
-            Quick Accounts (Organization A):
-          </span>
-          <span className="text-[10px] text-slate-400 font-mono">Pass: Password123!</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('admin@org-a.com', 'ORG_A')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'admin@org-a.com'
-                ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            🏛️ ADMIN (Org A)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('hod@org-a.com', 'ORG_A')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'hod@org-a.com'
-                ? 'bg-violet-50 border-violet-300 text-violet-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            🧭 HOD (Org A)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('faculty@org-a.com', 'ORG_A')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'faculty@org-a.com'
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            🎓 FACULTY (Org A)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('student@org-a.com', 'ORG_A')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'student@org-a.com'
-                ? 'bg-sky-50 border-sky-300 text-sky-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            🎒 STUDENT (Org A)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('mentor@org-a.com', 'ORG_A')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'mentor@org-a.com'
-                ? 'bg-amber-50 border-amber-300 text-amber-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            💼 MENTOR (Org A)
-          </button>
-        </div>
+      {/* Demo Personas Picker */}
+      {mode === 'demo' && (
+        <div className="p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-2.5">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
+            <span className="flex items-center gap-1.5 text-indigo-900 font-bold">
+              <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+              Maharashtra Institute of Technology, Pune (MIT_PUNE)
+            </span>
+            <span className="text-[10px] text-slate-400 font-mono">Pass: Password123!</span>
+          </div>
 
-        {/* Organization B Tenant Switcher */}
-        <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] font-semibold text-slate-700">
-          <span>Organization B (Isolated Tenant):</span>
-        </div>
-        <div className="grid grid-cols-2 gap-1.5 text-xs">
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('admin@org-b.com', 'ORG_B')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'admin@org-b.com'
-                ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            🏛️ ADMIN (Org B)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoSelect('student@org-b.com', 'ORG_B')}
-            className={`p-1.5 text-left rounded border transition-colors ${
-              email === 'student@org-b.com'
-                ? 'bg-sky-50 border-sky-300 text-sky-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            🎒 STUDENT (Org B)
-          </button>
-        </div>
-      </div>
+          <div className="grid grid-cols-1 gap-1.5 text-xs">
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('admin@mitpune.edu.in', 'MIT_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'admin@mitpune.edu.in'
+                  ? 'bg-white border-indigo-400 text-indigo-950 font-semibold shadow-xs ring-1 ring-indigo-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">🏛️ Prof. Rajesh Kulkarni</div>
+                <div className="text-[11px] text-slate-500">Dean / Institutional Administrator</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold">
+                ADMIN
+              </span>
+            </button>
 
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('rahul.mehta@tcs.com', 'MIT_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'rahul.mehta@tcs.com'
+                  ? 'bg-white border-amber-400 text-amber-950 font-semibold shadow-xs ring-1 ring-amber-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">💼 Rahul Mehta</div>
+                <div className="text-[11px] text-slate-500">Tech Lead & Industry Mentor (TCS)</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
+                MENTOR
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('priya.nair@infosys.com', 'MIT_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'priya.nair@infosys.com'
+                  ? 'bg-white border-amber-400 text-amber-950 font-semibold shadow-xs ring-1 ring-amber-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">💼 Priya Nair</div>
+                <div className="text-[11px] text-slate-500">Corporate Project Mentor (Infosys)</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">
+                MENTOR
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('aarav.sharma@mitpune.edu.in', 'MIT_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'aarav.sharma@mitpune.edu.in'
+                  ? 'bg-white border-sky-400 text-sky-950 font-semibold shadow-xs ring-1 ring-sky-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">🎒 Aarav Sharma</div>
+                <div className="text-[11px] text-slate-500">B.Tech CSE • Infosys Full-Stack Intern</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
+                STUDENT
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDemoSelect('ananya.patil@mitpune.edu.in', 'MIT_PUNE')}
+              className={`p-2 text-left rounded-lg border transition-all flex items-center justify-between ${
+                email === 'ananya.patil@mitpune.edu.in'
+                  ? 'bg-white border-sky-400 text-sky-950 font-semibold shadow-xs ring-1 ring-sky-300'
+                  : 'bg-white/80 border-slate-200 text-slate-700 hover:bg-white'
+              }`}
+            >
+              <div>
+                <div className="font-semibold text-slate-900">🎒 Ananya Patil</div>
+                <div className="text-[11px] text-slate-500">B.Tech ENTC • Tata Elxsi Embedded Intern</div>
+              </div>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold">
+                STUDENT
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Main Sign In Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormInput
           label="Institution / Tenant Code"
           type="text"
           value={organizationCode}
           onChange={(e) => setOrganizationCode(e.target.value)}
-          placeholder="e.g. ORG_A or ORG_B"
+          placeholder="e.g. MIT_PUNE or your assigned code"
           required
         />
 
@@ -184,7 +241,7 @@ export const LoginPage: React.FC = () => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="name@university.edu"
+          placeholder="name@university.edu.in"
           required
         />
 
@@ -198,22 +255,39 @@ export const LoginPage: React.FC = () => {
         />
 
         <div className="pt-2">
-          <Button type="submit" size="lg" className="w-full gap-2" isLoading={isLoading}>
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 shadow-md hover:shadow-lg transition-all"
+            isLoading={isLoading}
+          >
+            <UserCheck className="w-4 h-4" />
             <span>Sign In to Workspace</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </form>
 
-      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-        <span className="flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          Strict Tenant Isolation Active
-        </span>
-        <Link to="/activate" className="text-indigo-600 hover:text-indigo-700 font-medium">
-          Have an invite? Activate account
-        </Link>
+      {/* Registration & Activation Links */}
+      <div className="pt-2 border-t border-slate-100 space-y-2 text-xs text-slate-500">
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            Multi-Tenant Isolation Active
+          </span>
+          <Link to="/activate" className="text-indigo-600 hover:text-indigo-700 font-medium">
+            Activate Invite
+          </Link>
+        </div>
+        <div className="text-center pt-2">
+          <span>Are you an institution administrator? </span>
+          <Link to="/register-institution" className="text-indigo-600 hover:text-indigo-700 font-semibold underline">
+            Register Your University
+          </Link>
+        </div>
       </div>
     </div>
   );
 };
+
+export default LoginPage;

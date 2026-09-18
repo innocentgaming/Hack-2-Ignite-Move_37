@@ -653,6 +653,210 @@ export class StudentMentorStore {
     this.submissions.set(sub3_2.id, sub3_2);
     this.submissions.set(sub3_3.id, sub3_3);
     this.submissions.set(sub3_4.id, sub3_4);
+
+    // 7. Seed for MIT_PUNE Demo (demo-mit-pune)
+    const mitOrgId = 'demo-mit-pune';
+
+    const outMit1: InMemoryOutcomeDef = {
+      id: 'out-mit-fullstack',
+      organizationId: mitOrgId,
+      code: 'PO-1',
+      name: 'Full-Stack Cloud Architecture & Microservices',
+      description: 'Design and build resilient, multi-tenant cloud-native services with strict role-based access control and persistent schemas.',
+      expectedEvidence: ['GitHub Pull Request with comprehensive unit & integration tests', 'Swagger / OpenAPI 3.0 specification', 'Live deployment verification'],
+    };
+    const outMit2: InMemoryOutcomeDef = {
+      id: 'out-mit-ai',
+      organizationId: mitOrgId,
+      code: 'PO-2',
+      name: 'Applied Machine Learning & Distributed Pipelines',
+      description: 'Implement distributed data processing pipelines with automated inference, model evaluation, and caching mechanisms.',
+      expectedEvidence: ['Jupyter analysis benchmark / load tests', 'GitHub repository with model pipeline code', 'Verification telemetry report'],
+    };
+    const outMit3: InMemoryOutcomeDef = {
+      id: 'out-mit-devops',
+      organizationId: mitOrgId,
+      code: 'PO-3',
+      name: 'Cloud Automation, Containerization & CI/CD',
+      description: 'Deploy automated continuous integration and delivery pipelines with Docker containerization, security vulnerability scanning, and cloud hosting.',
+      expectedEvidence: ['GitHub Actions pipeline execution badge', 'Docker container configurations and health probes', 'SSL-secured live endpoint'],
+    };
+    this.outcomes.set(outMit1.id, outMit1);
+    this.outcomes.set(outMit2.id, outMit2);
+    this.outcomes.set(outMit3.id, outMit3);
+
+    // Milestones for internship-mit-1 (Aarav Sharma @ TCS, Mentor: Rahul Mehta)
+    const mitM1: InMemoryMilestone = {
+      id: 'ms-mit-1',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      title: 'Phase 1: Architecture, Monorepo & Environment',
+      description: 'Bootstrap monorepo with strict TypeScript typing, Docker dev containers, and PostgreSQL relational schemas.',
+      order: 1,
+      startDate: new Date('2026-06-01'),
+      dueDate: new Date('2026-06-30'),
+      progress: 100,
+      status: 'COMPLETED',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const mitM2: InMemoryMilestone = {
+      id: 'ms-mit-2',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      title: 'Phase 2: Core Microservices & Multi-Tenant Engine',
+      description: 'Implement tenant isolation middleware, JWT security credentials, and department management endpoints.',
+      order: 2,
+      startDate: new Date('2026-07-01'),
+      dueDate: new Date('2026-09-30'),
+      progress: 75,
+      status: 'IN_PROGRESS',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const mitM3: InMemoryMilestone = {
+      id: 'ms-mit-3',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      title: 'Phase 3: CI/CD Automation & Production Hardening',
+      description: 'Configure automated testing pipelines, SonarQube quality gates, and staging cloud deployment.',
+      order: 3,
+      startDate: new Date('2026-10-01'),
+      dueDate: new Date('2026-11-25'),
+      progress: 0,
+      status: 'NOT_STARTED',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.milestones.set(mitM1.id, mitM1);
+    this.milestones.set(mitM2.id, mitM2);
+    this.milestones.set(mitM3.id, mitM3);
+
+    // Tasks for internship-mit-1
+    const mitT1: InMemoryTask = {
+      id: 'task-mit-101',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      milestoneId: 'ms-mit-1',
+      title: 'Monorepo & Docker Container Setup',
+      description: 'Initialize pnpm workspace, Docker compose with PostgreSQL, and ESLint strict configurations.',
+      instructions: 'Ensure docker-compose up initializes database with healthy status checks.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-06-15'),
+      learningOutcomeId: 'out-mit-devops',
+      expectedEvidence: 'GitHub repository URL with Dockerfile and setup documentation',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const mitT2: InMemoryTask = {
+      id: 'task-mit-102',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      milestoneId: 'ms-mit-2',
+      title: 'Multi-Tenant Authentication & RBAC Engine',
+      description: 'Implement JWT authentication with organization isolation and role verification.',
+      instructions: 'Deliver endpoints for login, activation, and token refresh with complete test coverage.',
+      status: TaskStatus.APPROVED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-07-20'),
+      learningOutcomeId: 'out-mit-fullstack',
+      expectedEvidence: 'GitHub PR link with automated test report verifying multi-tenant isolation',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const mitT3: InMemoryTask = {
+      id: 'task-mit-103',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      milestoneId: 'ms-mit-2',
+      title: 'High-Throughput Data Pipeline & Caching',
+      description: 'Implement Redis caching layer and asynchronous task queue with retry logic.',
+      instructions: 'Demonstrate sub-50ms p99 latency under 500 req/s load.',
+      status: TaskStatus.SUBMITTED,
+      priority: 'HIGH',
+      dueDate: new Date('2026-09-25'),
+      learningOutcomeId: 'out-mit-fullstack',
+      expectedEvidence: 'PR link with benchmark telemetry report and Redis cache hit-ratio analysis',
+      createdAt: now,
+      updatedAt: now,
+    };
+    const mitT4: InMemoryTask = {
+      id: 'task-mit-104',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      milestoneId: 'ms-mit-3',
+      title: 'Automated CI/CD Pipeline with GitHub Actions',
+      description: 'Set up GitHub Actions to run linter, typecheck, unit tests, and build Docker containers.',
+      instructions: 'Pipeline must fail if any test or type check fails.',
+      status: TaskStatus.PENDING,
+      priority: 'MEDIUM',
+      dueDate: new Date('2026-10-15'),
+      learningOutcomeId: 'out-mit-devops',
+      expectedEvidence: 'GitHub Actions workflow YAML and successful run execution link',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.tasks.set(mitT1.id, mitT1);
+    this.tasks.set(mitT2.id, mitT2);
+    this.tasks.set(mitT3.id, mitT3);
+    this.tasks.set(mitT4.id, mitT4);
+
+    // Submissions for internship-mit-1
+    const mitSub1: InMemorySubmissionRecord = {
+      id: 'sub-mit-101',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      taskId: 'task-mit-101',
+      studentId: 'user-mit-student-1',
+      title: 'Monorepo & Docker Container Setup Evidence',
+      description: 'Configured Dockerized monorepo with automated migration scripts and pre-commit hooks.',
+      evidenceType: EvidenceType.GITHUB_REPO,
+      evidenceUrl: 'https://github.com/mit-students/internos-platform',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-06-14'),
+      updatedAt: new Date('2026-06-15'),
+      mentorFeedback: 'Clean monorepo structure and fast Docker bootstrap. Excellent work Aarav.',
+      mentorRating: 5,
+      mentorStrengths: 'Attention to detail in container optimization.',
+      mentorNextAction: 'Proceed to Authentication & RBAC implementation.',
+      reviewedAt: new Date('2026-06-15'),
+    };
+    const mitSub2: InMemorySubmissionRecord = {
+      id: 'sub-mit-102',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      taskId: 'task-mit-102',
+      studentId: 'user-mit-student-1',
+      title: 'Multi-Tenant Authentication & RBAC Engine Evidence',
+      description: 'Implemented JWT token verification with organization scoping and comprehensive Jest tests.',
+      evidenceType: EvidenceType.GITHUB_PR,
+      evidenceUrl: 'https://github.com/mit-students/internos-platform/pull/4',
+      status: SubmissionStatus.ACCEPTED,
+      submittedAt: new Date('2026-07-19'),
+      updatedAt: new Date('2026-07-20'),
+      mentorFeedback: 'Solid multi-tenant middleware implementation with strict security checks. Approved.',
+      mentorRating: 5,
+      mentorStrengths: 'High test coverage including negative authorization test cases.',
+      reviewedAt: new Date('2026-07-20'),
+    };
+    const mitSub3: InMemorySubmissionRecord = {
+      id: 'sub-mit-103',
+      organizationId: mitOrgId,
+      internshipId: 'internship-mit-1',
+      taskId: 'task-mit-103',
+      studentId: 'user-mit-student-1',
+      title: 'High-Throughput Data Pipeline & Caching Deliverable',
+      description: 'Integrated Redis cache with BullMQ job queues and benchmarked throughput under simulated load.',
+      evidenceType: EvidenceType.GITHUB_PR,
+      evidenceUrl: 'https://github.com/mit-students/internos-platform/pull/11',
+      status: SubmissionStatus.SUBMITTED,
+      submittedAt: new Date('2026-09-17T11:00:00Z'),
+      updatedAt: new Date('2026-09-17T11:00:00Z'),
+    };
+    this.submissions.set(mitSub1.id, mitSub1);
+    this.submissions.set(mitSub2.id, mitSub2);
+    this.submissions.set(mitSub3.id, mitSub3);
   }
 }
 

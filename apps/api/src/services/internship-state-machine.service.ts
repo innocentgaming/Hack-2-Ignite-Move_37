@@ -25,20 +25,20 @@ export const STATE_TRANSITION_RULES: StateTransitionRule[] = [
   {
     from: InternshipStatus.PENDING_APPROVAL,
     to: InternshipStatus.APPROVED,
-    allowedRoles: [UserRole.ADMIN, UserRole.MENTOR, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.ADMIN, UserRole.MENTOR],
   },
   // 4. PENDING_APPROVAL -> REJECTED (Mentor or Admin rejects with reason)
   {
     from: InternshipStatus.PENDING_APPROVAL,
     to: InternshipStatus.REJECTED,
-    allowedRoles: [UserRole.ADMIN, UserRole.MENTOR, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.ADMIN, UserRole.MENTOR],
     requiresReason: true,
   },
   // 5. PENDING_APPROVAL -> CANCELLED (Student withdraws)
   {
     from: InternshipStatus.PENDING_APPROVAL,
     to: InternshipStatus.CANCELLED,
-    allowedRoles: [UserRole.STUDENT, UserRole.ADMIN, UserRole.HOD],
+    allowedRoles: [UserRole.STUDENT, UserRole.ADMIN],
   },
   // 6. REJECTED -> DRAFT (Student re-opens to address feedback)
   {
@@ -50,67 +50,67 @@ export const STATE_TRANSITION_RULES: StateTransitionRule[] = [
   {
     from: InternshipStatus.APPROVED,
     to: InternshipStatus.ACTIVE,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
   },
   // 8. APPROVED -> CANCELLED
   {
     from: InternshipStatus.APPROVED,
     to: InternshipStatus.CANCELLED,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
   // 9. APPROVED -> TERMINATED
   {
     from: InternshipStatus.APPROVED,
     to: InternshipStatus.TERMINATED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
   // 10. ACTIVE -> READY_FOR_COMPLETION (Tasks/milestones finished)
   {
     from: InternshipStatus.ACTIVE,
     to: InternshipStatus.READY_FOR_COMPLETION,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
   },
   // 11. ACTIVE -> TERMINATED (Early termination)
   {
     from: InternshipStatus.ACTIVE,
     to: InternshipStatus.TERMINATED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
   // 12. READY_FOR_COMPLETION -> COMPLETED (Final evaluation & completion sign-off)
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.COMPLETED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
   },
   // 13. READY_FOR_COMPLETION -> ACTIVE (Sent back for further milestone work)
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.ACTIVE,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
   // 14. READY_FOR_COMPLETION -> TERMINATED
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.TERMINATED,
-    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
   // 15. ACTIVE -> CANCELLED (Authorized cancellation with justification)
   {
     from: InternshipStatus.ACTIVE,
     to: InternshipStatus.CANCELLED,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
   // 16. READY_FOR_COMPLETION -> CANCELLED
   {
     from: InternshipStatus.READY_FOR_COMPLETION,
     to: InternshipStatus.CANCELLED,
-    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY],
+    allowedRoles: [UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN],
     requiresReason: true,
   },
 ];

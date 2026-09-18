@@ -5,14 +5,11 @@
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  HOD = 'HOD',
-  FACULTY = 'FACULTY',
-  STUDENT = 'STUDENT',
   MENTOR = 'MENTOR',
+  STUDENT = 'STUDENT',
   // Backwards compatibility legacy aliases
   SUPER_ADMIN = 'SUPER_ADMIN',
   INSTITUTION_ADMIN = 'INSTITUTION_ADMIN',
-  FACULTY_SUPERVISOR = 'FACULTY_SUPERVISOR',
   INDUSTRY_MENTOR = 'INDUSTRY_MENTOR',
 }
 
@@ -277,13 +274,18 @@ export interface CreateInternshipDto {
 
 export interface RegisterInstitutionDto {
   institutionName: string;
+  institutionType?: string;
   institutionCode: string;
   officialEmail: string;
+  officialEmailDomain?: string;
+  phoneNumber?: string;
   website?: string;
   address?: string;
   country?: string;
   state?: string;
   city?: string;
+  pincode?: string;
+  accreditationDetails?: string;
   adminFirstName: string;
   adminLastName: string;
   adminEmail: string;
@@ -347,10 +349,8 @@ export interface DepartmentDto {
   name: string;
   description?: string;
   isActive: boolean;
-  hodId?: string | null;
-  hodName?: string | null;
   studentCount?: number;
-  facultyCount?: number;
+  mentorCount?: number;
   activeInternships?: number;
   completedInternships?: number;
   pendingRegistrations?: number;
@@ -365,7 +365,6 @@ export interface CreateDepartmentDto {
   code: string;
   name: string;
   description?: string;
-  hodId?: string;
 }
 
 export interface UpdateDepartmentDto {
@@ -373,7 +372,6 @@ export interface UpdateDepartmentDto {
   name?: string;
   description?: string;
   isActive?: boolean;
-  hodId?: string | null;
 }
 
 export interface DepartmentStatsDto {
@@ -382,15 +380,90 @@ export interface DepartmentStatsDto {
   departmentCode: string;
   totalStudents: number;
   studentCount?: number;
-  totalFaculty?: number;
   activeInternships: number;
+  totalMentors?: number;
+  pendingTasks?: number;
+  completedOutcomes?: number;
   completedInternships?: number;
   pendingRegistrations?: number;
   pendingReviews?: number;
   mentorCount?: number;
   averageProgress?: number;
   completionRate?: number;
-  hodName?: string | null;
+  enrollment?: {
+    totalStudents: number;
+    activeStudents: number;
+    interningStudents: number;
+  };
+  internships?: {
+    active: number;
+    pending: number;
+    completed: number;
+    completionRate: number;
+  };
+  mentors?: {
+    assigned: number;
+    active: number;
+    avgInternsPerMentor: number;
+  };
+  tasks?: {
+    total: number;
+    completed: number;
+    pending: number;
+    overdue: number;
+  };
+  submissions?: {
+    submitted: number;
+    reviewed: number;
+    pendingReview: number;
+  };
+  outcomes?: {
+    evidenceSubmitted: number;
+    verified: number;
+    pending: number;
+  };
+}
+
+// ==========================================
+// Mentor Bulk CSV Import Pipeline DTOs
+// ==========================================
+
+export interface MentorCsvRowDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  company: string;
+  designation: string;
+  department: string;
+  specialization?: string;
+  linkedinUrl?: string;
+}
+
+export interface MentorCsvPreviewResponse {
+  token: string;
+  totalRows: number;
+  validRows: Array<MentorCsvRowDto & { departmentId?: string }>;
+  errorRows: Array<{
+    rowNumber: number;
+    raw: Record<string, string>;
+    errors: string[];
+  }>;
+  summary: {
+    total: number;
+    valid: number;
+    errors: number;
+  };
+}
+
+export interface MentorCsvImportResult {
+  importedCount: number;
+  skippedCount: number;
+  users: Array<{
+    id: string;
+    email: string;
+    activationUrl?: string;
+  }>;
 }
 
 // ==========================================
@@ -488,9 +561,7 @@ export interface CSVImportResult {
 
 export interface AdminDashboardMetrics {
   totalStudents: number;
-  totalFaculty: number;
   totalMentors: number;
-  totalHods: number;
   totalDepartments: number;
   activeInternships: number;
   pendingApprovals: number;
@@ -499,28 +570,9 @@ export interface AdminDashboardMetrics {
     departmentName: string;
     departmentCode: string;
     studentCount: number;
-    facultyCount: number;
+    mentorCount?: number;
     internshipCount: number;
   }[];
-}
-
-export interface HODDashboardMetrics {
-  departmentId: string;
-  departmentName: string;
-  departmentCode: string;
-  totalStudents: number;
-  totalFaculty: number;
-  activeInternships: number;
-  pendingApprovals: number;
-  unassignedInternsCount: number;
-}
-
-export interface FacultyDashboardMetrics {
-  facultyId: string;
-  supervisedStudentsCount: number;
-  activeInternshipsCount: number;
-  pendingReviewsCount: number;
-  completedEvaluationsCount: number;
 }
 
 export interface MentorDashboardMetrics {
@@ -664,6 +716,47 @@ export interface IAIService {
   analyzeSubmission(request: AISubmissionAnalysisRequest): Promise<AISubmissionAnalysisResponse>;
   mapInternshipOutcomes(request: AIOutcomeMappingRequest): Promise<AIOutcomeMappingResponse>;
   recommendRubric(request: AIRubricRecommendationRequest): Promise<AIRubricRecommendationResponse>;
+}
+
+export interface StudentRosterItemDto {
+  id: string; // internship id
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  departmentId?: string;
+  departmentName?: string;
+  departmentCode?: string;
+  companyName: string;
+  roleTitle: string;
+  status: string;
+  progressPercentage: number;
+  tasksTotal: number;
+  tasksCompleted: number;
+  submissionsCount: number;
+  mentorName?: string;
+  mentorEmail?: string;
+}
+
+export interface StudentProgressAssessmentResult {
+  studentId: string;
+  studentName: string;
+  departmentName: string;
+  companyName: string;
+  roleTitle: string;
+  velocityScore: number;
+  status: 'EXCELLING' | 'ON_TRACK' | 'NEEDS_ATTENTION' | 'CRITICAL_RISK';
+  summary: string;
+  strengths: string[];
+  riskFactors: string[];
+  recommendations: {
+    forStudent: string[];
+    forMentor: string[];
+    forInstitution: string[];
+  };
+  predictedOutcome: string;
+  academicCreditReadiness: string;
+  assessedAt: string;
+  source: 'GROQ_AI' | 'DETERMINISTIC_EVALUATOR';
 }
 
 // ==========================================
@@ -1135,38 +1228,7 @@ export interface StudentWorkspaceDto {
   submissions: SubmissionDto[];
 }
 
-export interface FacultyWorkspaceDto {
-  assignedInternships: InternshipDetailsDto[];
-  activeInternshipsCount: number;
-  overdueTasks: WorkflowTaskDto[];
-  pendingReviews: SubmissionDto[];
-  attentionCases: AttentionCaseDto[];
-  recentActivity: Array<{
-    id: string;
-    action: string;
-    description: string;
-    timestamp: string;
-  }>;
-}
 
-export interface HODWorkspaceDto {
-  departmentInternships: InternshipDetailsDto[];
-  facultyAssignments: Array<{
-    facultyId: string;
-    facultyName: string;
-    assignedCount: number;
-    activeCount: number;
-  }>;
-  departmentMonitoring: {
-    totalStudents: number;
-    totalInternships: number;
-    active: number;
-    pendingApproval: number;
-    completed: number;
-    overdueCount: number;
-  };
-  attentionCases: AttentionCaseDto[];
-}
 
 export interface MentorWorkspaceDto {
   assignedStudents: Array<{
@@ -1328,34 +1390,15 @@ export interface CompletionChecklistDto {
     requiredSubmissionsCompleted: boolean;
     requiredReviewsCompleted: boolean;
     finalEvaluationCompleted: boolean;
-    facultyConfirmationCompleted: boolean;
+    adminApprovalCompleted?: boolean;
   };
   details: {
     requiredTasksTotal: number;
     requiredTasksSubmitted: number;
     pendingReviewsTotal: number;
     hasFinalEvaluation: boolean;
-    hasFacultyConfirmation: boolean;
+    hasAdminApproval?: boolean;
   };
-}
-
-export interface FacultyConfirmationDto {
-  id: string;
-  organizationId: string;
-  internshipId: string;
-  facultyId: string;
-  facultyName: string;
-  facultyNotes: string;
-  academicRecommendation: 'APPROVED_FOR_CREDITS' | 'SATISFACTORY' | 'COMMENDED';
-  creditsAwarded?: number;
-  confirmedAt: string;
-}
-
-export interface CreateFacultyConfirmationDto {
-  internshipId: string;
-  facultyNotes: string;
-  academicRecommendation?: 'APPROVED_FOR_CREDITS' | 'SATISFACTORY' | 'COMMENDED';
-  creditsAwarded?: number;
 }
 
 export interface CompletedInternshipDossierDto {
@@ -1379,7 +1422,6 @@ export interface CompletedInternshipDossierDto {
     completedAt: string;
   };
   finalEvaluation: FinalEvaluationDto;
-  facultyConfirmation: FacultyConfirmationDto;
   outcomes: ExpectedOutcomeDto[];
   evidenceFiles: SubmissionFileDto[];
   milestoneFeedback: ReviewDto[];

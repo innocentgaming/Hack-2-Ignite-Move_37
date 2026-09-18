@@ -176,11 +176,7 @@ export class SubmissionService {
         if (memFile.internshipId) {
           const internship = internshipStore.details.get(memFile.internshipId);
           if (internship) {
-            if (role === UserRole.FACULTY && internship.facultyId === caller.id) {
-              isAuthorizedSupervisor = true;
-            } else if (role === UserRole.MENTOR && (internship.mentorId === caller.id || internship.mentor?.email === caller.email)) {
-              isAuthorizedSupervisor = true;
-            } else if (role === UserRole.HOD) {
+            if (role === UserRole.MENTOR && (internship.mentorId === caller.id || internship.mentor?.email === caller.email || (internship as any).industryMentorId === caller.id)) {
               isAuthorizedSupervisor = true;
             }
           }
@@ -445,8 +441,8 @@ export class SubmissionService {
     }
 
     const reviewerRole = normalizeRole(reviewerUser.role);
-    if (![UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN, UserRole.MENTOR].includes(reviewerRole)) {
-      throw new ForbiddenError('Only supervisors and industry mentors can submit reviews');
+    if (![UserRole.ADMIN, UserRole.MENTOR].includes(reviewerRole)) {
+      throw new ForbiddenError('Only assigned mentors and administrators can submit reviews');
     }
 
     const feedback = (dto.feedback || (dto as any).overallFeedback || '').trim();
@@ -562,19 +558,10 @@ export class SubmissionService {
     const role = normalizeRole(user.role);
     if (role === UserRole.STUDENT) {
       list = list.filter((s) => s.studentId === user.id);
-    } else if (role === UserRole.FACULTY) {
-      const supervisedIds = new Set(
-        Array.from(internshipStore.details.values())
-          .filter((d) => d.facultyId === user.id)
-          .map((d) => d.id)
-      );
-      if (supervisedIds.size > 0) {
-        list = list.filter((s) => supervisedIds.has(s.internshipId));
-      }
     } else if (role === UserRole.MENTOR) {
       const menteeInternshipIds = new Set(
         Array.from(internshipStore.details.values())
-          .filter((d) => d.mentorId === user.id || d.mentor?.email === user.email)
+          .filter((d) => (d as any).industryMentorId === user.id || (d as any).mentorId === user.id || d.mentor?.email === user.email)
           .map((d) => d.id)
       );
       if (menteeInternshipIds.size > 0) {

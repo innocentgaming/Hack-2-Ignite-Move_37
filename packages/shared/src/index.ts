@@ -154,6 +154,7 @@ export type Permission =
   | 'documents:manage'
   // Phase 2: Import, Audit, Settings
   | 'students:import'
+  | 'mentors:import'
   | 'audit:read'
   | 'settings:manage';
 
@@ -163,11 +164,6 @@ export function normalizeRole(role: UserRole | string): UserRole {
     case 'INSTITUTION_ADMIN':
     case 'ADMIN':
       return UserRole.ADMIN;
-    case 'HOD':
-      return UserRole.HOD;
-    case 'FACULTY_SUPERVISOR':
-    case 'FACULTY':
-      return UserRole.FACULTY;
     case 'INDUSTRY_MENTOR':
     case 'MENTOR':
       return UserRole.MENTOR;
@@ -211,54 +207,9 @@ const ADMIN_PERMISSIONS: Permission[] = [
   'documents:upload',
   'documents:manage',
   'students:import',
+  'mentors:import',
   'audit:read',
   'settings:manage',
-];
-
-const HOD_PERMISSIONS: Permission[] = [
-  'institution:read',
-  'department:read',
-  'department:manage',
-  'users:read',
-  'users:invite',
-  'workflows:read',
-  'workflows:manage',
-  'internships:read',
-  'internships:manage',
-  'approvals:read',
-  'approvals:manage',
-  'mentor_assignment:read',
-  'mentor_assignment:manage',
-  'submissions:read',
-  'reviews:read',
-  'evaluations:read',
-  'evaluations:manage',
-  'completion:read',
-  'completion:manage',
-  'monitoring:read',
-  'monitoring:manage',
-  'documents:read',
-  'documents:upload',
-];
-
-const FACULTY_PERMISSIONS: Permission[] = [
-  'institution:read',
-  'department:read',
-  'users:read',
-  'workflows:read',
-  'internships:read',
-  'approvals:read',
-  'approvals:manage',
-  'mentor_assignment:read',
-  'submissions:read',
-  'reviews:read',
-  'reviews:create',
-  'evaluations:read',
-  'evaluations:create',
-  'completion:read',
-  'monitoring:read',
-  'documents:read',
-  'documents:upload',
 ];
 
 const STUDENT_PERMISSIONS: Permission[] = [
@@ -295,14 +246,11 @@ const MENTOR_PERMISSIONS: Permission[] = [
 
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [UserRole.ADMIN]: ADMIN_PERMISSIONS,
-  [UserRole.HOD]: HOD_PERMISSIONS,
-  [UserRole.FACULTY]: FACULTY_PERMISSIONS,
   [UserRole.STUDENT]: STUDENT_PERMISSIONS,
   [UserRole.MENTOR]: MENTOR_PERMISSIONS,
   // Legacy aliases
   [UserRole.SUPER_ADMIN]: ADMIN_PERMISSIONS,
   [UserRole.INSTITUTION_ADMIN]: ADMIN_PERMISSIONS,
-  [UserRole.FACULTY_SUPERVISOR]: FACULTY_PERMISSIONS,
   [UserRole.INDUSTRY_MENTOR]: MENTOR_PERMISSIONS,
 };
 

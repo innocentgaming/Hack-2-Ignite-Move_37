@@ -16,8 +16,6 @@ import {
   UserFilterQuery,
   UserListItemDto,
   AdminDashboardMetrics,
-  HODDashboardMetrics,
-  FacultyDashboardMetrics,
   MentorDashboardMetrics,
   InstitutionProfileDto,
   UpdateInstitutionDto,
@@ -78,7 +76,40 @@ class TenantStore {
 
   public seedDefaults() {
     const now = new Date('2026-09-01T00:00:00Z');
-    // Departments for ORG_A
+
+    // 1. Departments for MIT_PUNE (demo-mit-pune)
+    this.departments.set('dept-mit-cse', {
+      id: 'dept-mit-cse',
+      organizationId: 'demo-mit-pune',
+      code: 'CSE',
+      name: 'Computer Science & Engineering',
+      description: 'Department of Computer Science & Engineering - Autonomous B.Tech & M.Tech Programs',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-mit-entc', {
+      id: 'dept-mit-entc',
+      organizationId: 'demo-mit-pune',
+      code: 'ENTC',
+      name: 'Electronics & Telecommunication',
+      description: 'Department of E&TC - Embedded Systems, IoT, and Signal Processing',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+    this.departments.set('dept-mit-mech', {
+      id: 'dept-mit-mech',
+      organizationId: 'demo-mit-pune',
+      code: 'MECH',
+      name: 'Mechanical Engineering',
+      description: 'Department of Mechanical Engineering - Mechatronics, Robotics, and Manufacturing',
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // 2. Departments for ORG_A
     this.departments.set('dept-a-cs', {
       id: 'dept-a-cs',
       organizationId: 'org-a-id',
@@ -86,7 +117,6 @@ class TenantStore {
       name: 'Computer Science Department',
       description: 'Department of Computer Science & Engineering',
       isActive: true,
-      hodId: 'user-a-hod',
       createdAt: now,
       updatedAt: now,
     });
@@ -97,7 +127,6 @@ class TenantStore {
       name: 'Information Technology',
       description: 'Department of Information Technology & Software Systems',
       isActive: true,
-      hodId: null,
       createdAt: now,
       updatedAt: now,
     });
@@ -108,12 +137,11 @@ class TenantStore {
       name: 'Electrical Engineering Department',
       description: 'Department of Electrical Engineering',
       isActive: true,
-      hodId: null,
       createdAt: now,
       updatedAt: now,
     });
 
-    // Departments for ORG_B
+    // 3. Departments for ORG_B
     this.departments.set('dept-b-me', {
       id: 'dept-b-me',
       organizationId: 'org-b-id',
@@ -121,7 +149,6 @@ class TenantStore {
       name: 'Mechanical Engineering Department',
       description: 'Department of Mechanical Engineering',
       isActive: true,
-      hodId: 'user-b-hod',
       createdAt: now,
       updatedAt: now,
     });
@@ -132,12 +159,11 @@ class TenantStore {
       name: 'Biotechnology Department',
       description: 'Department of Biotechnology',
       isActive: true,
-      hodId: null,
       createdAt: now,
       updatedAt: now,
     });
 
-    // Legacy Apex Depts
+    // 4. Legacy Apex Depts
     this.departments.set('dept-cse-uuid', {
       id: 'dept-cse-uuid',
       organizationId: 'apex-org-demo-uuid',
@@ -145,9 +171,49 @@ class TenantStore {
       name: 'Department of Computer Science & Engineering',
       description: 'Department of CSE',
       isActive: true,
-      hodId: 'user-hod-uuid',
       createdAt: now,
       updatedAt: now,
+    });
+
+    // Internships for MIT_PUNE
+    this.internships.set('internship-mit-1', {
+      id: 'internship-mit-1',
+      organizationId: 'demo-mit-pune',
+      studentId: 'user-mit-student-1',
+      companyId: 'company-tcs',
+      title: 'Full Stack Cloud Engineering Internship',
+      type: 'FULL_TIME',
+      status: InternshipStatus.ACTIVE,
+      startDate: new Date('2026-06-01'),
+      endDate: new Date('2026-11-30'),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    this.internships.set('internship-mit-2', {
+      id: 'internship-mit-2',
+      organizationId: 'demo-mit-pune',
+      studentId: 'user-mit-student-2',
+      companyId: 'company-infosys',
+      title: 'AI & Enterprise Automation Internship',
+      type: 'FULL_TIME',
+      status: InternshipStatus.ACTIVE,
+      startDate: new Date('2026-07-01'),
+      endDate: new Date('2026-12-15'),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    this.internships.set('internship-mit-3', {
+      id: 'internship-mit-3',
+      organizationId: 'demo-mit-pune',
+      studentId: 'user-mit-student-3',
+      companyId: 'company-bharatforge',
+      title: 'Autonomous Systems Software Intern',
+      type: 'PART_TIME',
+      status: InternshipStatus.PENDING_APPROVAL,
+      startDate: new Date('2026-08-01'),
+      endDate: new Date('2026-12-31'),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     // Internships for ORG_A
@@ -595,7 +661,6 @@ export class TenantService {
       name: dept.name,
       description: dept.description,
       isActive: dept.isActive,
-      hodId: dept.hodId,
       createdAt: dept.createdAt.toISOString(),
       updatedAt: dept.updatedAt.toISOString(),
     };
@@ -614,14 +679,6 @@ export class TenantService {
       throw new ConflictError(`Department with code '${dto.code}' already exists in this organization`);
     }
 
-    // Validate HOD if provided
-    if (dto.hodId) {
-      const hodUser = authStore.users.get(dto.hodId);
-      if (!hodUser || hodUser.organizationId !== organizationId) {
-        throw new ValidationError('Assigned HOD does not exist in this organization');
-      }
-    }
-
     const id = `dept-${dto.code.toLowerCase()}-${Date.now().toString(36)}`;
     const now = new Date();
     const newDept: InMemoryDepartment = {
@@ -631,21 +688,11 @@ export class TenantService {
       name: dto.name,
       description: dto.description,
       isActive: true,
-      hodId: dto.hodId || null,
       createdAt: now,
       updatedAt: now,
     };
 
     tenantStore.departments.set(id, newDept);
-
-    // If HOD was assigned, set user department and role to HOD if not already
-    if (dto.hodId) {
-      const hodUser = authStore.users.get(dto.hodId);
-      if (hodUser) {
-        hodUser.departmentId = id;
-        hodUser.role = UserRole.HOD;
-      }
-    }
 
     await auditService.log({
       organizationId,
@@ -653,7 +700,7 @@ export class TenantService {
       action: 'DEPARTMENT_CREATE',
       entity: 'Department',
       entityId: id,
-      details: { code: newDept.code, name: newDept.name, hodId: newDept.hodId },
+      details: { code: newDept.code, name: newDept.name },
     });
 
     return {
@@ -663,7 +710,6 @@ export class TenantService {
       name: newDept.name,
       description: newDept.description,
       isActive: newDept.isActive,
-      hodId: newDept.hodId,
       createdAt: newDept.createdAt.toISOString(),
       updatedAt: newDept.updatedAt.toISOString(),
     };
@@ -692,20 +738,6 @@ export class TenantService {
     if (dto.description !== undefined) dept.description = dto.description;
     if (dto.isActive !== undefined) dept.isActive = dto.isActive;
 
-    if (dto.hodId !== undefined) {
-      if (dto.hodId) {
-        const hodUser = authStore.users.get(dto.hodId);
-        if (!hodUser || hodUser.organizationId !== organizationId) {
-          throw new ValidationError('Assigned HOD does not exist in this organization');
-        }
-        dept.hodId = dto.hodId;
-        hodUser.departmentId = departmentId;
-        hodUser.role = UserRole.HOD;
-      } else {
-        dept.hodId = null;
-      }
-    }
-
     dept.updatedAt = new Date();
 
     await auditService.log({
@@ -724,7 +756,6 @@ export class TenantService {
       name: dept.name,
       description: dept.description,
       isActive: dept.isActive,
-      hodId: dept.hodId,
       createdAt: dept.createdAt.toISOString(),
       updatedAt: dept.updatedAt.toISOString(),
     };
@@ -732,19 +763,6 @@ export class TenantService {
 
   async toggleDepartmentActive(organizationId: string, departmentId: string, isActive: boolean, updaterId?: string): Promise<DepartmentDto> {
     return this.updateDepartment(organizationId, departmentId, { isActive }, updaterId);
-  }
-
-  async assignDepartmentHOD(organizationId: string, departmentId: string, hodId: string | null, updaterId?: string): Promise<DepartmentDto> {
-    const updated = await this.updateDepartment(organizationId, departmentId, { hodId }, updaterId);
-    await auditService.log({
-      organizationId,
-      userId: updaterId,
-      action: 'DEPARTMENT_ASSIGN_HOD',
-      entity: 'Department',
-      entityId: departmentId,
-      details: { hodId },
-    });
-    return updated;
   }
 
   async getDepartmentStats(organizationId: string, departmentId: string): Promise<DepartmentStatsDto> {
@@ -761,42 +779,60 @@ export class TenantService {
     );
 
     const totalStudents = deptUsers.filter((u) => u.role === UserRole.STUDENT).length;
+    const activeStudents = deptUsers.filter((u) => u.role === UserRole.STUDENT && u.status === UserStatus.ACTIVE).length;
     const mentors = Array.from(authStore.users.values()).filter(
       (u) => u.organizationId === organizationId && u.role === UserRole.MENTOR && (!u.departmentId || u.departmentId === departmentId)
     );
     const mentorCount = mentors.length;
-    const totalFaculty = mentorCount;
 
     const studentIds = new Set(deptUsers.filter((u) => u.role === UserRole.STUDENT).map((u) => u.id));
     const allInternships = Array.from(tenantStore.internships.values()).filter(
       (i) => i.organizationId === organizationId && studentIds.has(i.studentId)
     );
+    const internshipIds = new Set(allInternships.map((i) => i.id));
 
     const activeInternships = allInternships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
     const completedInternships = allInternships.filter((i) => i.status === InternshipStatus.COMPLETED).length;
     const pendingRegistrations = allInternships.filter((i) => i.status === InternshipStatus.PENDING_APPROVAL).length;
+    const interningStudents = allInternships.filter((i) => i.status === InternshipStatus.ACTIVE || i.status === InternshipStatus.COMPLETED).length;
 
-    // Count pending reviews for department
+    // Rich Live Metrics from StudentMentorStore
     let pendingReviews = 0;
+    let submittedCount = 0;
+    let reviewedCount = 0;
+    let totalTasks = 0;
+    let completedTasks = 0;
+    let pendingTasks = 0;
+    let overdueTasks = 0;
+    let outcomesEvidence = 0;
+    let outcomesVerified = 0;
+
     try {
       const { studentMentorStore } = await import('./student-mentor.service.js');
-      const studentSubs = Array.from(studentMentorStore.submissions.values()).filter(
-        (s) => s.organizationId === organizationId && studentIds.has(s.studentId) && s.status === 'SUBMITTED'
+      const subs = Array.from(studentMentorStore.submissions.values()).filter(
+        (s) => s.organizationId === organizationId && (internshipIds.has(s.internshipId) || studentIds.has(s.studentId))
       );
-      pendingReviews = studentSubs.length;
+      submittedCount = subs.length;
+      reviewedCount = subs.filter((s) => s.status === 'ACCEPTED' || s.status === 'REVISION_NEEDED').length;
+      pendingReviews = subs.filter((s) => s.status === 'SUBMITTED').length;
+
+      const tasks = Array.from(studentMentorStore.tasks.values()).filter(
+        (t) => t.organizationId === organizationId && internshipIds.has(t.internshipId)
+      );
+      totalTasks = tasks.length;
+      completedTasks = tasks.filter((t) => (t.status as any) === 'APPROVED').length;
+      pendingTasks = tasks.filter((t) => (t.status as any) === 'PENDING' || (t.status as any) === 'SUBMITTED').length;
+      overdueTasks = tasks.filter((t) => new Date(t.dueDate) < new Date() && (t.status as any) !== 'APPROVED').length;
+
+      outcomesEvidence = subs.filter((s) => s.evidenceUrl || s.attachmentName).length;
+      outcomesVerified = subs.filter((s) => s.status === 'ACCEPTED' && (s.evidenceUrl || s.attachmentName)).length;
     } catch {
-      // fallback
+      // in-memory fallback
     }
 
     const totalTracked = activeInternships + completedInternships;
     const completionRate = totalTracked > 0 ? Math.round((completedInternships / totalTracked) * 100) : 0;
     const averageProgress = totalTracked > 0 ? Math.round(((completedInternships * 100) + (activeInternships * 55)) / totalTracked) : 0;
-
-    let hodName: string | null = null;
-    if (dept.hodId) {
-      const hod = authStore.users.get(dept.hodId);
-      if (hod) hodName = `${hod.firstName} ${hod.lastName}`.trim();
-    }
 
     return {
       departmentId: dept.id,
@@ -804,7 +840,6 @@ export class TenantService {
       departmentCode: dept.code,
       totalStudents,
       studentCount: totalStudents,
-      totalFaculty,
       mentorCount,
       activeInternships,
       completedInternships,
@@ -812,7 +847,38 @@ export class TenantService {
       pendingReviews,
       averageProgress,
       completionRate,
-      hodName,
+      enrollment: {
+        totalStudents,
+        activeStudents,
+        interningStudents,
+      },
+      internships: {
+        active: activeInternships,
+        pending: pendingRegistrations,
+        completed: completedInternships,
+        completionRate,
+      },
+      mentors: {
+        assigned: mentorCount,
+        active: mentorCount,
+        avgInternsPerMentor: mentorCount > 0 ? Number((activeInternships / mentorCount).toFixed(1)) : 0,
+      },
+      tasks: {
+        total: totalTasks,
+        completed: completedTasks,
+        pending: pendingTasks,
+        overdue: overdueTasks,
+      },
+      submissions: {
+        submitted: submittedCount,
+        reviewed: reviewedCount,
+        pendingReview: pendingReviews,
+      },
+      outcomes: {
+        evidenceSubmitted: outcomesEvidence,
+        verified: outcomesVerified,
+        pending: outcomesEvidence - outcomesVerified,
+      },
     };
   }
 
@@ -1074,9 +1140,7 @@ export class TenantService {
     const orgInternships = Array.from(tenantStore.internships.values()).filter((i) => i.organizationId === organizationId);
 
     const totalStudents = orgUsers.filter((u) => u.role === UserRole.STUDENT).length;
-    const totalFaculty = orgUsers.filter((u) => u.role === UserRole.FACULTY).length;
     const totalMentors = orgUsers.filter((u) => u.role === UserRole.MENTOR).length;
-    const totalHods = orgUsers.filter((u) => u.role === UserRole.HOD).length;
     const totalDepartments = orgDepts.length;
 
     const activeInternships = orgInternships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
@@ -1085,7 +1149,7 @@ export class TenantService {
     const departmentBreakdown = orgDepts.map((d) => {
       const deptStudents = orgUsers.filter((u) => u.role === UserRole.STUDENT && u.departmentId === d.id);
       const studentIds = new Set(deptStudents.map((u) => u.id));
-      const deptFacultyCount = orgUsers.filter((u) => u.role === UserRole.FACULTY && u.departmentId === d.id).length;
+      const deptMentorCount = orgUsers.filter((u) => u.role === UserRole.MENTOR && u.departmentId === d.id).length;
       const deptInternshipCount = orgInternships.filter((i) => studentIds.has(i.studentId)).length;
 
       return {
@@ -1093,86 +1157,18 @@ export class TenantService {
         departmentName: d.name,
         departmentCode: d.code,
         studentCount: deptStudents.length,
-        facultyCount: deptFacultyCount,
+        mentorCount: deptMentorCount,
         internshipCount: deptInternshipCount,
       };
     });
 
     return {
       totalStudents,
-      totalFaculty,
       totalMentors,
-      totalHods,
       totalDepartments,
       activeInternships,
       pendingApprovals,
       departmentBreakdown,
-    };
-  }
-
-  async getHODDashboardMetrics(organizationId: string, userId: string): Promise<HODDashboardMetrics> {
-    const user = authStore.users.get(userId);
-    if (!user || user.organizationId !== organizationId) {
-      throw new UnauthorizedError('HOD user not found in organization context');
-    }
-
-    const dept = Array.from(tenantStore.departments.values()).find(
-      (d) => d.organizationId === organizationId && (d.hodId === userId || d.id === user.departmentId)
-    );
-
-    const deptId = dept ? dept.id : user.departmentId || 'unknown';
-    const deptName = dept ? dept.name : 'Unassigned Department';
-    const deptCode = dept ? dept.code : 'N/A';
-
-    const orgUsers = Array.from(authStore.users.values()).filter((u) => u.organizationId === organizationId);
-    const deptStudents = orgUsers.filter((u) => u.role === UserRole.STUDENT && u.departmentId === deptId);
-    const deptFaculty = orgUsers.filter((u) => u.role === UserRole.FACULTY && u.departmentId === deptId);
-
-    const studentIds = new Set(deptStudents.map((u) => u.id));
-    const deptInternships = Array.from(tenantStore.internships.values()).filter(
-      (i) => i.organizationId === organizationId && studentIds.has(i.studentId)
-    );
-
-    const activeInternships = deptInternships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
-    const pendingApprovals = deptInternships.filter((i) => i.status === InternshipStatus.PENDING_APPROVAL).length;
-    const unassignedInternsCount = deptStudents.filter((s) => !deptInternships.some((i) => i.studentId === s.id)).length;
-
-    return {
-      departmentId: deptId,
-      departmentName: deptName,
-      departmentCode: deptCode,
-      totalStudents: deptStudents.length,
-      totalFaculty: deptFaculty.length,
-      activeInternships,
-      pendingApprovals,
-      unassignedInternsCount,
-    };
-  }
-
-  async getFacultyDashboardMetrics(organizationId: string, facultyId: string): Promise<FacultyDashboardMetrics> {
-    const faculty = authStore.users.get(facultyId);
-    if (!faculty || faculty.organizationId !== organizationId) {
-      throw new UnauthorizedError('Faculty not found in organization context');
-    }
-
-    // In InternOS, faculty supervise students in their department or explicitly assigned
-    const orgStudents = Array.from(authStore.users.values()).filter(
-      (u) => u.organizationId === organizationId && u.role === UserRole.STUDENT && u.departmentId === faculty.departmentId
-    );
-    const studentIds = new Set(orgStudents.map((u) => u.id));
-    const internships = Array.from(tenantStore.internships.values()).filter(
-      (i) => i.organizationId === organizationId && studentIds.has(i.studentId)
-    );
-
-    const activeInternshipsCount = internships.filter((i) => i.status === InternshipStatus.ACTIVE).length;
-    const pendingReviewsCount = internships.filter((i) => i.status === InternshipStatus.PENDING_APPROVAL).length;
-
-    return {
-      facultyId,
-      supervisedStudentsCount: orgStudents.length,
-      activeInternshipsCount,
-      pendingReviewsCount,
-      completedEvaluationsCount: 0,
     };
   }
 

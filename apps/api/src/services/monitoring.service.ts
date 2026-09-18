@@ -46,37 +46,14 @@ export class MonitoringService {
       return allTenantInternships;
     }
 
-    if (role === UserRole.HOD) {
-      const hodUser = authStore.users.get(user.id);
-      const deptId = hodUser?.departmentId;
-      if (!deptId) return allTenantInternships;
-
-      return allTenantInternships.filter((d) => {
-        const student = authStore.users.get(d.studentId);
-        return student?.departmentId === deptId;
-      });
-    }
-
-    if (role === UserRole.FACULTY) {
-      const facultyUser = authStore.users.get(user.id);
-      const deptId = facultyUser?.departmentId;
-
-      const directAssigned = allTenantInternships.filter((d) => d.facultyId === user.id);
-      if (directAssigned.length > 0) return directAssigned;
-
-      if (deptId) {
-        return allTenantInternships.filter((d) => {
-          const student = authStore.users.get(d.studentId);
-          return student?.departmentId === deptId;
-        });
-      }
-      return allTenantInternships;
-    }
-
     if (role === UserRole.MENTOR) {
       const mentorUser = authStore.users.get(user.id);
       return allTenantInternships.filter(
-        (d) => d.mentorId === user.id || (mentorUser && d.mentor?.email === mentorUser.email)
+        (d) =>
+          (d as any).industryMentorId === user.id ||
+          (d as any).mentorId === user.id ||
+          d.mentor?.email === user.email ||
+          (mentorUser && d.mentor?.email === mentorUser.email)
       );
     }
 

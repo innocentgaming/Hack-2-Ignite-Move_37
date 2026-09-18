@@ -13,6 +13,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { AdminDepartmentsPage } from './pages/AdminDepartmentsPage';
 import { AdminUsersPage } from './pages/AdminUsersPage';
 import { AdminStudentImportPage } from './pages/AdminStudentImportPage';
+import { AdminMentorImportPage } from './pages/AdminMentorImportPage';
 import { AdminAuditLogsPage } from './pages/AdminAuditLogsPage';
 import { AdminSettingsPage } from './pages/AdminSettingsPage';
 import { AdminWorkflowsPage } from './pages/AdminWorkflowsPage';
@@ -88,6 +89,7 @@ export const App: React.FC = () => {
               <Route path="admin/departments" element={<AdminDepartmentsPage />} />
               <Route path="admin/users" element={<AdminUsersPage />} />
               <Route path="admin/students/import" element={<AdminStudentImportPage />} />
+              <Route path="admin/mentors/import" element={<AdminMentorImportPage />} />
               <Route path="admin/audit" element={<AdminAuditLogsPage />} />
               <Route path="admin/workflows" element={<AdminWorkflowsPage />} />
               <Route path="admin/settings" element={<AdminSettingsPage />} />

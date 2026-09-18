@@ -213,6 +213,12 @@ export const Sidebar: React.FC = () => {
       roles: [UserRole.ADMIN],
     },
     {
+      label: 'Mentor CSV Import',
+      to: '/app/admin/mentors/import',
+      icon: Users,
+      roles: [UserRole.ADMIN],
+    },
+    {
       label: 'Workflow Blueprints',
       to: '/app/admin/workflows',
       icon: GitBranch,

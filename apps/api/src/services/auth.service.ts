@@ -59,7 +59,36 @@ class AuthStore {
     const defaultPasswordHash = bcrypt.hashSync('Password123!', 10);
     const seedDate = new Date('2026-09-01T00:00:00Z');
 
-    // 1. Organization A
+    // 1. Isolated Demo Tenant: MIT Pune (Maharashtra Institute of Technology, Pune)
+    const orgDemo: InMemoryOrg = {
+      id: 'demo-mit-pune',
+      code: 'MIT_PUNE',
+      name: 'Maharashtra Institute of Technology, Pune',
+      domain: 'mitpune.edu.in',
+      settings: {
+        academicYear: '2026-2027',
+        semester: 'Semester VII',
+        institutionType: 'AUTONOMOUS_INSTITUTE',
+        officialEmailDomain: 'mitpune.edu.in',
+        phoneNumber: '+91 20 2543 1795',
+        pincode: '411038',
+        accreditationDetails: 'NAAC A+ Autonomous (Grade: 3.65) / NBA Tier-1 Accredited',
+        address: 'Paud Road, Kothrud',
+        city: 'Pune',
+        state: 'Maharashtra',
+        country: 'India',
+        defaultInternshipDurationWeeks: 16,
+        requireMentorEvaluation: true,
+        allowStudentSelfRegistration: true,
+        contactEmail: 'admin@mitpune.edu.in',
+        isDemoAccount: true,
+      },
+      createdAt: seedDate,
+      updatedAt: seedDate,
+    };
+    this.organizations.set(orgDemo.id, orgDemo);
+
+    // 2. Organization A
     const orgA: InMemoryOrg = {
       id: 'org-a-id',
       code: 'ORG_A',
@@ -78,7 +107,7 @@ class AuthStore {
     };
     this.organizations.set(orgA.id, orgA);
 
-    // 2. Organization B
+    // 3. Organization B
     const orgB: InMemoryOrg = {
       id: 'org-b-id',
       code: 'ORG_B',
@@ -97,7 +126,7 @@ class AuthStore {
     };
     this.organizations.set(orgB.id, orgB);
 
-    // 3. Apex Legacy Org
+    // 4. Apex Legacy Org
     const orgApex: InMemoryOrg = {
       id: 'apex-org-demo-uuid',
       code: 'apex-inst',
@@ -116,7 +145,77 @@ class AuthStore {
     };
     this.organizations.set(orgApex.id, orgApex);
 
-    // Seed ORG_A Users (ADMIN, HOD, FACULTY, STUDENT, MENTOR)
+    // Seed MIT_PUNE Demo Users (ADMIN, MENTOR, STUDENT)
+    const mitPuneUsers: Omit<InMemoryUser, 'createdAt' | 'updatedAt'>[] = [
+      {
+        id: 'user-mit-admin',
+        organizationId: 'demo-mit-pune',
+        departmentId: 'dept-mit-cse',
+        email: 'admin@mitpune.edu.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Rajesh',
+        lastName: 'Kulkarni',
+        role: UserRole.ADMIN,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-mit-mentor-1',
+        organizationId: 'demo-mit-pune',
+        departmentId: 'dept-mit-cse',
+        email: 'rahul.mehta@tcs.com',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Rahul',
+        lastName: 'Mehta',
+        role: UserRole.MENTOR,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-mit-mentor-2',
+        organizationId: 'demo-mit-pune',
+        departmentId: 'dept-mit-cse',
+        email: 'priya.nair@infosys.com',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Priya',
+        lastName: 'Nair',
+        role: UserRole.MENTOR,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-mit-student-1',
+        organizationId: 'demo-mit-pune',
+        departmentId: 'dept-mit-cse',
+        email: 'aarav.sharma@mitpune.edu.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Aarav',
+        lastName: 'Sharma',
+        role: UserRole.STUDENT,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-mit-student-2',
+        organizationId: 'demo-mit-pune',
+        departmentId: 'dept-mit-cse',
+        email: 'ananya.patil@mitpune.edu.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Ananya',
+        lastName: 'Patil',
+        role: UserRole.STUDENT,
+        status: UserStatus.ACTIVE,
+      },
+      {
+        id: 'user-mit-student-3',
+        organizationId: 'demo-mit-pune',
+        departmentId: 'dept-mit-entc',
+        email: 'rohan.k@mitpune.edu.in',
+        passwordHash: defaultPasswordHash,
+        firstName: 'Rohan',
+        lastName: 'Kulkarni',
+        role: UserRole.STUDENT,
+        status: UserStatus.ACTIVE,
+      },
+    ];
+
+    // Seed ORG_A Users (ADMIN, STUDENT, MENTOR)
     const orgAUsers: Omit<InMemoryUser, 'createdAt' | 'updatedAt'>[] = [
       {
         id: 'user-a-admin',
@@ -127,28 +226,6 @@ class AuthStore {
         firstName: 'Alice',
         lastName: 'Admin',
         role: UserRole.ADMIN,
-        status: UserStatus.ACTIVE,
-      },
-      {
-        id: 'user-a-hod',
-        organizationId: 'org-a-id',
-        departmentId: 'dept-a-cs',
-        email: 'hod@org-a.com',
-        passwordHash: defaultPasswordHash,
-        firstName: 'Harold',
-        lastName: 'HeadOfDept',
-        role: UserRole.HOD,
-        status: UserStatus.ACTIVE,
-      },
-      {
-        id: 'user-a-faculty',
-        organizationId: 'org-a-id',
-        departmentId: 'dept-a-cs',
-        email: 'faculty@org-a.com',
-        passwordHash: defaultPasswordHash,
-        firstName: 'Fiona',
-        lastName: 'Faculty',
-        role: UserRole.FACULTY,
         status: UserStatus.ACTIVE,
       },
       {
@@ -208,7 +285,7 @@ class AuthStore {
       },
     ];
 
-    // Seed ORG_B Users (ADMIN, HOD, FACULTY, STUDENT, MENTOR)
+    // Seed ORG_B Users (ADMIN, STUDENT, MENTOR)
     const orgBUsers: Omit<InMemoryUser, 'createdAt' | 'updatedAt'>[] = [
       {
         id: 'user-b-admin',
@@ -219,28 +296,6 @@ class AuthStore {
         firstName: 'Bob',
         lastName: 'Admin',
         role: UserRole.ADMIN,
-        status: UserStatus.ACTIVE,
-      },
-      {
-        id: 'user-b-hod',
-        organizationId: 'org-b-id',
-        departmentId: 'dept-b-me',
-        email: 'hod@org-b.com',
-        passwordHash: defaultPasswordHash,
-        firstName: 'Helena',
-        lastName: 'HeadOfDept',
-        role: UserRole.HOD,
-        status: UserStatus.ACTIVE,
-      },
-      {
-        id: 'user-b-faculty',
-        organizationId: 'org-b-id',
-        departmentId: 'dept-b-me',
-        email: 'faculty@org-b.com',
-        passwordHash: defaultPasswordHash,
-        firstName: 'Frank',
-        lastName: 'Faculty',
-        role: UserRole.FACULTY,
         status: UserStatus.ACTIVE,
       },
       {
@@ -267,7 +322,7 @@ class AuthStore {
       },
     ];
 
-    // Seed Legacy Demo Accounts
+    // Seed Legacy Demo Accounts (ADMIN, MENTOR, STUDENT)
     const legacyUsers: Omit<InMemoryUser, 'createdAt' | 'updatedAt'>[] = [
       {
         id: 'demo-user-admin',
@@ -278,17 +333,6 @@ class AuthStore {
         firstName: 'Arthur',
         lastName: 'Pendelton',
         role: UserRole.ADMIN,
-        status: UserStatus.ACTIVE,
-      },
-      {
-        id: 'demo-user-faculty',
-        organizationId: 'apex-org-demo-uuid',
-        departmentId: 'dept-cse-uuid',
-        email: 'dr.sharma@apex.edu',
-        passwordHash: defaultPasswordHash,
-        firstName: 'Priya',
-        lastName: 'Sharma',
-        role: UserRole.FACULTY,
         status: UserStatus.ACTIVE,
       },
       {
@@ -315,7 +359,7 @@ class AuthStore {
       },
     ];
 
-    const allSeed = [...orgAUsers, ...orgBUsers, ...legacyUsers];
+    const allSeed = [...mitPuneUsers, ...orgAUsers, ...orgBUsers, ...legacyUsers];
     for (const u of allSeed) {
       this.users.set(u.id, {
         ...u,
@@ -529,9 +573,9 @@ export class AuthService {
     const normalizedEmail = email.toLowerCase().trim();
     const normalizedRole = normalizeRole(role);
 
-    // Restrict invited roles to valid platform roles
-    if (![UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN, UserRole.HOD, UserRole.FACULTY].includes(normalizedRole)) {
-      throw new ValidationError('Invalid role for organization invite');
+    // Restrict invited roles to valid platform roles (ADMIN, MENTOR, STUDENT)
+    if (![UserRole.STUDENT, UserRole.MENTOR, UserRole.ADMIN].includes(normalizedRole)) {
+      throw new ValidationError('Invalid role for organization invite. Only STUDENT, MENTOR, and ADMIN are permitted');
     }
 
     // Check if user already exists in this organization
@@ -581,7 +625,7 @@ export class AuthService {
             passwordHash: '',
             firstName,
             lastName,
-            role: normalizedRole,
+            role: normalizedRole as any,
             status: UserStatus.PENDING_VERIFICATION,
           },
         });
@@ -694,11 +738,29 @@ export class AuthService {
       adminLastName,
       adminEmail,
       password,
+      institutionType,
+      officialEmailDomain,
+      phoneNumber,
+      pincode,
+      accreditationDetails,
     } = dto;
 
     const normalizedOrgCode = institutionCode.toUpperCase().trim();
     const normalizedAdminEmail = adminEmail.toLowerCase().trim();
     const normalizedOfficialEmail = officialEmail.toLowerCase().trim();
+
+    // Indian PIN code validation (6 digits)
+    if (pincode && !/^\d{6}$/.test(pincode.trim())) {
+      throw new ValidationError('Indian PIN code must be exactly 6 digits');
+    }
+
+    // Phone number validation
+    if (phoneNumber && !/^(\+91[\-\s]?)?[6-9]\d{9}$/.test(phoneNumber.trim().replace(/\s+/g, ''))) {
+      // allow flexible format but warn if completely non-numeric
+      if (phoneNumber.replace(/\D/g, '').length < 10) {
+        throw new ValidationError('Contact phone number must have at least 10 digits');
+      }
+    }
 
     // Verify org code is unique
     const existingOrg = authStore.findOrgByCode(normalizedOrgCode);
@@ -724,15 +786,20 @@ export class AuthService {
       id: orgId,
       code: normalizedOrgCode,
       name: institutionName.trim(),
-      domain: website || `${normalizedOrgCode.toLowerCase()}.edu`,
+      domain: officialEmailDomain || website || `${normalizedOrgCode.toLowerCase()}.edu.in`,
       settings: {
         academicYear: '2026-2027',
-        semester: 'Fall',
+        semester: 'Semester VII',
         officialEmail: normalizedOfficialEmail,
-        address,
-        country: country || 'United States',
-        state,
-        city,
+        institutionType: institutionType || 'UNIVERSITY',
+        officialEmailDomain: officialEmailDomain || normalizedOfficialEmail.split('@')[1],
+        phoneNumber: phoneNumber?.trim(),
+        pincode: pincode?.trim(),
+        accreditationDetails: accreditationDetails?.trim(),
+        address: address?.trim(),
+        country: country || 'India',
+        state: state?.trim(),
+        city: city?.trim(),
         requireMentorEvaluation: true,
         allowStudentSelfRegistration: true,
       },

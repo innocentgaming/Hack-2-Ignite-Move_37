@@ -122,11 +122,11 @@ export const AdminWorkflowsPage: React.FC = () => {
         order: 3,
         type: WorkflowStepType.REVIEW,
         frequency: WorkflowStepFrequency.MONTHLY,
-        actor: UserRole.FACULTY,
+        actor: UserRole.MENTOR,
         required: true,
         deadlineDays: 35,
-        title: 'Faculty Supervisor Review',
-        description: 'Academic supervisor review and milestone endorsement',
+        title: 'Mentor Milestone Review',
+        description: 'Supervisory review and milestone verification',
         evaluationCriteria: 'Milestone completion and code quality',
         maxMarks: 50,
         latePolicy: LatePolicyType.STRICT_LOCK,
@@ -150,11 +150,11 @@ export const AdminWorkflowsPage: React.FC = () => {
         order: 5,
         type: WorkflowStepType.EVALUATION,
         frequency: WorkflowStepFrequency.ONE_TIME,
-        actor: UserRole.FACULTY,
+        actor: UserRole.MENTOR,
         required: true,
         deadlineDays: 90,
         title: 'Final Capstone Evaluation',
-        description: 'Comprehensive exit rubric and internship defense',
+        description: 'Comprehensive exit rubric and internship evaluation',
         evaluationCriteria: 'Summative rubric scores and technical outcome mastery',
         maxMarks: 100,
         latePolicy: LatePolicyType.STRICT_LOCK,
@@ -538,9 +538,8 @@ export const AdminWorkflowsPage: React.FC = () => {
                         className="w-full rounded-lg border border-slate-300 p-2 bg-white"
                       >
                         <option value={UserRole.STUDENT}>Student</option>
-                        <option value={UserRole.FACULTY}>Faculty Supervisor</option>
-                        <option value={UserRole.HOD}>Department Head (HOD)</option>
-                        <option value={UserRole.MENTOR}>Industry Mentor</option>
+                        <option value={UserRole.MENTOR}>Assigned Mentor</option>
+                        <option value={UserRole.ADMIN}>Administrator</option>
                       </select>
                     </div>
 

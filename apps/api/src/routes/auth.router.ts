@@ -15,13 +15,18 @@ const loginSchema = z.object({
 
 const registerInstitutionSchema = z.object({
   institutionName: z.string().min(2, 'Institution name is required'),
+  institutionType: z.string().optional(),
   institutionCode: z.string().min(2, 'Institution code is required'),
   officialEmail: z.string().email('Valid official email is required'),
+  officialEmailDomain: z.string().optional(),
+  phoneNumber: z.string().optional(),
   website: z.string().optional(),
   address: z.string().optional(),
   country: z.string().optional(),
   state: z.string().optional(),
   city: z.string().optional(),
+  pincode: z.string().optional(),
+  accreditationDetails: z.string().optional(),
   adminFirstName: z.string().min(1, 'Admin first name is required'),
   adminLastName: z.string().min(1, 'Admin last name is required'),
   adminEmail: z.string().email('Valid admin email is required'),
@@ -30,7 +35,7 @@ const registerInstitutionSchema = z.object({
 
 const inviteSchema = z.object({
   email: z.string().email('Valid email address is required'),
-  role: z.nativeEnum(UserRole),
+  role: z.enum([UserRole.ADMIN, UserRole.MENTOR, UserRole.STUDENT]),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   departmentId: z.string().optional(),

@@ -1,56 +1,63 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardBody } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { FormInput } from '../components/FormInput';
 import { apiClient } from '../services/apiClient';
-import { DepartmentDto, DepartmentStatsDto, UserListItemDto } from '@internos/types';
-import { BookOpen, Plus, ToggleLeft, ToggleRight, X, BarChart3 } from 'lucide-react';
+import { DepartmentDto, DepartmentStatsDto } from '@internos/types';
+import {
+  BookOpen,
+  Plus,
+  Edit2,
+  CheckCircle,
+  XCircle,
+  BarChart2,
+  X,
+  ArrowLeft,
+  Users,
+  Briefcase,
+  Award,
+  CheckSquare,
+  Sparkles,
+} from 'lucide-react';
 
 export const AdminDepartmentsPage: React.FC = () => {
   const [departments, setDepartments] = useState<DepartmentDto[]>([]);
-  const [users, setUsers] = useState<UserListItemDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Department Modal State
+  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedDept, setSelectedDept] = useState<DepartmentDto | null>(null);
+
+  // Form Fields
   const [formCode, setFormCode] = useState('');
   const [formName, setFormName] = useState('');
   const [formDesc, setFormDesc] = useState('');
-  const [formHodId, setFormHodId] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Department Stats Drawer / Modal
+  // Department Stats Drawer
   const [selectedStats, setSelectedStats] = useState<DepartmentStatsDto | null>(null);
   const [loadingStats, setLoadingStats] = useState(false);
 
-  const loadData = async () => {
-    setLoading(true);
-    setError(null);
+  const fetchDepartments = async () => {
     try {
-      const [deptRes, userRes] = await Promise.all([
-        apiClient.get<DepartmentDto[]>('/api/v1/admin/departments'),
-        apiClient.get<{ users: UserListItemDto[]; total: number }>('/api/v1/admin/users'),
-      ]);
-
-      if (deptRes.success && deptRes.data) {
-        setDepartments(deptRes.data);
-      }
-      if (userRes.success && userRes.data) {
-        setUsers(userRes.data.users);
+      setLoading(true);
+      const res = await apiClient.get<DepartmentDto[]>('/api/v1/admin/departments');
+      if (res.success && res.data) {
+        setDepartments(res.data);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load department registry');
+      setError(err instanceof Error ? err.message : 'Failed to fetch departments');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    fetchDepartments();
   }, []);
 
   const openCreateModal = () => {
@@ -59,7 +66,6 @@ export const AdminDepartmentsPage: React.FC = () => {
     setFormCode('');
     setFormName('');
     setFormDesc('');
-    setFormHodId('');
     setIsModalOpen(true);
   };
 
@@ -69,7 +75,6 @@ export const AdminDepartmentsPage: React.FC = () => {
     setFormCode(dept.code);
     setFormName(dept.name);
     setFormDesc(dept.description || '');
-    setFormHodId(dept.hodId || '');
     setIsModalOpen(true);
   };
 
@@ -84,21 +89,22 @@ export const AdminDepartmentsPage: React.FC = () => {
           code: formCode,
           name: formName,
           description: formDesc,
-          hodId: formHodId || undefined,
         });
-        if (!res.success) throw new Error(res.error?.message || 'Failed to create department');
+        if (res.success && res.data) {
+          setDepartments((prev) => [...prev, res.data!]);
+          setIsModalOpen(false);
+        }
       } else if (selectedDept) {
-        const res = await apiClient.put<DepartmentDto>(`/api/v1/admin/departments/${selectedDept.id}`, {
+        const res = await apiClient.patch<DepartmentDto>(`/api/v1/admin/departments/${selectedDept.id}`, {
           code: formCode,
           name: formName,
           description: formDesc,
-          hodId: formHodId || null,
         });
-        if (!res.success) throw new Error(res.error?.message || 'Failed to update department');
+        if (res.success && res.data) {
+          setDepartments((prev) => prev.map((d) => (d.id === selectedDept.id ? res.data! : d)));
+          setIsModalOpen(false);
+        }
       }
-
-      setIsModalOpen(false);
-      await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error saving department');
     } finally {
@@ -111,24 +117,23 @@ export const AdminDepartmentsPage: React.FC = () => {
       const res = await apiClient.patch<DepartmentDto>(`/api/v1/admin/departments/${dept.id}/status`, {
         isActive: !dept.isActive,
       });
-      if (res.success) {
-        await loadData();
+      if (res.success && res.data) {
+        setDepartments((prev) => prev.map((d) => (d.id === dept.id ? res.data! : d)));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error toggling department status');
+      setError(err instanceof Error ? err.message : 'Error updating status');
     }
   };
 
   const handleViewStats = async (deptId: string) => {
-    setLoadingStats(true);
-    setSelectedStats(null);
     try {
+      setLoadingStats(true);
       const res = await apiClient.get<DepartmentStatsDto>(`/api/v1/admin/departments/${deptId}/stats`);
       if (res.success && res.data) {
         setSelectedStats(res.data);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load department statistics');
+      setError(err instanceof Error ? err.message : 'Error loading department metrics');
     } finally {
       setLoadingStats(false);
     }
@@ -136,39 +141,40 @@ export const AdminDepartmentsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <BookOpen className="w-7 h-7 text-indigo-600" />
-            Department Management
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Configure academic departments, assign Heads of Department (HOD), and inspect real telemetry.
-          </p>
+      {/* Navigation & Header */}
+      <div>
+        <Link
+          to="/app/admin"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors mb-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Dashboard</span>
+        </Link>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Academic Department Registry</h1>
+            <p className="text-xs text-slate-500 mt-1">
+              Configure and govern academic departments, evaluate live telemetry, and supervise student cohorts.
+            </p>
+          </div>
+          <Button onClick={openCreateModal} className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+            <Plus className="w-4 h-4" />
+            <span>Create Department</span>
+          </Button>
         </div>
-        <Button onClick={openCreateModal} className="flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Add Department
-        </Button>
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-sm flex justify-between items-center">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center justify-between">
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="text-rose-500 hover:text-rose-800">
+          <button onClick={() => setError(null)} className="text-rose-500 hover:text-rose-700">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Department Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="h-44 bg-slate-200 rounded-xl" />
-          ))}
-        </div>
+        <div className="p-12 text-center text-slate-400">Loading department registry...</div>
       ) : departments.length === 0 ? (
         <Card>
           <CardBody className="py-12 text-center">
@@ -179,111 +185,110 @@ export const AdminDepartmentsPage: React.FC = () => {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {departments.map((dept) => {
-            const assignedHod = users.find((u) => u.id === dept.hodId);
-            return (
-              <Card key={dept.id} className="relative flex flex-col justify-between hover:shadow-md transition-shadow">
-                <CardHeader className="flex items-start justify-between pb-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                        {dept.code}
-                      </span>
-                      <Badge variant={dept.isActive ? 'emerald' : 'slate'}>
-                        {dept.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-900 mt-2">{dept.name}</h3>
-                  </div>
-                  <button
-                    onClick={() => handleToggleStatus(dept)}
-                    title={dept.isActive ? 'Deactivate Department' : 'Activate Department'}
-                    className="text-slate-400 hover:text-slate-600 p-1"
-                  >
-                    {dept.isActive ? (
-                      <ToggleRight className="w-6 h-6 text-emerald-600" />
-                    ) : (
-                      <ToggleLeft className="w-6 h-6 text-slate-400" />
-                    )}
-                  </button>
-                </CardHeader>
-                <CardBody className="pt-0 space-y-4">
-                  <p className="text-xs text-slate-500 line-clamp-2">
-                    {dept.description || 'No description provided.'}
-                  </p>
-
-                  <div className="text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100 flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Head of Department:</span>
-                    <span className="font-semibold text-slate-800">
-                      {assignedHod ? `${assignedHod.firstName} ${assignedHod.lastName}` : 'Unassigned'}
+          {departments.map((dept) => (
+            <Card key={dept.id} className="relative flex flex-col justify-between hover:shadow-md transition-shadow">
+              <CardHeader className="flex items-start justify-between pb-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      {dept.code}
                     </span>
+                    <Badge variant={dept.isActive ? 'emerald' : 'slate'}>
+                      {dept.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
                   </div>
+                  <h3 className="text-lg font-semibold text-slate-900 mt-2">{dept.name}</h3>
+                </div>
+                <button
+                  onClick={() => handleToggleStatus(dept)}
+                  title={dept.isActive ? 'Deactivate Department' : 'Activate Department'}
+                  className="text-slate-400 hover:text-slate-600 p-1"
+                >
+                  {dept.isActive ? (
+                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-slate-300" />
+                  )}
+                </button>
+              </CardHeader>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewStats(dept.id)}
-                      className="flex-1 flex items-center justify-center gap-1.5 text-xs"
-                    >
-                      <BarChart3 className="w-3.5 h-3.5" />
-                      Live Metrics
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditModal(dept)}
-                      className="flex-1 text-xs"
-                    >
-                      Edit Details
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
-            );
-          })}
+              <CardBody className="py-2 flex-1">
+                <p className="text-xs text-slate-500 line-clamp-2">
+                  {dept.description || 'No description provided.'}
+                </p>
+              </CardBody>
+
+              <div className="p-4 border-t border-slate-100 bg-slate-50/50 rounded-b-xl flex items-center justify-between gap-2">
+                <button
+                  onClick={() => handleViewStats(dept.id)}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                >
+                  <BarChart2 className="w-3.5 h-3.5" />
+                  <span>Live Telemetry</span>
+                </button>
+
+                <div className="flex items-center gap-1">
+                  <Button variant="outline" size="sm" onClick={() => openEditModal(dept)}>
+                    <Edit2 className="w-3.5 h-3.5 mr-1" />
+                    <span>Edit</span>
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       )}
 
-      {/* Live Metrics Modal */}
+      {/* Live Metrics Telemetry Drawer / Modal */}
       {(selectedStats || loadingStats) && (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-indigo-600" />
-                {selectedStats ? selectedStats.departmentName : 'Loading Statistics...'}
-              </h3>
-              <button onClick={() => setSelectedStats(null)} className="text-slate-400 hover:text-slate-600">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                  {selectedStats?.departmentCode || 'DEPT'}
+                </span>
+                <h3 className="text-base font-bold text-slate-900 mt-1">
+                  {selectedStats?.departmentName || 'Department Telemetry'}
+                </h3>
+              </div>
+              <button onClick={() => setSelectedStats(null)} className="text-slate-400 hover:text-slate-600 p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {loadingStats ? (
-              <div className="py-8 text-center text-slate-500 text-sm">Computing dynamic telemetry...</div>
+              <div className="py-8 text-center text-xs text-slate-400">Loading department live metrics...</div>
             ) : selectedStats ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-center">
-                    <span className="text-2xl font-black text-indigo-600">{selectedStats.totalStudents}</span>
+                  <div className="p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl text-center">
+                    <Users className="w-4 h-4 text-indigo-500 mx-auto mb-1" />
+                    <span className="text-2xl font-black text-indigo-700">{selectedStats.totalStudents}</span>
                     <p className="text-xs text-indigo-800 font-medium mt-0.5">Enrolled Students</p>
                   </div>
-                  <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-center">
-                    <span className="text-2xl font-black text-emerald-600">{selectedStats.activeInternships}</span>
+                  <div className="p-3.5 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
+                    <Briefcase className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
+                    <span className="text-2xl font-black text-emerald-700">{selectedStats.activeInternships}</span>
                     <p className="text-xs text-emerald-800 font-medium mt-0.5">Active Internships</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg text-center">
-                    <span className="text-2xl font-black text-amber-600">{selectedStats.totalFaculty}</span>
-                    <p className="text-xs text-amber-800 font-medium mt-0.5">Assigned Faculty</p>
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="p-2.5 bg-amber-50 border border-amber-100 rounded-xl text-center">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500 mx-auto mb-1" />
+                    <span className="text-lg font-black text-amber-700">{selectedStats.totalMentors}</span>
+                    <p className="text-[11px] text-amber-800 font-medium mt-0.5">Mentors</p>
                   </div>
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
-                    <span className="text-xs font-mono font-bold text-slate-700 block truncate mt-2">
-                      {selectedStats.hodName || 'None'}
-                    </span>
-                    <p className="text-xs text-slate-500 font-medium mt-1">Designated HOD</p>
+                  <div className="p-2.5 bg-purple-50 border border-purple-100 rounded-xl text-center">
+                    <CheckSquare className="w-3.5 h-3.5 text-purple-500 mx-auto mb-1" />
+                    <span className="text-lg font-black text-purple-700">{selectedStats.pendingTasks}</span>
+                    <p className="text-[11px] text-purple-800 font-medium mt-0.5">Tasks</p>
+                  </div>
+                  <div className="p-2.5 bg-sky-50 border border-sky-100 rounded-xl text-center">
+                    <Award className="w-3.5 h-3.5 text-sky-500 mx-auto mb-1" />
+                    <span className="text-lg font-black text-sky-700">{selectedStats.completedOutcomes}</span>
+                    <p className="text-[11px] text-sky-800 font-medium mt-0.5">Outcomes</p>
                   </div>
                 </div>
 
@@ -304,7 +309,7 @@ export const AdminDepartmentsPage: React.FC = () => {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-lg font-bold text-slate-900">
-                {modalMode === 'create' ? 'Create New Department' : `Edit Department (${formCode})`}
+                {modalMode === 'create' ? 'Create New Academic Department' : `Edit Department (${formCode})`}
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
@@ -315,7 +320,7 @@ export const AdminDepartmentsPage: React.FC = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-1">
                   <FormInput
-                    label="Code (e.g. CS)"
+                    label="Code"
                     value={formCode}
                     onChange={(e) => setFormCode(e.target.value.toUpperCase())}
                     placeholder="CSE"
@@ -338,31 +343,10 @@ export const AdminDepartmentsPage: React.FC = () => {
                 <textarea
                   value={formDesc}
                   onChange={(e) => setFormDesc(e.target.value)}
-                  rows={2}
+                  rows={3}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
-                  placeholder="Department focus areas and details..."
+                  placeholder="Department academic focus areas, syllabus links, and internship prerequisites..."
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Assign Head of Department (HOD)
-                </label>
-                <select
-                  value={formHodId}
-                  onChange={(e) => setFormHodId(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none bg-white"
-                >
-                  <option value="">-- No HOD Assigned --</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.firstName} {u.lastName} ({u.role} - {u.email})
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Selecting a user will automatically grant them HOD role permissions within this department.
-                </p>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -380,3 +364,5 @@ export const AdminDepartmentsPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminDepartmentsPage;

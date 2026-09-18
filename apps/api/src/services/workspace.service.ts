@@ -9,8 +9,6 @@ import {
   CreateMentorConcernDto,
   AttentionCaseDto,
   StudentWorkspaceDto,
-  FacultyWorkspaceDto,
-  HODWorkspaceDto,
   MentorWorkspaceDto,
   SubmissionStatus,
   TaskStatus,
@@ -237,15 +235,14 @@ export class WorkspaceService {
     const role = normalizeRole(user.role);
     if (role === UserRole.STUDENT) {
       list = list.filter((s) => s.studentId === user.id);
-    } else if (role === UserRole.FACULTY) {
-      // Filter to internships assigned to this faculty
-      const supervisedIds = new Set(
+    } else if (role === UserRole.MENTOR) {
+      const menteeInternshipIds = new Set(
         Array.from(internshipStore.details.values())
-          .filter((d) => d.facultyId === user.id)
+          .filter((d) => (d as any).industryMentorId === user.id || (d as any).mentorId === user.id || d.mentor?.email === user.email)
           .map((d) => d.id)
       );
-      if (supervisedIds.size > 0) {
-        list = list.filter((s) => supervisedIds.has(s.internshipId));
+      if (menteeInternshipIds.size > 0) {
+        list = list.filter((s) => menteeInternshipIds.has(s.internshipId));
       }
     }
 
@@ -288,8 +285,8 @@ export class WorkspaceService {
     }
 
     const reviewerRole = normalizeRole(reviewerUser.role);
-    if (![UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN, UserRole.MENTOR].includes(reviewerRole)) {
-      throw new ForbiddenError('Only supervisors and industry mentors can submit reviews');
+    if (![UserRole.ADMIN, UserRole.MENTOR].includes(reviewerRole)) {
+      throw new ForbiddenError('Only assigned mentors and administrators can submit reviews');
     }
 
     if (!dto.feedback || !dto.feedback.trim()) {
@@ -363,8 +360,8 @@ export class WorkspaceService {
     }
 
     const role = normalizeRole(mentorUser.role);
-    if (![UserRole.MENTOR, UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN].includes(role)) {
-      throw new ForbiddenError('Only assigned industry mentors or faculty coordinators can modify outcomes');
+    if (![UserRole.MENTOR, UserRole.ADMIN].includes(role)) {
+      throw new ForbiddenError('Only assigned industry mentors or administrators can modify outcomes');
     }
 
     if (!Array.isArray(newOutcomes) || newOutcomes.length === 0) {
@@ -526,8 +523,8 @@ export class WorkspaceService {
     }
 
     const role = normalizeRole(evaluatorUser.role);
-    if (![UserRole.FACULTY, UserRole.HOD, UserRole.ADMIN, UserRole.MENTOR].includes(role)) {
-      throw new ForbiddenError('Only faculty or authorized evaluators can submit evaluations');
+    if (![UserRole.ADMIN, UserRole.MENTOR].includes(role)) {
+      throw new ForbiddenError('Only mentors or administrators can submit evaluations');
     }
 
     const finalGrade = (dto.finalGrade || (dto as any).recommendation || 'A').toString().trim();
@@ -680,10 +677,10 @@ export class WorkspaceService {
     };
   }
 
-  async getFacultyWorkspace(organizationId: string, facultyId: string): Promise<FacultyWorkspaceDto> {
+  async getFacultyWorkspace(organizationId: string, facultyId: string): Promise<Record<string, unknown>> {
     const facultyUser = authStore.users.get(facultyId);
     if (!facultyUser || facultyUser.organizationId !== organizationId) {
-      throw new TenantViolationError('Faculty not found in organization context');
+      throw new TenantViolationError('User not found in organization context');
     }
 
     // Supervised: explicitly assigned or within department
@@ -755,17 +752,17 @@ export class WorkspaceService {
         {
           id: 'act-1',
           action: 'STATUS_SYNC',
-          description: 'Department supervisor records updated',
+          description: 'Supervisor records updated',
           timestamp: new Date().toISOString(),
         },
       ],
     };
   }
 
-  async getHODWorkspace(organizationId: string, hodId: string): Promise<HODWorkspaceDto> {
+  async getHODWorkspace(organizationId: string, hodId: string): Promise<Record<string, unknown>> {
     const hodUser = authStore.users.get(hodId);
     if (!hodUser || hodUser.organizationId !== organizationId) {
-      throw new TenantViolationError('HOD not found in organization context');
+      throw new TenantViolationError('User not found in organization context');
     }
 
     const deptId = hodUser.departmentId;
@@ -773,13 +770,13 @@ export class WorkspaceService {
       (d) => d.organizationId === organizationId && (!deptId || this.isStudentInDept(d.studentId, deptId))
     );
 
-    // Faculty Assignments Loading Matrix
-    const deptFaculty = Array.from(authStore.users.values()).filter(
-      (u) => u.organizationId === organizationId && u.role === UserRole.FACULTY && (!deptId || u.departmentId === deptId)
+    // Mentor Assignments Loading Matrix
+    const deptMentors = Array.from(authStore.users.values()).filter(
+      (u) => u.organizationId === organizationId && u.role === UserRole.MENTOR && (!deptId || u.departmentId === deptId)
     );
 
-    const facultyAssignments = deptFaculty.map((f) => {
-      const assigned = departmentInternships.filter((d) => d.facultyId === f.id);
+    const facultyAssignments = deptMentors.map((f) => {
+      const assigned = departmentInternships.filter((d) => d.mentorId === f.id || (d as any).industryMentorId === f.id);
       return {
         facultyId: f.id,
         facultyName: `${f.firstName} ${f.lastName}`.trim(),

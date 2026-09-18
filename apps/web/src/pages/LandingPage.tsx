@@ -56,7 +56,7 @@ export const LandingPage: React.FC = () => {
             </Button>
           </Link>
           <Link to="/login">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700">
+            <Button variant="dark" size="lg" className="w-full sm:w-auto px-8 font-semibold text-white border-slate-700 bg-slate-800 hover:bg-slate-700 shadow-md">
               Explore Demo Environment
             </Button>
           </Link>

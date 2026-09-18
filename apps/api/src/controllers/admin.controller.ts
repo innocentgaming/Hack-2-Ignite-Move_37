@@ -3,6 +3,7 @@ import { tenantService } from '../services/tenant.service.js';
 import { authService } from '../services/auth.service.js';
 import { auditService } from '../services/audit.service.js';
 import { csvImportService } from '../services/csvImport.service.js';
+import { mentorImportService } from '../services/mentorImport.service.js';
 import { ValidationError, formatSuccessResponse } from '@internos/shared';
 import { UserRole, UserStatus } from '@internos/types';
 
@@ -109,16 +110,7 @@ export class AdminController {
     }
   }
 
-  async assignDepartmentHOD(req: Request, res: Response, next: NextFunction) {
-    try {
-      const orgId = req.organizationId!;
-      const { hodId } = req.body;
-      const dept = await tenantService.assignDepartmentHOD(orgId, req.params.departmentId, hodId || null, req.user?.id);
-      return res.json(formatSuccessResponse(dept));
-    } catch (err) {
-      next(err);
-    }
-  }
+
 
   async getDepartmentStats(req: Request, res: Response, next: NextFunction) {
     try {
@@ -261,6 +253,49 @@ export class AdminController {
   }
 
   // ==========================================
+  // CSV Mentor Bulk Import Pipeline
+  // ==========================================
+
+  async getMentorImportTemplate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const csv = mentorImportService.getCSVTemplate();
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="mentors_import_template.csv"');
+      return res.send(csv);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async parseAndPreviewMentorCSV(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orgId = req.organizationId!;
+      const { csvContent } = req.body;
+      if (!csvContent || typeof csvContent !== 'string') {
+        throw new ValidationError('csvContent string is required in the body');
+      }
+      const preview = await mentorImportService.processMentorCSVPreview(orgId, csvContent);
+      return res.json(formatSuccessResponse(preview));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async confirmMentorCSVImport(req: Request, res: Response, next: NextFunction) {
+    try {
+      const orgId = req.organizationId!;
+      const { previewToken } = req.body;
+      if (!previewToken) {
+        throw new ValidationError('previewToken is required for mentor confirmation');
+      }
+      const result = await mentorImportService.confirmMentorCSVImport(orgId, previewToken, req.user?.id);
+      return res.status(201).json(formatSuccessResponse(result));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // ==========================================
   // Audit Logs
   // ==========================================
 
@@ -298,7 +333,7 @@ export class AdminController {
   async getHODDashboard(req: Request, res: Response, next: NextFunction) {
     try {
       const orgId = req.organizationId!;
-      const metrics = await tenantService.getHODDashboardMetrics(orgId, req.user!.id);
+      const metrics = await tenantService.getAdminDashboardMetrics(orgId);
       return res.json(formatSuccessResponse(metrics));
     } catch (err) {
       next(err);
@@ -308,7 +343,7 @@ export class AdminController {
   async getFacultyDashboard(req: Request, res: Response, next: NextFunction) {
     try {
       const orgId = req.organizationId!;
-      const metrics = await tenantService.getFacultyDashboardMetrics(orgId, req.user!.id);
+      const metrics = await tenantService.getAdminDashboardMetrics(orgId);
       return res.json(formatSuccessResponse(metrics));
     } catch (err) {
       next(err);

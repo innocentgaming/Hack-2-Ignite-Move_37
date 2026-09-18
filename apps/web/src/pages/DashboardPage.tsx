@@ -21,7 +21,6 @@ import {
   BookOpen,
   Copy,
   Check,
-  Users,
   FileSpreadsheet,
   GraduationCap,
   Award,
@@ -189,12 +188,12 @@ export const DashboardPage: React.FC = () => {
             <Card hoverable>
               <CardBody className="p-5 flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-slate-500 uppercase">Total Faculty</span>
-                  <div className="text-2xl font-black text-slate-900 mt-1">{adminMetrics.totalFaculty}</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">Supervisors</div>
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Departments</span>
+                  <div className="text-2xl font-black text-slate-900 mt-1">{adminMetrics.totalDepartments}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">Academic Units</div>
                 </div>
                 <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <Users className="w-5 h-5" />
+                  <BookOpen className="w-5 h-5" />
                 </div>
               </CardBody>
             </Card>
@@ -298,10 +297,8 @@ export const DashboardPage: React.FC = () => {
                       className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                       <option value={UserRole.STUDENT}>STUDENT (Intern)</option>
-                      <option value={UserRole.FACULTY}>FACULTY (Supervisor)</option>
-                      <option value={UserRole.HOD}>HOD (Head of Dept)</option>
-                      <option value={UserRole.MENTOR}>MENTOR (Industry Mentor)</option>
-                      {role === UserRole.ADMIN && <option value={UserRole.ADMIN}>ADMIN (Tenant Admin)</option>}
+                      <option value={UserRole.MENTOR}>MENTOR (Industry / Academic Mentor)</option>
+                      <option value={UserRole.ADMIN}>ADMIN (University Administrator)</option>
                     </select>
                   </div>
 
