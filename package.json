@@ -11,7 +11,7 @@
     "dev": "npm run dev --workspaces",
     "dev:api": "npm run dev --workspace=@internos/api",
     "dev:web": "npm run dev --workspace=@internos/web",
-    "build": "npm run build --workspaces",
+    "build": "npm --workspace=@internos/types run build && npm --workspace=@internos/shared run build && npm --workspace=@internos/api run build && npm --workspace=@internos/web run build",
     "build:api": "npm --workspace=@internos/types run build && npm --workspace=@internos/shared run build && npm --workspace=@internos/api run build",
     "build:web": "npm --workspace=@internos/types run build && npm --workspace=@internos/shared run build && npm --workspace=@internos/web run build",
     "start": "npm run start --workspace=@internos/api",

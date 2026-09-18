@@ -1000,7 +1000,7 @@ export class StudentMentorStore {
       studentId: 'user-ghristu-student-1',
       title: 'CI/CD Pipeline & Staging Deployment Evidence',
       description: 'Automated GitHub Actions workflow building multi-stage Docker images and deployed to staging cloud.',
-      evidenceType: EvidenceType.LIVE_URL,
+      evidenceType: EvidenceType.DEPLOYMENT_URL,
       evidenceUrl: 'https://staging.ghristu-internos.app',
       attachmentName: 'github-actions-pipeline-log.pdf',
       status: SubmissionStatus.SUBMITTED,

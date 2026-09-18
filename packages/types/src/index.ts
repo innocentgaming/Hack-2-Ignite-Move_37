@@ -1426,6 +1426,26 @@ export interface CompletionChecklistDto {
   };
 }
 
+export interface CompletionConfirmationDto {
+  id: string;
+  organizationId: string;
+  internshipId: string;
+  confirmedById: string;
+  confirmedByName: string;
+  notes: string;
+  academicRecommendation?: string;
+  creditsAwarded?: number;
+  confirmedAt: string;
+}
+
+export interface CreateCompletionConfirmationDto {
+  internshipId: string;
+  notes?: string;
+  facultyNotes?: string;
+  academicRecommendation?: string;
+  creditsAwarded?: number;
+}
+
 export interface CompletedInternshipDossierDto {
   internship: InternshipDetailsDto;
   company: {
@@ -1447,6 +1467,7 @@ export interface CompletedInternshipDossierDto {
     completedAt: string;
   };
   finalEvaluation: FinalEvaluationDto;
+  facultyConfirmation?: CompletionConfirmationDto;
   outcomes: ExpectedOutcomeDto[];
   evidenceFiles: SubmissionFileDto[];
   milestoneFeedback: ReviewDto[];
@@ -1751,6 +1772,7 @@ export enum EvidenceType {
   GITHUB_REPO = 'GITHUB_REPO',
   GITHUB_PR = 'GITHUB_PR',
   DEPLOYMENT_URL = 'DEPLOYMENT_URL',
+  LIVE_URL = 'LIVE_URL',
   DOCUMENT = 'DOCUMENT',
   SCREENSHOT = 'SCREENSHOT',
   VIDEO = 'VIDEO',
